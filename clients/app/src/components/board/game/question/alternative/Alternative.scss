@@ -1,0 +1,39 @@
+button {
+  min-height: 50px;
+  &.incorrect.selected {
+    animation-name: bg-color-pulse-incorrect;
+  }
+  &.correct:not(.selected) {
+    animation-name: bg-color-pulse-correct;
+  }
+  &.correct.selected {
+    background-color: green;
+  }
+
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+
+  &.alternative--image {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+}
+
+@keyframes bg-color-pulse-incorrect {
+  0% {
+    background-color: red;
+  }
+  100% {
+    background-color: darkred;
+  }
+}
+
+@keyframes bg-color-pulse-correct {
+  0% {
+    background-color: green;
+  }
+  100% {
+    background-color: darkgreen;
+  }
+}
