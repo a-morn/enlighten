@@ -1,6 +1,6 @@
 const { produce } = require('immer');
 const moment = require('moment');
-const ws = require('../ws');
+const { listGames, getGame } = require('./singleplayer');
 
 let limitBreaks = {};
 
@@ -92,12 +92,10 @@ const getUpdatedLimitBreak = (baseLb, isAnswerCorrect, date) =>
     draftLb.date = date;
   });
 
-const startLoop = () =>
+const limitBreakLoop = () =>
   setInterval(() => {
-    const wss = ws();
-    wss.clients.forEach(wsClient => {
-      const lb =
-        limitBreaks[wsClient.playerId] || defaultLimitBreak(wsClient.playerId);
+    Object.values(listGames()).forEach(({ player: { wsClient, playerId } }) => {
+      const lb = limitBreaks[playerId] || defaultLimitBreak(playerId);
       const updatedLb = produce(lb, draftLb => {
         draftLb.charge = Math.max(
           0,
@@ -107,29 +105,31 @@ const startLoop = () =>
         draftLb.status = getUpdatedStatus(draftLb);
       });
       wsClient.send(
-        JSON.stringify({ type: 'limit-break', payload: updatedLb })
+        JSON.stringify({
+          resource: 'limit-break',
+          method: 'PUT',
+          payload: updatedLb
+        })
       );
-      limitBreaks[wsClient.playerId] = updatedLb;
+      limitBreaks[playerId] = updatedLb;
     });
   }, 500);
 
-const updateLimitBreakOnAnswer = (playerIdToUpdate, isAnswerCorrect, date) => {
-  const wss = ws();
-  console.log(wss.clients, playerIdToUpdate);
-  const wsClient = Array.from(wss.clients).find(
-    ({ playerId }) => playerId === playerIdToUpdate
-  );
+const updateLimitBreakOnAnswer = (gameId, isAnswerCorrect, date) => {
+  const {
+    player: { wsClient, playerId }
+  } = getGame(gameId);
 
   const updatedLb = getUpdatedLimitBreak(
-    limitBreaks[wsClient.playerId] || defaultLimitBreak(playerIdToUpdate),
+    limitBreaks[playerId] || defaultLimitBreak(playerId),
     isAnswerCorrect,
     date
   );
-  limitBreaks[wsClient.playerId] = updatedLb;
+  limitBreaks[playerId] = updatedLb;
   wsClient.send(JSON.stringify({ type: 'limit-break', payload: updatedLb }));
 };
 
 module.exports = {
-  startLoop,
+  limitBreakLoop,
   updateLimitBreakOnAnswer
 };

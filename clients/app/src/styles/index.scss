@@ -1,15 +1,21 @@
 @tailwind base;
 
+h2 {
+  @apply text-xl;
+}
+
 @tailwind components;
 
 @tailwind utilities;
 
 strong {
-	font-weight: 700;
+  font-weight: 700;
 }
 em {
-	font-style: italic;
-	font-weight: 300;
+  font-style: italic;
+  font-weight: 300;
 }
 
-.bg-origin-content { background-origin: content-box; }
+.bg-origin-content {
+  background-origin: content-box;
+}

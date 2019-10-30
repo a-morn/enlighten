@@ -1,4 +1,4 @@
-const NotFoundError = require('./exceptions/not-found-error');
+const NotFoundError = require('./exceptions/not-found');
 
 const errorHandledAction = (res, action) => {
   try {
