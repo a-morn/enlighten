@@ -44,7 +44,7 @@ function CategoryPicker({
 
   useEffect(() => {})
 
-  let buttonClasses = 'bg-blue-500 text-white font-bold py-2 px-4 rounded'
+  let buttonClasses = 'bg-blue-500 text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
 
   const disabled =
     disabledCategories.some(c => c === category) ||
@@ -57,11 +57,11 @@ function CategoryPicker({
     buttonClasses += ' hover:bg-blue-700'
   }
   return (
-    <div className={`flex flex-col justify-center ${className}`}>
+    <div className={`flex flex-col md:flex-row justify-center ${className}`}>
       {isNameUsed && (
         <Fragment>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+            className="shadow appearance-none border rounded w-full py-6 px-3 text-gray-700 leading-tight focus:outline-none"
             placeholder="Enter your name"
             onChange={({ target: { value: name } }) => setName(name)}
           />
@@ -72,7 +72,6 @@ function CategoryPicker({
           if (onChange) {
             onChange(category)
           }
-          console.log(category)
           setCategory(category)
         }}
         categories={categories}

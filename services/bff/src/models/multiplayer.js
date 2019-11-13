@@ -1,4 +1,8 @@
-const NotFoundError = require('../exceptions/not-found');
+const {
+  PlayerNotFoundError,
+  GameNotFoundError,
+  GameRequestNotFoundError
+} = require('../errors');
 const shuffle = require('shuffle-array');
 const { getQuestion } = require('./questions');
 const periodicTable = require('../data/questions/periodic-table');
@@ -18,7 +22,29 @@ const addPlayer = (category, name) => {
   return playerId;
 };
 
-const sendTo = (
+const answerQuestion = (gameId, playerId, answerId, questionId) => {
+  // Need a lock?
+  let gameEnded = false;
+  const game = getGameById(gameId);
+  if (questionId === game.lastQuestionId) {
+    const question = getQuestion(game.lastQuestionId);
+    const player = getPlayerInGameById(gameId, playerId);
+    const correct = answerId === question.answer;
+    player.score += correct ? 1 : -1;
+    if (player.score >= 1) {
+      player.winner = true;
+      gameEnded = true;
+    }
+
+    sendToGame(gameId, 'answers', 'POST', { correctAnswerId: question.answer });
+    sendToGame(gameId, 'players', 'PATCH', { players: game.players });
+  } else {
+    console.log(`Tried to answer invalid question`);
+  }
+  return gameEnded;
+};
+
+const sendToLobby = (
   resource,
   method,
   payload,
@@ -30,6 +56,7 @@ const sendTo = (
     )
     .filter(p => !exclude.includes(p.playerId))
     .filter(p => !include || include.includes(p.playerId))
+    .filter(({ wsClient }) => wsClient)
     .forEach(({ wsClient }) =>
       wsClient.send(
         JSON.stringify({
@@ -41,12 +68,23 @@ const sendTo = (
     );
 };
 
-const sendToPlayerId = (resource, method, payload, playerId) => {
-  const player = players.find(p => p.playerId === playerId);
-
-  if (!player) {
-    throw NotFoundError(`No player with id ${playerId}`);
-  }
+const sendToGame = (gameId, resource, method, payload, playerId = null) => {
+  const game = getGameById(gameId);
+  game.players
+    .filter(p => !playerId || p.playerId === playerId)
+    .forEach(({ wsClient, playerId }) => {
+      console.log(`sending to ${playerId}`);
+      wsClient.send(
+        JSON.stringify({
+          resource,
+          method,
+          payload
+        })
+      );
+    });
+};
+const sendToLobbyPlayerId = (resource, method, payload, playerId) => {
+  const player = getPlayerById(playerId);
 
   player.wsClient.send(
     JSON.stringify({
@@ -60,7 +98,7 @@ const sendToPlayerId = (resource, method, payload, playerId) => {
 const getNextQuestionId = gameId => {
   const game = getGameById(gameId);
   if (!game) {
-    throw NotFoundError(`No game with id ${gameId}`);
+    throw new GameNotFoundError(`No game with id ${gameId}`);
   }
   const { lastQuestionId, levels } = game;
   const questionId = shuffle(
@@ -74,19 +112,12 @@ const getNextQuestionId = gameId => {
 };
 
 const connectPlayerToWsLobby = (playerId, wsClient) => {
-  const player = players.find(p => p.playerId === playerId);
+  const player = getPlayerById(playerId);
   player.wsClient = wsClient;
 };
 
 const connectPlayerToWsGame = (playerId, gameId, wsClient) => {
-  const game = getGameById(gameId);
-  if (!game) {
-    throw NotFoundError(`No such game: ${gameId}`);
-  }
-  const player = game.players.find(p => p.playerId === playerId);
-  if (!player) {
-    throw NotFoundError(`No such player in game: ${playerId}`);
-  }
+  const player = getPlayerInGameById(gameId, playerId);
   player.wsClient = wsClient;
 };
 
@@ -105,23 +136,32 @@ const deletePlayer = playerIdToDelete => {
   );
 
   if (index === -1) {
-    throw NotFoundError('No such player');
+    throw new PlayerNotFoundError('No such player');
   }
 
   const { category: onlyToCategory } = players[index];
 
   players.splice(index, 1);
-  sendTo('players', 'DELETE', [{ playerId: playerIdToDelete }], {
+  sendToLobby('players', 'DELETE', [{ playerId: playerIdToDelete }], {
     onlyToCategory
   });
 };
 
 const getPlayerById = playerId => {
-  return players.find(p => p.playerId === playerId);
+  const player = players.find(p => p.playerId === playerId);
+  if (!player) {
+    throw new PlayerNotFoundError(`No such player in game: ${playerId}`);
+  }
+
+  return player;
 };
 
 const getGameById = gameId => {
-  return games.find(g => g.gameId === gameId);
+  const game = games.find(g => g.gameId === gameId);
+  if (!game) {
+    throw new GameNotFoundError(`No game with id ${gameId}`);
+  }
+  return game;
 };
 
 const getPlayersInGame = gameId => {
@@ -131,16 +171,28 @@ const getPlayersInGame = gameId => {
 
 const getPlayerInGameById = (gameId, playerId) => {
   const game = getGameById(gameId);
-  return game.players.find(p => p.playerId === playerId);
+  const player = game.players.find(p => p.playerId === playerId);
+  if (!player) {
+    throw new PlayerNotFoundError(`No such player in game: ${playerId}`);
+  }
+
+  return player;
 };
 
 const sendNextQuestion = gameId => {
   const questionId = getNextQuestionId(gameId);
+  const game = getGameById(gameId);
+  game.lastQuestionId = questionId;
   const { answer, record, ...question } = getQuestion(questionId);
-  const playerIdsInGame = getPlayersInGame(gameId).map(
-    ({ playerId }) => playerId
-  );
-  sendTo('questions', 'POST', question, { include: playerIdsInGame });
+  sendToGame(gameId, 'questions', 'POST', question);
+};
+
+const sendCurrentQuestion = (gameId, playerId) => {
+  const { lastQuestionId } = getGameById(gameId);
+  if (lastQuestionId) {
+    const { answer, record, ...question } = getQuestion(lastQuestionId);
+    sendToGame(gameId, 'questions', 'POST', question, playerId);
+  }
 };
 
 const handleIncomingMessageGame = (
@@ -153,18 +205,18 @@ const handleIncomingMessageGame = (
     case 'answers': {
       switch (method) {
         case 'POST': {
-          const { answerId } = payload;
-          const correctAnswerId = answerId;
-          ws.send(
-            JSON.stringify({
-              resource: 'answers',
-              method: 'POST',
-              payload: { correctAnswerId }
-            })
+          const { answerId, questionId } = payload;
+          const gameEnded = answerQuestion(
+            gameId,
+            playerId,
+            answerId,
+            questionId
           );
-          setTimeout(() => {
-            sendNextQuestion(gameId);
-          }, 300);
+          if (!gameEnded) {
+            setTimeout(() => {
+              sendNextQuestion(gameId);
+            }, 300);
+          }
           break;
         }
       }
@@ -176,9 +228,19 @@ const handleIncomingMessageGame = (
           const { status } = payload;
           const player = getPlayerInGameById(gameId, playerId);
           player.status = status;
-          if (allPlayersConnected(gameId)) {
-            sendNextQuestion(gameId);
-          }
+          break;
+        }
+        case 'GET': {
+          const game = getGameById(gameId);
+          sendToGame(gameId, 'players', 'POST', { players: game.players });
+        }
+      }
+      break;
+    }
+    case 'questions': {
+      switch (method) {
+        case 'GET': {
+          sendCurrentQuestion(gameId, playerId);
         }
       }
     }
@@ -202,13 +264,6 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
         case 'DELETE': {
           const { playerId } = payload;
           deletePlayer(playerId);
-          ws.send(
-            JSON.stringify({
-              resource: 'players',
-              method: 'DELETE',
-              payload: [{ playerId }]
-            })
-          );
           break;
         }
         case 'PUT': {
@@ -216,8 +271,8 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
           const player = getPlayerById(playerId);
           player.category = category;
           player.name = name;
-          sendTo('players', 'DELETE', [player]);
-          sendTo('players', 'POST', [player]);
+          sendToLobby('players', 'DELETE', [player]);
+          sendToLobby('players', 'POST', [player]);
         }
       }
       break;
@@ -234,7 +289,7 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
             gameRequestId
           });
           const { name: playerRequestName } = getPlayerById(playerRequestId);
-          sendToPlayerId(
+          sendToLobbyPlayerId(
             'game-requests',
             'POST',
             { playerRequestId, playerRequestName, gameRequestId },
@@ -252,12 +307,17 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
           if (accepted) {
             const gameId = Math.random();
             const playerIdsInGame = [playerRequestId, playerOfferedId];
-            console.log(allQuestions[category]);
             games.push({
               gameId,
-              players: playerIdsInGame.map(playerId => ({ playerId })),
+              players: playerIdsInGame.map(playerId => ({
+                playerId,
+                score: 0,
+                winner: false,
+                name: getPlayerById(playerId).name
+              })),
               category,
-              levels: allQuestions[category]
+              levels: allQuestions[category],
+              started: false
             });
             const playersInGame = players.filter(p =>
               playerIdsInGame.includes(p.playerId)
@@ -265,8 +325,13 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
 
             playersInGame.forEach(p => (p.status = 'IN_GAME'));
 
-            sendTo('games', 'POST', { gameId }, { include: playerIdsInGame });
-            sendTo('players', 'PUT', [playersInGame], {
+            sendToLobby(
+              'games',
+              'POST',
+              { gameId },
+              { include: playerIdsInGame }
+            );
+            sendToLobby('players', 'PUT', [playersInGame], {
               onlyToCategory: category
             });
           } else {
@@ -275,13 +340,13 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
             );
 
             if (index === -1) {
-              throw NotFoundError('No such game request');
+              throw new GameRequestNotFoundError('No such game request');
             }
 
             const { playerRequestId } = gameRequests[index];
 
             players.splice(index, 1);
-            sendToPlayerId(
+            sendToLobbyPlayerId(
               'game-requests',
               'DELETE',
               [{ gameRequestId }],
@@ -297,12 +362,12 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
           );
 
           if (index === -1) {
-            throw NotFoundError('No such game request');
+            throw new GameNotFoundError('No such game request');
           }
 
           const { playerRequestId } = gameRequests[index];
 
-          sendToPlayerId(
+          sendToLobbyPlayerId(
             'game-requests',
             'DELETE',
             [{ gameRequestId }],
@@ -329,21 +394,40 @@ const handleIncomingMessageLobby = (ws, { resource, method, payload }) => {
       break;
     }
     default:
-      console.log(`Unsupported resource ${resource}`);
+      console.error(`Unsupported resource ${resource}`);
   }
 };
 
 const cleanUpLoop = () => {
   setInterval(() => {
-    const playersToRemove = players
-      .filter(({ wsClient }) => wsClient)
-      .filter(({ wsClient: { readyState, OPEN } }) => readyState !== OPEN);
+    const playersToRemove = players.filter(
+      ({ wsClient }) => !wsClient || wsClient.readyState === wsClient.CLOSED
+    );
 
     players = players.filter(p => !playersToRemove.includes(p));
 
+    if (playersToRemove.length) {
+      console.log(
+        `Removing players ${playersToRemove.map(({ playerId }) => playerId)}`
+      );
+    }
     playersToRemove.forEach(({ playerId, name, category }) =>
-      sendTo('players', 'DELETE', [{ playerId, name }], { category })
+      sendToLobby('players', 'DELETE', [{ playerId, name }], { category })
     );
+  }, 1000);
+};
+
+const startGameLoop = () => {
+  setInterval(() => {
+    games
+      .filter(({ started }) => !started)
+      .forEach(g => {
+        if (allPlayersConnected(g.gameId)) {
+          sendNextQuestion(g.gameId);
+          g.started = true;
+          console.log(`Started game ${g.gameId}`);
+        }
+      });
   }, 1000);
 };
 
@@ -355,5 +439,6 @@ module.exports = {
   connectPlayerToWsGame,
   handleIncomingMessageLobby,
   handleIncomingMessageGame,
-  cleanUpLoop
+  cleanUpLoop,
+  startGameLoop
 };

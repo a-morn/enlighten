@@ -29,10 +29,10 @@ const Question = React.memo(
   }) => {
     return (
       <div className={`${className}`}>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center text-gray-900">
           {questionHeading(type, src, text)}
         </div>
-        <ul className="question__alternatives">
+        <ul className="question__alternatives shadow-lg">
           {alternatives.map((alt, i) => (
             <li key={i}>
               <Alternative

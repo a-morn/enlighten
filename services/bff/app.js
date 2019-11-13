@@ -6,7 +6,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const ws = require('./src/ws');
 const { limitBreakLoop } = require('./src/models/singleplayer');
-const { cleanUpLoop } = require('./src/models/multiplayer');
+const { cleanUpLoop, startGameLoop } = require('./src/models/multiplayer');
 
 const app = express();
 ws(app);
@@ -29,5 +29,6 @@ app.use('/categories', categoriesRouter);
 
 limitBreakLoop();
 cleanUpLoop();
+startGameLoop();
 
 module.exports = app;

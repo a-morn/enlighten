@@ -1,64 +1,68 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import PlayerList from './player-list'
 import GameRequestModal from './game-request-modal'
 import CategoryPicker from '../category-picker'
 import { withRouter, useParams } from 'react-router-dom'
+import useWebSocket from 'react-use-websocket'
 
-let socket
+const CONNECTION_STATUS_OPEN = 1;
 
-function Lobby({ history }) {
+function Lobby({ history, playerId, removePlayerId }) {
+	const [socketUrl, setSocketUrl] = useState(`ws://${process.env.REACT_APP_BFF_URL}/ws`);
+
+	const playerIdRef = useRef(null)
+	playerIdRef.current = playerId
+	
+	const options = useMemo(() => ({
+		share: true,
+		onClose: e => console.log('onClose', e),
+		onError: e => console.log('onError', e),
+		onOpen: e => console.log('onOpen', e),
+		queryParams: { type: 'lobby', playerId }
+	}), [playerId])
+  const [sendMessage, lastMessage, readyState] = useWebSocket(socketUrl, options);
   const [category, setCategory] = useState()
-  const [playerId, setPlayerId] = useState()
   const [players, setPlayers] = useState([])
   const [gameRequest, setGameRequest] = useState()
   const [requestPending, setRequestPending] = useState(false)
   const { category: categoryFromParams } = useParams()
 
   const leave = useCallback(async () => {
-    socket.send(
-      JSON.stringify({
-        method: 'PUT',
-        resource: 'players',
-        payload: { playerId },
-      }),
-    )
     setPlayers(players => players.filter(p => p.playerId !== playerId))
   }, [playerId])
+
+	useEffect(() => {
+    return () => {
+      leave()
+    }
+	}, [])
 
   if (!category && categoryFromParams) {
     setCategory(categoryFromParams)
   }
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch(
-        `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/multiplayer/players`,
-        { method: 'POST', headers: { Accept: 'application/json' } },
-      )
-      const { playerId } = await response.json()
-      setPlayerId(playerId)
-    }
-
-    if (!playerId) {
-      fetchData()
-    }
-  }, [playerId])
-
-  useEffect(() => {
+		let subscribed = true
     async function fetchData() {
       const response = await fetch(
         `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/multiplayer/players?category=${category}`,
       )
       const result = await response.json()
-      setPlayers(result)
+			if (subscribed) { 
+				setPlayers(result)
+			}
     }
 
     fetchData()
+
+		return () => {
+			subscribed = false
+		}
   }, [category])
 
   const joinLobby = useCallback(
     name => {
-      socket.send(
+      sendMessage(
         JSON.stringify({
           resource: 'players',
           method: 'PUT',
@@ -73,90 +77,86 @@ function Lobby({ history }) {
     [category, playerId],
   )
 
-  useEffect(() => {
-    if (!playerId) return
-    socket = new WebSocket(
-      `ws://${process.env.REACT_APP_BFF_URL}/ws?type=lobby&playerId=${playerId}`,
-    )
-    socket.onmessage = ({ data }) => {
-      const { resource, method, payload } = JSON.parse(data)
-      switch (resource) {
-        case 'players':
-          switch (method) {
-            case 'POST':
-              if (Array.isArray(payload)) {
-                setPlayers(players =>
-                  players.concat(
-                    payload
-                      .filter(p => p.category === category)
-                      .filter(
-                        p => !players.some(p2 => p2.playerId === p.playerId),
-                      ),
-                  ),
-                )
-              } else {
-                throw Error(`Payload type not supported`)
-              }
-              break
-            case 'DELETE': {
-              setPlayers(players =>
-                players.filter(
-                  p =>
-                    !payload
-                      .filter(p => p.category === category)
-                      .some(p2 => p2.playerId === p.playerId),
-                ),
-              )
-              break
-            }
-            default: {
-              throw Error(`Method ${method} mot supported for ${resource}`)
-            }
-          }
-          break
-        case 'game-requests': {
-          switch (method) {
-            case 'POST': {
-              console.log(payload)
-              setGameRequest(payload)
-              break
-            }
-            case 'DELETE': {
-              setRequestPending(false)
-              break
-            }
-            default: {
-              throw Error(`Method ${method} mot supported for ${resource}`)
-            }
-          }
-          break
-        }
-        case 'games': {
-          switch (method) {
-            case 'POST': {
-              const { gameId } = payload
-              history.push(`/multiplayer/${gameId}/${playerId}`)
-              break
-            }
-            default: {
-              throw Error(`Method ${method} mot supported for ${resource}`)
-            }
-          }
-          break
-        }
-        default:
-          throw Error(`Unsuported resource: ${resource}`)
-      }
-    }
-    return () => {
-      leave()
-      socket.close()
-    }
-  }, [playerId, category, history, leave])
+	useEffect(() => {
+		if (!lastMessage) {
+			return
+		}
+		const { resource, method, payload } = JSON.parse(lastMessage.data)
+		switch (resource) {
+			case 'players':
+				switch (method) {
+					case 'POST':
+						if (Array.isArray(payload)) {
+							setPlayers(players =>
+								players.concat(
+									payload
+										.filter(p => p.category === category)
+										.filter(
+											p => !players.some(p2 => p2.playerId === p.playerId),
+										),
+								),
+							)
+						} else {
+							throw Error(`Payload type not supported`)
+						}
+						break
+					case 'DELETE': {
+						if (payload === playerId) {
+							removePlayerId()	
+						} else if (Array.isArray(payload)) {
+							setPlayers(players =>
+								players.filter(
+									p =>
+										!payload
+											.some(p2 => p2.playerId === p.playerId),
+								),
+							)
+						}
+						break
+					}
+					default: {
+						throw Error(`Method ${method} mot supported for ${resource}`)
+					}
+				}
+				break
+			case 'game-requests': {
+				switch (method) {
+					case 'POST': {
+						console.log(payload)
+						setGameRequest(payload)
+						break
+					}
+					case 'DELETE': {
+						setRequestPending(false)
+						break
+					}
+					default: {
+						throw Error(`Method ${method} mot supported for ${resource}`)
+					}
+				}
+				break
+			}
+			case 'games': {
+				switch (method) {
+					case 'POST': {
+						const { gameId } = payload
+						history.push(`/multiplayer/${gameId}/${playerId}`)
+						break
+					}
+					default: {
+						throw Error(`Method ${method} mot supported for ${resource}`)
+					}
+				}
+				break
+			}
+			default:
+				throw Error(`Unsuported resource: ${resource}`)
+		}
+  }, [category, history, leave, lastMessage])
 
   const requestGame = useCallback(
     playerOfferedId => {
-      socket.send(
+      sendMessage(
         JSON.stringify({
           resource: 'game-requests',
           method: 'POST',
@@ -174,7 +174,7 @@ function Lobby({ history }) {
 
   const declineRequestGame = useCallback(() => {
     const { gameRequestId } = gameRequest
-    socket.send(
+    sendMessage(
       JSON.stringify({
         resource: 'game-requests',
         method: 'DELETE',
@@ -188,7 +188,7 @@ function Lobby({ history }) {
 
   const onAccept = useCallback(() => {
     const { gameRequestId } = gameRequest
-    socket.send(
+    sendMessage(
       JSON.stringify({
         resource: 'game-requests',
         method: 'PUT',
@@ -207,7 +207,7 @@ function Lobby({ history }) {
   )
 
   let leaveLobbyButtonClassName =
-    'bg-red-500 text-white rounded px-4 mt-10 disabled:opacity-50'
+    'hover:bg-red-600 bg-red-500 text-white rounded px-4 mt-4 disabled:opacity-50 shadow-lg p-6 md:p-4'
 
   if (!joinedCurrentCategory) {
     leaveLobbyButtonClassName += ' cursor-not-allowed opacity-50'
@@ -222,9 +222,10 @@ function Lobby({ history }) {
   const memoSetCategory = useCallback(c => setCategory(c), [])
 
   return (
-    <div className="flex">
-      <div className="w-64">
+    <div className="flex flex-col">
+      <div className="flex flex-col">
         <CategoryPicker
+					className=""
           onClick={joinLobby}
           buttonLabel={'Join lobby'}
           disabledCategories={disabledCategories}
@@ -233,26 +234,27 @@ function Lobby({ history }) {
           isNameUsed={true}
           autoPick
         />
-        <button
+        { joinedCurrentCategory && <button
           className={leaveLobbyButtonClassName}
-          onClick={leave}
-          disabled={!joinedCurrentCategory}
+          onClick={leave} 
         >
           Leave lobby
-        </button>
+        </button> }
         <GameRequestModal
           show={gameRequest}
           onDecline={declineRequestGame}
           onAccept={onAccept}
+					playerRequestName={gameRequest && gameRequest.playerRequestName}
         />
-        {requestPending && <p>Waiting for player to accept challange</p>}
+        {requestPending && <p className="p-4">Waiting for player to accept challange...</p>}
       </div>
+			<div className="mt-4">
       <PlayerList
-        className="w-2/3"
         players={players}
         onClick={requestGame}
         currentPlayerId={playerId}
       />
+			</div>
     </div>
   )
 }

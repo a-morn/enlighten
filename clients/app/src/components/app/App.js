@@ -1,6 +1,6 @@
 import React, { StrictMode, Fragment } from 'react'
 import Singleplayer from '../singleplayer'
-import Lobby from '../lobby'
+import LobbyLogin from '../lobby-login'
 import Header from '../header'
 import About from '../about'
 import Multiplayer from '../multiplayer'
@@ -10,18 +10,18 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 function App() {
   return (
     <StrictMode>
-      <div className="h-screen flex flex-col">
+      <div className="h-screen flex flex-col bg-gray-100">
         <Router>
           <Header />
           <Switch>
-            <Fragment>
-              <section className="m-auto w-1/2">
+            <div className="m:p-6 md:m-auto max-w-full">
+              <section className="p-8">
                 <SessionProvider>
                   <Route path="/(|singleplayer)/">
                     <Singleplayer />
                   </Route>
                   <Route path="/lobby/:category?">
-                    <Lobby />
+                    <LobbyLogin />
                   </Route>
                   <Route path="/multiplayer/:gameId/:playerId">
                     <Multiplayer />
@@ -31,7 +31,7 @@ function App() {
                   <About />
                 </Route>
               </section>
-            </Fragment>
+            </div>
           </Switch>
         </Router>
       </div>

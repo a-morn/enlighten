@@ -7,7 +7,7 @@ const allQuestions = {
   'periodic-table': periodicTable
 };
 const { getQuestion } = require('./questions');
-const NotFoundError = require('../exceptions/not-found');
+const NotFoundError = require('../errors/not-found');
 const { produce } = require('immer');
 const moment = require('moment');
 
@@ -34,11 +34,13 @@ const chargeDecreasePerSecondByStatus = status => {
 
 const getUpdatedLevel = lb => {
   switch (lb.status) {
-    case 'charging':
+    case 'charging': {
       return lb.internalLevel;
+    }
     case 'charged':
-    case 'decharge':
+    case 'decharge': {
       return lb.internalLevel + lb.charge;
+    }
     default:
       return 0;
   }
@@ -46,13 +48,14 @@ const getUpdatedLevel = lb => {
 
 const getUpdatedStatus = (lb, now) => {
   switch (lb.status) {
-    case 'charging':
+    case 'charging': {
       if (lb.streak > 5 && lb.charge > 5) {
         return 'charged';
       } else {
         return lb.status;
       }
-    case 'charged':
+    }
+    case 'charged': {
       if (lb.streak === 0 && lb.charge < 5) {
         return 'charging';
       } else if (
@@ -64,12 +67,14 @@ const getUpdatedStatus = (lb, now) => {
       } else {
         return lb.status;
       }
-    case 'decharge':
+    }
+    case 'decharge': {
       if (lb.charge <= 0) {
         return 'charging';
       } else {
         return lb.status;
       }
+    }
     default:
       return 'charging';
   }

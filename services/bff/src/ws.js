@@ -11,6 +11,7 @@ const {
   connectPlayerToWsGame,
   handleIncomingMessageGame
 } = require('./models/multiplayer');
+const { PlayerNotFoundError, GameNotFoundError } = require('./errors');
 
 let wss;
 
@@ -42,28 +43,103 @@ module.exports = app => {
           break;
         }
         case 'multiplayer': {
-          connectPlayerToWsGame(parseFloat(playerId), parseFloat(gameId), ws);
+          try {
+            connectPlayerToWsGame(parseFloat(playerId), parseFloat(gameId), ws);
+          } catch (e) {
+            console.error(e);
+            console.log(e);
+            if (e instanceof PlayerNotFoundError) {
+              ws.send(
+                JSON.stringify({
+                  resource: 'players',
+                  method: 'DELETE',
+                  playerId: parseFloat(playerId)
+                })
+              );
+            } else if (e instanceof GameNotFoundError) {
+              ws.send(
+                JSON.stringify({
+                  resource: 'games',
+                  method: 'DELETE',
+                  playerId: parseFloat(gameId)
+                })
+              );
+            }
+          }
           ws.on('message', data => {
             if (data) {
               console.log(
                 `Multiplayer - gameId: ${gameId} - playerId ${playerId} - data ${data}`
               );
-              handleIncomingMessageGame(
-                parseFloat(playerId),
-                parseFloat(gameId),
-                ws,
-                JSON.parse(data)
-              );
+              try {
+                handleIncomingMessageGame(
+                  parseFloat(playerId),
+                  parseFloat(gameId),
+                  ws,
+                  JSON.parse(data)
+                );
+              } catch (e) {
+                if (e instanceof PlayerNotFoundError) {
+                  console.error(e);
+                  console.log(e);
+                  ws.send(
+                    JSON.stringify({
+                      resource: 'players',
+                      method: 'DELETE',
+                      playerId: parseFloat(playerId)
+                    })
+                  );
+                } else if (e instanceof GameNotFoundError) {
+                  console.error(e);
+                  console.log(e);
+                  ws.send(
+                    JSON.stringify({
+                      resource: 'games',
+                      method: 'DELETE',
+                      playerId: parseFloat(gameId)
+                    })
+                  );
+                } else {
+                  throw e;
+                }
+              }
             }
           });
           break;
         }
         case 'lobby': {
-          connectPlayerToWsLobby(parseFloat(playerId), ws);
+          try {
+            connectPlayerToWsLobby(parseFloat(playerId), ws);
+          } catch (e) {
+            if (e instanceof PlayerNotFoundError) {
+              ws.send(
+                JSON.stringify({
+                  resource: 'players',
+                  method: 'DELETE',
+                  playerId: parseFloat(playerId)
+                })
+              );
+            } else {
+              throw e;
+            }
+          }
           ws.on('message', data => {
             if (data) {
-              console.log(`Lobby - playerId ${playerId} - data ${data}`);
-              handleIncomingMessageLobby(ws, JSON.parse(data));
+              try {
+                handleIncomingMessageLobby(ws, JSON.parse(data));
+              } catch (e) {
+                if (e instanceof PlayerNotFoundError) {
+                  ws.send(
+                    JSON.stringify({
+                      resource: 'players',
+                      method: 'DELETE',
+                      playerId: parseFloat(playerId)
+                    })
+                  );
+                } else {
+                  throw e;
+                }
+              }
             }
           });
           break;

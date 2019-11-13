@@ -5,14 +5,16 @@ import MultiplayerGame from './multiplayer-game'
 function Multiplayer({ history }) {
   const { gameId, playerId } = useParams()
 
-  const deleteGame = () => null
+  const gameDeleted = () => {
+		history.push('/lobby')
+	}
 
   return (
     <div className="flex">
       <MultiplayerGame
         gameId={gameId}
         playerId={playerId}
-        deleteGame={deleteGame}
+        gameDeleted={gameDeleted}
       />
     </div>
   )

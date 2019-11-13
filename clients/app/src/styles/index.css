@@ -1,9 +1,5 @@
 @tailwind base;
 
-h2 {
-  @apply text-xl;
-}
-
 @tailwind components;
 
 @tailwind utilities;
