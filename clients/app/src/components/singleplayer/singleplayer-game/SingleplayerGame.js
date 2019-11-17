@@ -1,16 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import LimitBreak from './limit-break'
 import Question from '../../question'
-import useWebSocket from 'react-use-websocket';
+import useWebSocket from 'react-use-websocket'
 
-const CONNECTION_STATUS_CONNECTING = 0;
-const CONNECTION_STATUS_OPEN = 1;
-const CONNECTION_STATUS_CLOSING = 2;
-const CONNECTION_STATUS_CLOSED = 3;
+const CONNECTION_STATUS_OPEN = 1
 
 function Game({ playerId, gameId, deleteGame }) {
-	const [socketUrl, setSocketUrl] = useState(`ws://${process.env.REACT_APP_BFF_URL}/ws?type=singleplayer&playerId=${playerId}&gameId=${gameId}`)
-	const [sendMessage, lastMessage, readyState] = useWebSocket(socketUrl)
+  const options = useMemo(
+    () => ({
+      share: true,
+      queryParams: {
+        type: 'singleplayer',
+        playerId,
+        gameId,
+      },
+    }),
+    [gameId, playerId],
+  )
+  const [sendMessage, lastMessage, readyState] = useWebSocket(
+    process.env.REACT_APP_WS_URL,
+    options,
+  )
   const [question, setQuestion] = useState()
   const [selectedAlternativeId, setSelectedAlternativeId] = useState()
   const [correctAlternativeId, setCorrectAlternativeId] = useState()
@@ -33,80 +43,75 @@ function Game({ playerId, gameId, deleteGame }) {
   ] = useState(false)
 
   useEffect(() => {
-    setSocketUrl(`ws://${process.env.REACT_APP_BFF_URL}/ws?type=singleplayer&playerId=${playerId}&gameId=${gameId}`,
-    )
-  }, [gameId, playerId])
+    if (readyState === CONNECTION_STATUS_OPEN) {
+      sendMessage(
+        JSON.stringify({
+          method: 'GET',
+          resource: 'questions',
+        }),
+      )
+    }
+  }, [readyState, sendMessage])
 
   useEffect(() => {
-		if(readyState === CONNECTION_STATUS_OPEN) {
-			sendMessage(
-				JSON.stringify({
-					method: 'GET',
-					resource: 'questions',
-				}),
-			)
-		}
-	}, [readyState])
-
-  useEffect(() => {
-		if (!lastMessage) {
-			return
-		}
-		console.log(lastMessage)
-		const { resource, method, payload } = JSON.parse(lastMessage.data)
-		switch (resource) {
-			case 'limit-break':
-				switch (method) {
-					case 'PUT': {
-						const { level, status, charge } = payload
-						setLimitBreakLevel(level)
-						setLimitBreakStatus(status)
-						setLimitBreakCharge(charge)
-						if (status !== 'charged') {
-							setLimitBreakHasAchievedGodlike(false)
-							setLimitBreakHasAchievedDominating(false)
-							setLimitBreakHasAchievedRampage(false)
-						}
-						break
-					}
-					default: {
-						throw Error(`Unsupported method ${method}`)
-					}
-				}
-				break
-			case 'answers': {
-				switch (method) {
-					case 'POST': {
-						const { correctAnswerId } = payload
-						setCorrectAlternativeId(correctAnswerId)
-						break
-					}
-					default: {
-						throw Error(`Unsupported method ${method}`)
-					}
-				}
-				break
-			}
-			case 'questions': {
-				switch (method) {
-					case 'POST': {
-						setCorrectAlternativeId(null)
-						setSelectedAlternativeId(null)
-						setQuestion(payload)
-						setIsLoading(false)
-						setLimitBreakTimerActive(true)
-						break
-					}
-					default: {
-						throw Error(`Unsupported method ${method}`)
-					}
-				}
-				break
-			}
-			default:
-				throw Error(`Unsuported resource: ${resource}`)
-		}
-	}, [lastMessage])
+    if (!lastMessage) {
+      return
+    }
+    console.log(lastMessage)
+    const { resource, method, payload } = JSON.parse(lastMessage.data)
+    switch (resource) {
+      case 'limit-break':
+        switch (method) {
+          case 'PUT': {
+            const { level, status, charge } = payload
+            setLimitBreakLevel(level)
+            setLimitBreakStatus(status)
+            setLimitBreakCharge(charge)
+            if (status !== 'charged') {
+              setLimitBreakHasAchievedGodlike(false)
+              setLimitBreakHasAchievedDominating(false)
+              setLimitBreakHasAchievedRampage(false)
+            }
+            break
+          }
+          default: {
+            throw Error(`Unsupported method ${method}`)
+          }
+        }
+        break
+      case 'answers': {
+        switch (method) {
+          case 'POST': {
+            const { correctAnswerId } = payload
+            setCorrectAlternativeId(correctAnswerId)
+            break
+          }
+          default: {
+            throw Error(`Unsupported method ${method}`)
+          }
+        }
+        break
+      }
+      case 'questions': {
+        switch (method) {
+          case 'POST': {
+            setCorrectAlternativeId(null)
+            setSelectedAlternativeId(null)
+            setQuestion(payload)
+            setIsLoading(false)
+            setLimitBreakTimerActive(true)
+            break
+          }
+          default: {
+            throw Error(`Unsupported method ${method}`)
+          }
+        }
+        break
+      }
+      default:
+        throw Error(`Unsuported resource: ${resource}`)
+    }
+  }, [lastMessage])
 
   useEffect(() => {
     function postAlternative(alt) {
@@ -123,7 +128,7 @@ function Game({ playerId, gameId, deleteGame }) {
     if (typeof selectedAlternativeId === 'number') {
       postAlternative(selectedAlternativeId)
     }
-  }, [selectedAlternativeId, question])
+  }, [selectedAlternativeId, question, sendMessage])
 
   useEffect(() => {
     if (limitBreakStatus === 'charged') {

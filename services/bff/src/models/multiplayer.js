@@ -230,10 +230,6 @@ const handleIncomingMessageGame = (
           player.status = status;
           break;
         }
-        case 'GET': {
-          const game = getGameById(gameId);
-          sendToGame(gameId, 'players', 'POST', { players: game.players });
-        }
       }
       break;
     }
@@ -424,6 +420,7 @@ const startGameLoop = () => {
       .forEach(g => {
         if (allPlayersConnected(g.gameId)) {
           sendNextQuestion(g.gameId);
+          sendToGame(g.gameId, 'players', 'POST', { players: g.players });
           g.started = true;
           console.log(`Started game ${g.gameId}`);
         }

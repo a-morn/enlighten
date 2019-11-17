@@ -19,7 +19,7 @@ module.exports = app => {
   if (!wss) {
     const server = http.createServer(app);
     wss = new ws.Server({ server });
-    server.listen(3000, () => {
+    server.listen(process.env.WS_PORT, () => {
       console.log(`Server started on port ${server.address().port} :)`);
     });
     wss.on('connection', (ws, { url }) => {

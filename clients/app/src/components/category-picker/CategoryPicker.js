@@ -34,7 +34,6 @@ function CategoryPicker({
       )
       const result = await response.json()
       setCategories(result)
-      console.log(category)
       if (autoPick && result.length) {
         setCategory(category => category || result[0].id)
       }
@@ -44,7 +43,8 @@ function CategoryPicker({
 
   useEffect(() => {})
 
-  let buttonClasses = 'bg-blue-500 text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
+  let buttonClasses =
+    'bg-blue-500 text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
 
   const disabled =
     disabledCategories.some(c => c === category) ||

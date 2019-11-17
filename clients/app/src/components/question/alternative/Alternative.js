@@ -10,7 +10,7 @@ const Alternative = memo(
     alternative: { text, src, type },
   }) => {
     const classNames = [
-			'alternative',
+      'alternative',
       selected && 'selected',
       correct && 'correct',
       correct === false && 'incorrect',
@@ -20,17 +20,17 @@ const Alternative = memo(
       .filter(cn => cn)
       .join(' ')
     return (
-			<div className="alternative">
-      <button
-        className={`w-full bg-gray-300 hover:bg-gray-400 text-gray-700 py-8 m:py-6 px-4 rounded bg-origin-content ${classNames}`}
-        onClick={onClick}
-        disabled={disabled}
-        style={{ backgroundImage: `url(${src})` }}
-      >
-        {type === 'text' && text}
-				{type === 'image' && <div>&nbsp;</div>}
-      </button>
-			</div>
+      <div className="alternative">
+        <button
+          className={`w-full bg-gray-300 hover:bg-gray-400 text-gray-700 py-8 m:py-6 px-4 rounded bg-origin-content ${classNames}`}
+          onClick={onClick}
+          disabled={disabled}
+          style={{ backgroundImage: `url(${src})` }}
+        >
+          {type === 'text' && text}
+          {type === 'image' && <div>&nbsp;</div>}
+        </button>
+      </div>
     )
   },
 )

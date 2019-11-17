@@ -6,8 +6,8 @@ function Multiplayer({ history }) {
   const { gameId, playerId } = useParams()
 
   const gameDeleted = () => {
-		history.push('/lobby')
-	}
+    history.push('/lobby')
+  }
 
   return (
     <div className="flex">

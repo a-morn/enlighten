@@ -5,22 +5,21 @@ import CategoryPicker from '../category-picker'
 import { withRouter, useParams } from 'react-router-dom'
 import useWebSocket from 'react-use-websocket'
 
-const CONNECTION_STATUS_OPEN = 1;
-
 function Lobby({ history, playerId, removePlayerId }) {
-	const [socketUrl, setSocketUrl] = useState(`ws://${process.env.REACT_APP_BFF_URL}/ws`);
+  const playerIdRef = useRef(null)
+  playerIdRef.current = playerId
 
-	const playerIdRef = useRef(null)
-	playerIdRef.current = playerId
-	
-	const options = useMemo(() => ({
-		share: true,
-		onClose: e => console.log('onClose', e),
-		onError: e => console.log('onError', e),
-		onOpen: e => console.log('onOpen', e),
-		queryParams: { type: 'lobby', playerId }
-	}), [playerId])
-  const [sendMessage, lastMessage, readyState] = useWebSocket(socketUrl, options);
+  const options = useMemo(
+    () => ({
+      share: true,
+      queryParams: { type: 'lobby', playerId },
+    }),
+    [playerId],
+  )
+  const [sendMessage, lastMessage] = useWebSocket(
+    process.env.REACT_APP_WS_URL,
+    options,
+  )
   const [category, setCategory] = useState()
   const [players, setPlayers] = useState([])
   const [gameRequest, setGameRequest] = useState()
@@ -31,33 +30,38 @@ function Lobby({ history, playerId, removePlayerId }) {
     setPlayers(players => players.filter(p => p.playerId !== playerId))
   }, [playerId])
 
-	useEffect(() => {
+  useEffect(() => {
     return () => {
       leave()
     }
-	}, [])
+  }, [leave])
 
   if (!category && categoryFromParams) {
     setCategory(categoryFromParams)
   }
 
   useEffect(() => {
-		let subscribed = true
+    let subscribed = true
     async function fetchData() {
       const response = await fetch(
         `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/multiplayer/players?category=${category}`,
       )
+      if (!subscribed) {
+        return
+      }
+
       const result = await response.json()
-			if (subscribed) { 
-				setPlayers(result)
-			}
+      if (!subscribed) {
+        return
+      }
+      setPlayers(result)
     }
 
     fetchData()
 
-		return () => {
-			subscribed = false
-		}
+    return () => {
+      subscribed = false
+    }
   }, [category])
 
   const joinLobby = useCallback(
@@ -74,85 +78,83 @@ function Lobby({ history, playerId, removePlayerId }) {
         }),
       )
     },
-    [category, playerId],
+    [category, playerId, sendMessage],
   )
 
-	useEffect(() => {
-		if (!lastMessage) {
-			return
-		}
-		const { resource, method, payload } = JSON.parse(lastMessage.data)
-		switch (resource) {
-			case 'players':
-				switch (method) {
-					case 'POST':
-						if (Array.isArray(payload)) {
-							setPlayers(players =>
-								players.concat(
-									payload
-										.filter(p => p.category === category)
-										.filter(
-											p => !players.some(p2 => p2.playerId === p.playerId),
-										),
-								),
-							)
-						} else {
-							throw Error(`Payload type not supported`)
-						}
-						break
-					case 'DELETE': {
-						if (payload === playerId) {
-							removePlayerId()	
-						} else if (Array.isArray(payload)) {
-							setPlayers(players =>
-								players.filter(
-									p =>
-										!payload
-											.some(p2 => p2.playerId === p.playerId),
-								),
-							)
-						}
-						break
-					}
-					default: {
-						throw Error(`Method ${method} mot supported for ${resource}`)
-					}
-				}
-				break
-			case 'game-requests': {
-				switch (method) {
-					case 'POST': {
-						console.log(payload)
-						setGameRequest(payload)
-						break
-					}
-					case 'DELETE': {
-						setRequestPending(false)
-						break
-					}
-					default: {
-						throw Error(`Method ${method} mot supported for ${resource}`)
-					}
-				}
-				break
-			}
-			case 'games': {
-				switch (method) {
-					case 'POST': {
-						const { gameId } = payload
-						history.push(`/multiplayer/${gameId}/${playerId}`)
-						break
-					}
-					default: {
-						throw Error(`Method ${method} mot supported for ${resource}`)
-					}
-				}
-				break
-			}
-			default:
-				throw Error(`Unsuported resource: ${resource}`)
-		}
-  }, [category, history, leave, lastMessage])
+  useEffect(() => {
+    if (!lastMessage) {
+      return
+    }
+    const { resource, method, payload } = JSON.parse(lastMessage.data)
+    switch (resource) {
+      case 'players':
+        switch (method) {
+          case 'POST':
+            if (Array.isArray(payload)) {
+              setPlayers(players =>
+                players.concat(
+                  payload
+                    .filter(p => p.category === category)
+                    .filter(
+                      p => !players.some(p2 => p2.playerId === p.playerId),
+                    ),
+                ),
+              )
+            } else {
+              throw Error(`Payload type not supported`)
+            }
+            break
+          case 'DELETE': {
+            if (payload === playerId) {
+              removePlayerId()
+            } else if (Array.isArray(payload)) {
+              setPlayers(players =>
+                players.filter(
+                  p => !payload.some(p2 => p2.playerId === p.playerId),
+                ),
+              )
+            }
+            break
+          }
+          default: {
+            throw Error(`Method ${method} mot supported for ${resource}`)
+          }
+        }
+        break
+      case 'game-requests': {
+        switch (method) {
+          case 'POST': {
+            console.log(payload)
+            setGameRequest(payload)
+            break
+          }
+          case 'DELETE': {
+            setRequestPending(false)
+            break
+          }
+          default: {
+            throw Error(`Method ${method} mot supported for ${resource}`)
+          }
+        }
+        break
+      }
+      case 'games': {
+        switch (method) {
+          case 'POST': {
+            const { gameId } = payload
+            history.push(`/multiplayer/${gameId}/${playerId}`)
+            break
+          }
+          default: {
+            throw Error(`Method ${method} mot supported for ${resource}`)
+          }
+        }
+        break
+      }
+      default:
+        throw Error(`Unsuported resource: ${resource}`)
+    }
+  }, [category, history, leave, lastMessage, playerId, removePlayerId])
 
   const requestGame = useCallback(
     playerOfferedId => {
@@ -169,7 +171,7 @@ function Lobby({ history, playerId, removePlayerId }) {
       )
       setRequestPending(true)
     },
-    [category, playerId],
+    [category, playerId, sendMessage],
   )
 
   const declineRequestGame = useCallback(() => {
@@ -184,7 +186,7 @@ function Lobby({ history, playerId, removePlayerId }) {
       }),
     )
     setGameRequest(null)
-  }, [gameRequest])
+  }, [gameRequest, sendMessage])
 
   const onAccept = useCallback(() => {
     const { gameRequestId } = gameRequest
@@ -198,7 +200,7 @@ function Lobby({ history, playerId, removePlayerId }) {
         },
       }),
     )
-  }, [gameRequest])
+  }, [gameRequest, sendMessage])
 
   const joinedCurrentCategory = players.some(p => p.playerId === playerId)
   const disabledCategories = useMemo(
@@ -225,7 +227,7 @@ function Lobby({ history, playerId, removePlayerId }) {
     <div className="flex flex-col">
       <div className="flex flex-col">
         <CategoryPicker
-					className=""
+          className=""
           onClick={joinLobby}
           buttonLabel={'Join lobby'}
           disabledCategories={disabledCategories}
@@ -234,27 +236,28 @@ function Lobby({ history, playerId, removePlayerId }) {
           isNameUsed={true}
           autoPick
         />
-        { joinedCurrentCategory && <button
-          className={leaveLobbyButtonClassName}
-          onClick={leave} 
-        >
-          Leave lobby
-        </button> }
+        {joinedCurrentCategory && (
+          <button className={leaveLobbyButtonClassName} onClick={leave}>
+            Leave lobby
+          </button>
+        )}
         <GameRequestModal
           show={gameRequest}
           onDecline={declineRequestGame}
           onAccept={onAccept}
-					playerRequestName={gameRequest && gameRequest.playerRequestName}
+          playerRequestName={gameRequest && gameRequest.playerRequestName}
         />
-        {requestPending && <p className="p-4">Waiting for player to accept challange...</p>}
+        {requestPending && (
+          <p className="p-4">Waiting for player to accept challange...</p>
+        )}
       </div>
-			<div className="mt-4">
-      <PlayerList
-        players={players}
-        onClick={requestGame}
-        currentPlayerId={playerId}
-      />
-			</div>
+      <div className="mt-4">
+        <PlayerList
+          players={players}
+          onClick={requestGame}
+          currentPlayerId={playerId}
+        />
+      </div>
     </div>
   )
 }

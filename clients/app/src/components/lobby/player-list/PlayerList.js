@@ -3,7 +3,9 @@ import React, { memo } from 'react'
 const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
   return (
     <div className={className}>
-			<h3 className="p-6 md:p-4 text-lg text-gray-600 border-b border-gray-400 border-solid">Player list</h3>
+      <h3 className="p-6 md:p-4 text-lg text-gray-600 border-b border-gray-400 border-solid">
+        Player list
+      </h3>
       <ul className="">
         {Boolean(players.length) &&
           players
@@ -24,10 +26,11 @@ const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
                 </button>
               </li>
             ))}
-				{Boolean(!players.length) && <li
-			
-                  className="shadow  px-4 py-6 md:py-4 text-gray-600 border-b border-gray-400 block w-full"
-				>No players online</li>}
+        {Boolean(!players.length) && (
+          <li className="shadow  px-4 py-6 md:py-4 text-gray-600 border-b border-gray-400 block w-full">
+            No players online
+          </li>
+        )}
       </ul>
     </div>
   )

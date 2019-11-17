@@ -1,4 +1,4 @@
-import React, { StrictMode, Fragment } from 'react'
+import React, { StrictMode } from 'react'
 import Singleplayer from '../singleplayer'
 import LobbyLogin from '../lobby-login'
 import Header from '../header'
@@ -13,10 +13,10 @@ function App() {
       <div className="h-screen flex flex-col bg-gray-100">
         <Router>
           <Header />
-          <Switch>
-            <div className="m:p-6 md:m-auto max-w-full">
-              <section className="p-8">
-                <SessionProvider>
+          <div className="m:p-6 md:m-auto max-w-full">
+            <section className="p-8">
+              <SessionProvider>
+                <Switch>
                   <Route path="/(|singleplayer)/">
                     <Singleplayer />
                   </Route>
@@ -26,13 +26,13 @@ function App() {
                   <Route path="/multiplayer/:gameId/:playerId">
                     <Multiplayer />
                   </Route>
-                </SessionProvider>
-                <Route path="/about">
-                  <About />
-                </Route>
-              </section>
-            </div>
-          </Switch>
+                  <Route path="/about">
+                    <About />
+                  </Route>
+                </Switch>
+              </SessionProvider>
+            </section>
+          </div>
         </Router>
       </div>
     </StrictMode>
