@@ -1,6 +1,16 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import CategorySelect from './category-select'
-import useWhyDidYouUpdate from 'hooks/debug/why-did-you-update'
+import gql from 'graphql-tag'
+import { useQuery } from '@apollo/react-hooks'
+
+const GET_CATEGORIES = gql`
+  query {
+    categories {
+      id
+      label
+    }
+  }
+`
 
 function CategoryPicker({
   category,
@@ -13,35 +23,15 @@ function CategoryPicker({
   isNameUsed = false,
   autoPick = false,
 }) {
-  useWhyDidYouUpdate('CP', {
-    category,
-    setCategory,
-    className,
-    buttonLabel,
-    onClick,
-    onChange,
-    disabledCategories,
-    isNameUsed,
-    autoPick,
-  })
-  const [categories, setCategories] = useState([])
+  const { data } = useQuery(GET_CATEGORIES)
+
   const [name, setName] = useState()
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch(
-        `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/categories`,
-      )
-      const result = await response.json()
-      setCategories(result)
-      if (autoPick && result.length) {
-        setCategory(category => category || result[0].id)
-      }
+    if (autoPick && data && data.categories.length) {
+      setCategory(category => category || data.categories[0].id)
     }
-    fetchData()
-  }, [autoPick, category, setCategory])
-
-  useEffect(() => {})
+  }, [autoPick, data, setCategory])
 
   let buttonClasses =
     'bg-blue-500 text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
@@ -67,23 +57,27 @@ function CategoryPicker({
           />
         </Fragment>
       )}
-      <CategorySelect
-        onChange={category => {
-          if (onChange) {
-            onChange(category)
-          }
-          setCategory(category)
-        }}
-        categories={categories}
-        selected={category}
-      />
-      <button
-        disabled={disabled}
-        onClick={() => onClick(name)}
-        className={buttonClasses}
-      >
-        {buttonLabel}
-      </button>
+      {data && (
+        <>
+          <CategorySelect
+            onChange={category => {
+              if (onChange) {
+                onChange(category)
+              }
+              setCategory(category)
+            }}
+            categories={data.categories}
+            selected={category}
+          />
+          <button
+            disabled={disabled}
+            onClick={() => onClick(name)}
+            className={buttonClasses}
+          >
+            {buttonLabel}
+          </button>
+        </>
+      )}
     </div>
   )
 }

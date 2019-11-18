@@ -107,7 +107,7 @@ const questions = Object.entries(config).reduce(
                 .map(el => ({
                   id: uuidv1(),
                   ...foo(fromType, toType, el),
-                  alternatives: shuffle(
+                  alternatives:
                     [el]
                       .concat(
                         HOUSES.filter(({ name }) => name !== el.name).slice(
@@ -115,10 +115,14 @@ const questions = Object.entries(config).reduce(
                           maxAlternatives
                         )
                       )
-                      .map((el, id) => ({ ...bar(toType, el), id }))
-                  ),
-                  answer: 0,
+                      .map((el) => ({ ...bar(toType, el), id: uuidv1() }))
+                  ,
                   category: 'game-of-thrones'
+								}))
+								.map(({ alternatives, ...question}) => ({
+                  answerId: alternatives[0].id,
+									alternatives: shuffle(alternatives),
+									...question,
                 }))
             ),
           []

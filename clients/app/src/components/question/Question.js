@@ -22,8 +22,8 @@ const Question = React.memo(
   ({
     question: { type, alternatives, text, src },
     onAlternativeSelected,
-    selectedAlternativeId,
-    correctAlternativeId,
+    selectedAnswerId,
+    correctAnswerId,
     disabled,
     className,
   }) => {
@@ -38,11 +38,9 @@ const Question = React.memo(
               <Alternative
                 alternative={alt}
                 onClick={() => onAlternativeSelected(alt.id)}
-                selected={alt.id === selectedAlternativeId}
+                selected={alt.id === selectedAnswerId}
                 correct={
-                  correctAlternativeId === null
-                    ? null
-                    : alt.id === correctAlternativeId
+                  correctAnswerId === null ? null : alt.id === correctAnswerId
                 }
                 disabled={disabled}
               />

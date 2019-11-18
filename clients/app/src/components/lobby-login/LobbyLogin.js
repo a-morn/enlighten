@@ -1,35 +1,37 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import Lobby from '../lobby'
+import { useMutation, useQuery } from '@apollo/react-hooks'
+import gql from 'graphql-tag'
 
-function LobbyLogin() {
-  const [playerId, setPlayerId] = useState()
+const ADD_PLAYER = gql`
+  mutation($playerId: ID!) {
+    addPlayer(id: $playerId) {
+      id
+    }
+  }
+`
 
-  useEffect(() => {
-    let subscribed = true
-    async function fetchData() {
-      const response = await fetch(
-        `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/multiplayer/players`,
-        { method: 'POST', headers: { Accept: 'application/json' } },
-      )
-      const { playerId } = await response.json()
-      if (subscribed) {
-        setPlayerId(playerId)
+const LOBBY = gql`
+  query {
+    lobby {
+      players {
+        id
       }
     }
-
-    if (!playerId) {
-      fetchData()
-    }
-    return () => {
-      subscribed = false
-    }
-  }, [playerId])
-
-  const removePlayerId = useCallback(() => setPlayerId(() => null), [])
-
-  if (!playerId) {
-    return null
   }
+`
+
+function LobbyLogin({ playerId }) {
+  const [addPlayer] = useMutation(ADD_PLAYER)
+  const { data: lobbyData } = useQuery(LOBBY)
+
+  useEffect(() => {
+    if (lobbyData && !lobbyData.hasJoined) {
+      addPlayer({ variables: { playerId } })
+    }
+  }, [addPlayer, lobbyData, playerId])
+
+  const removePlayerId = () => {}
 
   return <Lobby playerId={playerId} removePlayerId={removePlayerId} />
 }

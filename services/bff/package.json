@@ -4,18 +4,25 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "start:debug": "node --inspect-brk ./bin/www",
     "lint": "eslint --fix . && echo 'Lint complete.'"
   },
   "dependencies": {
+    "apollo-server": "^2.9.9",
+    "apollo-server-express": "^2.9.9",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "graphql": "^14.5.8",
+    "graphql-subscriptions": "^1.1.0",
+    "graphql-yoga": "^1.18.3",
     "immer": "^4.0.1",
     "moment": "^2.24.0",
     "morgan": "~1.9.1",
     "redis": "^2.8.0",
     "shuffle-array": "^1.0.1",
+    "subscriptions-transport-ws": "^0.9.16",
     "uuid": "^3.3.3",
     "ws": "^7.1.2"
   },

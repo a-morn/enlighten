@@ -1,153 +1,208 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import Question from '../../question'
-import useWebSocket from 'react-use-websocket'
+import gql from 'graphql-tag'
+import * as R from 'ramda'
+import { useQuery, useMutation } from '@apollo/react-hooks'
+
+const GET_CURRENT_QUESTION = gql`
+  query {
+    currentQuestionMultiplayer {
+      id
+      type
+      text
+      src
+      alternatives {
+        id
+        type
+        text
+        src
+      }
+    }
+  }
+`
+
+const GET_LAST_ANSWER = gql`
+  query {
+    lastAnswerMultiplayer {
+      id
+      questionId
+    }
+  }
+`
+
+const GET_SCORE = gql`
+  query {
+    score {
+      id
+      score
+      name
+      won
+    }
+  }
+`
+
+const ANSWER = gql`
+  mutation($questionId: ID!, $id: ID!) {
+    answerQuestionMultiplayer(questionId: $questionId, answerId: $id) {
+      id
+      questionId
+    }
+  }
+`
+
+const NEW_QUESTION = gql`
+  subscription {
+    newQuestionMultiplayer {
+      id
+      type
+      text
+      src
+      alternatives {
+        id
+        type
+        text
+        src
+      }
+    }
+  }
+`
+
+const NEW_ANSWER = gql`
+  subscription {
+    newAnswerMultiplayer {
+      id
+      questionId
+    }
+  }
+`
+
+const SCORE_UPDATED = gql`
+  subscription {
+    scoreUpdated {
+      id
+      score
+      name
+      won
+    }
+  }
+`
 
 function MultiplayerGame({ playerId, gameId, gameDeleted }) {
-  const [winner, setWinner] = useState()
-  const [score, setScore] = useState(0)
-  const [opponentScore, setOpponentScore] = useState(0)
-  const [question, setQuestion] = useState()
-  const [selectedAlternativeId, setSelectedAlternativeId] = useState()
-  const [correctAlternativeId, setCorrectAlternativeId] = useState()
-  const [isLoading, setIsLoading] = useState(false)
-  const options = useMemo(
-    () => ({
-      share: true,
-      onOpen: e => {
-        sendMessage(
-          JSON.stringify({
-            method: 'PATCH',
-            resource: 'players',
-            payload: { status: 'READY' },
-          }),
-        )
-        sendMessage(
-          JSON.stringify({
-            method: 'GET',
-            resource: 'questions',
-          }),
-        )
+  const [selectedAnswerId, setSelectedAnswerId] = useState()
+  const [isLoading] = useState(false)
+
+  const {
+    data: questionData,
+    subscribeToMore: questionSubscribeToMore,
+  } = useQuery(GET_CURRENT_QUESTION)
+  useEffect(() => {
+    questionSubscribeToMore({
+      document: NEW_QUESTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev
+        } else {
+          return {
+            currentQuestionMultiplayer:
+              subscriptionData.data.newQuestionMultiplayer,
+          }
+        }
       },
-      queryParams: { type: 'multiplayer', playerId, gameId },
-    }),
-    [gameId, playerId, sendMessage],
+    })
+  }, [questionSubscribeToMore])
+
+  const { data: answerData, subscribeToMore: answerSubscribeToMore } = useQuery(
+    GET_LAST_ANSWER,
   )
-  const [sendMessage, lastMessage] = useWebSocket(
-    process.env.REACT_APP_WS_URL,
-    options,
+  useEffect(() => {
+    answerSubscribeToMore({
+      document: NEW_ANSWER,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev
+        } else {
+          return {
+            lastAnswerMultiplayer: subscriptionData.data.newAnswerMultiplayer,
+          }
+        }
+      },
+    })
+  }, [answerSubscribeToMore])
+
+  const { data: scoreData, subscribeToMore: scoreSubscribeToMore } = useQuery(
+    GET_SCORE,
   )
+  useEffect(() => {
+    scoreSubscribeToMore({
+      document: SCORE_UPDATED,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev
+        } else {
+          return {
+            score: subscriptionData.data.scoreUpdated,
+          }
+        }
+      },
+    })
+  }, [scoreSubscribeToMore])
+
+  const [answer] = useMutation(ANSWER)
+
+  const [correctAnswerId, setCorrectAnswerId] = useState()
 
   useEffect(() => {
-    if (!lastMessage || !playerId || !gameId) {
-      return
+    const answerQuestionId = R.pathOr(
+      null,
+      ['lastAnswerMultiplayer', 'questionId'],
+      answerData,
+    )
+    const currentQuestionId = R.pathOr(
+      null,
+      ['currentQuestionMultiplayer', 'id'],
+      questionData,
+    )
+    const answerId = R.pathOr(null, ['lastAnswerMultiplayer', 'id'], answerData)
+    if (answerQuestionId === currentQuestionId) {
+      setCorrectAnswerId(answerId)
+    } else {
+      setCorrectAnswerId(null)
     }
-    const { resource, method, payload } = JSON.parse(lastMessage.data)
-    switch (resource) {
-      case 'answers': {
-        switch (method) {
-          case 'POST': {
-            const { correctAnswerId } = payload
-            setCorrectAlternativeId(correctAnswerId)
-            break
-          }
-          default: {
-            throw Error(`Unsupported method ${method}`)
-          }
-        }
-        break
-      }
-      case 'questions': {
-        switch (method) {
-          case 'POST':
-            setCorrectAlternativeId(null)
-            setSelectedAlternativeId(null)
-            setQuestion(payload)
-            setIsLoading(false)
-            break
-          default: {
-            throw Error(`Unsupported method ${method}`)
-          }
-        }
-        break
-      }
-      case 'games': {
-        switch (method) {
-          case 'DELETE': {
-            gameDeleted()
-            break
-          }
-          default:
-            throw Error(`Unsuported method ${method} for resource ${resource}`)
-        }
-        break
-      }
-      case 'players': {
-        switch (method) {
-          case 'POST':
-          case 'PATCH': {
-            const { players } = payload
-            setScore(players.find(p => p.playerId === playerId).score)
-            setOpponentScore(players.find(p => p.playerId !== playerId).score)
-            const winner = players.find(({ winner }) => winner)
-            if (winner) {
-              setWinner(winner)
-            }
-            break
-          }
-          default:
-            throw Error(`Unsuported method ${method} for resource ${resource}`)
-        }
-        break
-      }
-      default:
-        throw Error(`Unsuported resource: ${resource}`)
-    }
-  }, [gameId, playerId, lastMessage, gameDeleted])
+  }, [answerData, questionData])
 
-  useEffect(() => {
-    function postAlternative(alt) {
-      setIsLoading(true)
-      sendMessage(
-        JSON.stringify({
-          method: 'POST',
-          resource: 'answers',
-          payload: { answerId: selectedAlternativeId, questionId: question.id },
-        }),
-      )
-    }
-    if (typeof selectedAlternativeId === 'number') {
-      postAlternative(selectedAlternativeId)
-    }
-  }, [selectedAlternativeId, question, sendMessage])
-
-  const alternativeSelected = altId => {
-    setSelectedAlternativeId(altId)
+  const alternativeSelected = id => {
+    answer({
+      variables: {
+        id,
+        questionId: questionData.currentQuestionMultiplayer.id,
+      },
+    })
+    setSelectedAnswerId(id)
   }
 
-  const endGame = async () => {
-    await fetch(
-      `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/singleplayer/games/${gameId}`,
-      {
-        method: 'DELETE',
-      },
-    )
+  const endGame = () => {
     gameDeleted()
   }
 
+  const winner = scoreData ? scoreData.score.find(({ won }) => won) : null
+
   return (
-    <div>
+    <div className="flex flex-col">
       {winner && <span>{winner.name} won!</span>}
-      <div className="flex justify-between text-lg">
-        <span>You: {score}</span>
-        <span>Opponent: {opponentScore}</span>
-      </div>
-      {question && (
+      {scoreData && (
+        <div className="flex justify-between text-lg">
+          {scoreData.score.map(({ name, score, id }) => (
+            <span key={id}>{`${name}: ${score || 0}`}</span>
+          ))}
+        </div>
+      )}
+      {questionData && (
         <Question
           className="pt-4"
           disabled={isLoading || winner}
-          question={question}
-          selectedAlternativeId={selectedAlternativeId}
-          correctAlternativeId={correctAlternativeId}
+          question={questionData.currentQuestionMultiplayer}
+          selectedAnswerId={selectedAnswerId}
+          correctAnswerId={correctAnswerId}
           onAlternativeSelected={alternativeSelected}
         />
       )}

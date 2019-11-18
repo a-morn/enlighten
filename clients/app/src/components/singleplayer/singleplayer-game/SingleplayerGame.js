@@ -1,30 +1,130 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import LimitBreak from './limit-break'
+import React, { useState, useEffect, useCallback } from 'react'
+//import LimitBreak from './limit-break'
 import Question from '../../question'
-import useWebSocket from 'react-use-websocket'
+import gql from 'graphql-tag'
+import { useQuery, useMutation } from '@apollo/react-hooks'
+import * as R from 'ramda'
 
-const CONNECTION_STATUS_OPEN = 1
+const GET_LAST_ANSWER = gql`
+  query {
+    gameSingleplayer {
+      id
+      lastQuestion {
+        id
+        answerId
+      }
+    }
+  }
+`
 
-function Game({ playerId, gameId, deleteGame }) {
-  const options = useMemo(
-    () => ({
-      share: true,
-      queryParams: {
-        type: 'singleplayer',
-        playerId,
-        gameId,
+const GET_CURRENT_QUESTION = gql`
+  query {
+    gameSingleplayer {
+      id
+      currentQuestion {
+        id
+        type
+        text
+        src
+        alternatives {
+          id
+          type
+          text
+          src
+        }
+      }
+    }
+  }
+`
+
+const ANSWER = gql`
+  mutation($questionId: ID!, $id: ID!) {
+    answerQuestionSingleplayer(questionId: $questionId, answerId: $id) {
+      id
+      questionId
+    }
+  }
+`
+
+const NEW_QUESTION = gql`
+  subscription {
+    newQuestionSingleplayer {
+      id
+      type
+      text
+      src
+      alternatives {
+        id
+        type
+        text
+        src
+      }
+    }
+  }
+`
+
+function SingleplayerGame({ playerId, gameId, deleteGame }) {
+  const {
+    data: questionData,
+    subscribeToMore: questionSubscribeToMore,
+  } = useQuery(GET_CURRENT_QUESTION)
+  useEffect(() => {
+    questionSubscribeToMore({
+      document: NEW_QUESTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev
+        } else {
+          return R.mergeDeepLeft(
+            {
+              gameSingleplayer: {
+                currentQuestion: subscriptionData.data.newQuestionSingleplayer,
+              },
+            },
+            prev,
+          )
+        }
       },
-    }),
-    [gameId, playerId],
-  )
-  const [sendMessage, lastMessage, readyState] = useWebSocket(
-    process.env.REACT_APP_WS_URL,
-    options,
-  )
-  const [question, setQuestion] = useState()
-  const [selectedAlternativeId, setSelectedAlternativeId] = useState()
-  const [correctAlternativeId, setCorrectAlternativeId] = useState()
-  const [isLoading, setIsLoading] = useState(false)
+    })
+  }, [questionSubscribeToMore])
+  const { data: answerData } = useQuery(GET_LAST_ANSWER)
+
+  const [answer] = useMutation(ANSWER, {
+    refetchQueries: [
+      {
+        query: GET_LAST_ANSWER,
+      },
+    ],
+  })
+
+  const [correctAnswerId, setCorrectAnswerId] = useState()
+
+  useEffect(() => {
+    const answerQuestionId = R.pathOr(
+      null,
+      ['gameSingleplayer', 'lastQuestion', 'id'],
+      answerData,
+    )
+    const currentQuestionId = R.pathOr(
+      null,
+      ['gameSingleplayer', 'currentQuestion', 'id'],
+      questionData,
+    )
+    const answerId = R.pathOr(
+      null,
+      ['gameSingleplayer', 'lastQuestion', 'answerId'],
+      answerData,
+    )
+    if (answerQuestionId === currentQuestionId) {
+      setCorrectAnswerId(answerId)
+    } else {
+      setCorrectAnswerId(null)
+    }
+  }, [answerData, questionData])
+
+  const [selectedAnswerId, setSelectedAlternativeId] = useState()
+  const [isLoading] = useState(false)
+  /*
   const [limitBreakLevel, setLimitBreakLevel] = useState(0)
   const [limitBreakTimerActive, setLimitBreakTimerActive] = useState(false)
   const [limitBreakStatus, setLimitBreakStatus] = useState('inactive')
@@ -41,94 +141,6 @@ function Game({ playerId, gameId, deleteGame }) {
     limitBreakHasAchievedRampage,
     setLimitBreakHasAchievedRampage,
   ] = useState(false)
-
-  useEffect(() => {
-    if (readyState === CONNECTION_STATUS_OPEN) {
-      sendMessage(
-        JSON.stringify({
-          method: 'GET',
-          resource: 'questions',
-        }),
-      )
-    }
-  }, [readyState, sendMessage])
-
-  useEffect(() => {
-    if (!lastMessage) {
-      return
-    }
-    console.log(lastMessage)
-    const { resource, method, payload } = JSON.parse(lastMessage.data)
-    switch (resource) {
-      case 'limit-break':
-        switch (method) {
-          case 'PUT': {
-            const { level, status, charge } = payload
-            setLimitBreakLevel(level)
-            setLimitBreakStatus(status)
-            setLimitBreakCharge(charge)
-            if (status !== 'charged') {
-              setLimitBreakHasAchievedGodlike(false)
-              setLimitBreakHasAchievedDominating(false)
-              setLimitBreakHasAchievedRampage(false)
-            }
-            break
-          }
-          default: {
-            throw Error(`Unsupported method ${method}`)
-          }
-        }
-        break
-      case 'answers': {
-        switch (method) {
-          case 'POST': {
-            const { correctAnswerId } = payload
-            setCorrectAlternativeId(correctAnswerId)
-            break
-          }
-          default: {
-            throw Error(`Unsupported method ${method}`)
-          }
-        }
-        break
-      }
-      case 'questions': {
-        switch (method) {
-          case 'POST': {
-            setCorrectAlternativeId(null)
-            setSelectedAlternativeId(null)
-            setQuestion(payload)
-            setIsLoading(false)
-            setLimitBreakTimerActive(true)
-            break
-          }
-          default: {
-            throw Error(`Unsupported method ${method}`)
-          }
-        }
-        break
-      }
-      default:
-        throw Error(`Unsuported resource: ${resource}`)
-    }
-  }, [lastMessage])
-
-  useEffect(() => {
-    function postAlternative(alt) {
-      setLimitBreakTimerActive(false)
-      setIsLoading(true)
-      sendMessage(
-        JSON.stringify({
-          method: 'POST',
-          resource: 'answers',
-          payload: { answerId: selectedAlternativeId },
-        }),
-      )
-    }
-    if (typeof selectedAlternativeId === 'number') {
-      postAlternative(selectedAlternativeId)
-    }
-  }, [selectedAlternativeId, question, sendMessage])
 
   useEffect(() => {
     if (limitBreakStatus === 'charged') {
@@ -156,46 +168,40 @@ function Game({ playerId, gameId, deleteGame }) {
     limitBreakHasAchievedRampage,
     limitBreakStatus,
   ])
+*/
+  const alternativeSelected = useCallback(
+    id => {
+      answer({
+        variables: {
+          id,
+          questionId: questionData.gameSingleplayer.currentQuestion.id,
+        },
+      })
+      setSelectedAlternativeId(id)
+      // mutate
+    },
+    [answer, questionData],
+  )
 
-  useEffect(() => {
-    let interval = null
-    if (limitBreakTimerActive && false) {
-      interval = setInterval(() => {
-        setLimitBreakLevel(Math.max(limitBreakLevel - 1, 0))
-      }, 250)
-    }
-    return () => clearInterval(interval)
-  }, [limitBreakTimerActive, limitBreakLevel])
-
-  const alternativeSelected = altId => {
-    setSelectedAlternativeId(altId)
-  }
-
-  const endGame = async () => {
-    await fetch(
-      `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/singleplayer/games/${gameId}`,
-      {
-        method: 'DELETE',
-      },
-    )
+  const endGame = useCallback(() => {
     deleteGame()
-  }
-
+  }, [deleteGame])
+  console.log(questionData)
   return (
     <div>
-      <LimitBreak
+      {/* <LimitBreak
         level={limitBreakLevel}
         charge={limitBreakCharge}
         status={limitBreakStatus}
         max={100}
-      />
-      {question && (
+      /> */}
+      {questionData && (
         <Question
           className="pt-4"
-          disabled={isLoading || limitBreakStatus === 'decharge'}
-          question={question}
-          selectedAlternativeId={selectedAlternativeId}
-          correctAlternativeId={correctAlternativeId}
+          disabled={isLoading /*|| limitBreakStatus === 'decharge' */}
+          question={questionData.gameSingleplayer.currentQuestion}
+          selectedAnswerId={selectedAnswerId}
+          correctAnswerId={correctAnswerId}
           onAlternativeSelected={alternativeSelected}
         />
       )}
@@ -209,4 +215,4 @@ function Game({ playerId, gameId, deleteGame }) {
   )
 }
 
-export default Game
+export default SingleplayerGame

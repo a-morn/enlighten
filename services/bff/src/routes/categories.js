@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   const categories = [
-    { id: 'periodic-table', label: 'Periodic table' },
+//    { id: 'periodic-table', label: 'Periodic table' },
     { id: 'game-of-thrones', label: 'Game of Thrones' }
   ];
 

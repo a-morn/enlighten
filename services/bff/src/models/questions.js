@@ -13,21 +13,27 @@ const allQuestionsArray = Object.values(allQuestions).reduce(
         (acc2, { questions }) => acc2.concat(questions),
         []
       )
-    ),
-  []
-);
+    ), [])
+	.filter(q => q);
 
-const getQuestion = questionId => {
-  const { alternatives, ...question } = allQuestionsArray.find(
+const getQuestionById = questionId => {
+	console.log(questionId)
+  const question = allQuestionsArray.find(
     ({ id }) => id === questionId
   );
 
+	if (!question) {
+		//throw
+	}
+
+	const { alternatives, ...rest } = question
+
   return {
-    ...question,
+    ...rest,
     alternatives: shuffle(alternatives)
   };
 };
 
 module.exports = {
-  getQuestion
+  getQuestionById
 };

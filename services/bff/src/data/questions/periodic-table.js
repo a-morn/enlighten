@@ -141,7 +141,7 @@ const questions = Object.entries(config).reduce(
                     )
                     .slice(0, maxAlternatives)
                     .map((el, id) => ({ type: 'text', text: el[toType], id })),
-                  answer: 0,
+                  answerId: 0,
                   category: 'periodic-table'
                 }))
             ),

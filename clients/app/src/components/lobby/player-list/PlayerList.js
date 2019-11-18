@@ -11,12 +11,12 @@ const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
           players
             .map(p => ({
               ...p,
-              isCurrentPlayer: currentPlayerId === p.playerId,
+              isCurrentPlayer: currentPlayerId === p.id,
             }))
-            .map(({ name, playerId, isCurrentPlayer, status }, i) => (
+            .map(({ name, id, isCurrentPlayer, status }, i) => (
               <li key={i}>
                 <button
-                  onClick={_ => !isCurrentPlayer && onClick(playerId)}
+                  onClick={_ => !isCurrentPlayer && onClick(id)}
                   className={`shadow hover:bg-gray-300 hover:text-blue-500  px-32 py-6 md:py-4 text-gray-600 border-b border-gray-400 block w-full ${
                     isCurrentPlayer ? 'cursor-not-allowed' : ''
                   }`}
