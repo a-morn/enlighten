@@ -4,7 +4,7 @@ const {
 } = require('../errors');
 
 const {
-	GAME_REQUESTED,
+	GAME_REQUEST,
 } = require('../triggers')
 
 const players = []
@@ -21,8 +21,7 @@ const getGameRequestById = gameRequestId => {
 
 const getGameRequestByPlayerId = playerId => {
 	return gameRequests
-		.find(gr => gr.playerOfferedId === playerId ||
-			gr.playerRequestedId === playerId && [true, false].includes(gr.accepted))
+		.find(({playerOfferedId, playerRequestId}) => playerOfferedId === playerId || playerRequestId === playerId)
 }
 
 const getPlayerById = playerId => {
@@ -49,20 +48,47 @@ const getPlayers = (category) => {
 
 const addGameRequest = (pubsub, playerRequestId, playerOfferedId, category) => {
 	const { name: playerRequestName } = getPlayerById(playerRequestId);
+	const { name: playerOfferedName } = getPlayerById(playerOfferedId);
 	const id = ''+Math.random()
-	const gameRequested = {
+	const gameRequest = {
 		accepted: null,
 		id,
 		playerRequestId,
 		playerOfferedId,
 		category,
-		playerRequestName
+		playerRequestName,
+		playerOfferedName,
 	}
-	gameRequests.push(gameRequested)
-	pubsub.publish(GAME_REQUESTED, {
-		gameRequested,
+	gameRequests.push(gameRequest)
+	pubsub.publish(GAME_REQUEST, {
+		gameRequestSubscription: {
+			gameRequest,
+			mutation: "CREATE"
+		}
 	})
-	return gameRequested;
+	return gameRequest;
+}
+
+const deleteGameRequestById = (pubsub, playerId, id) => {
+	const { playerRequestId, playerOfferedId } = getGameRequestById(id)
+	if (![playerRequestId, playerOfferedId].includes(playerId)) {
+	  throw new Error('Unauthorized')
+	}
+
+	const index = gameRequests.findIndex(g => g.id === id)
+	if (index === -1) {
+		throw new GameRequestNotFoundError('Tried deleting non existent game request')
+	}
+	const [gameRequest] = gameRequests.splice(index, 1)
+
+	pubsub.publish(GAME_REQUEST, {
+		gameRequestSubscription: {
+			gameRequest,
+			mutation: "DELETE"
+		}
+	})
+
+	return gameRequest
 }
 
 module.exports = {
@@ -72,4 +98,5 @@ module.exports = {
 	getPlayers,
 	addGameRequest,
 	getGameRequestByPlayerId,
+	deleteGameRequestById
 };

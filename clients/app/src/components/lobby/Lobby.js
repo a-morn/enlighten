@@ -19,32 +19,15 @@ const LOBBY = gql`
   }
 `
 
-const GET_GAME_REQUEST = gql`
+const GAME_REQUEST = gql`
   query {
     gameRequest {
       id
       category
+      playerRequestId
+      playerOfferedId
       playerRequestName
-      accepted
-    }
-  }
-`
-
-const GAME_REQUESTED = gql`
-  subscription {
-    gameRequested {
-      id
-      playerRequestName
-      category
-      accepted
-    }
-  }
-`
-
-const GAME_REQUEST_ANSWERED = gql`
-  subscription {
-    gameRequestAnswered {
-      id
+      playerOfferedName
       accepted
     }
   }
@@ -90,6 +73,14 @@ const ANSWER_GAME_REQUEST = gql`
   }
 `
 
+const DELETE_GAME_REQUEST = gql`
+  mutation($gameRequestId: ID!) {
+    deleteGameRequest(id: $gameRequestId) {
+      id
+    }
+  }
+`
+
 const GAME = gql`
   query {
     gameMultiplayer {
@@ -99,7 +90,7 @@ const GAME = gql`
 `
 
 const GAME_SUBSCRIPTION = gql`
-  subscription onGameUpdated($mutation: String!) {
+  subscription onGameUpdated($mutation: String) {
     gameMultiplayer(mutation: $mutation) {
       game {
         id
@@ -108,14 +99,37 @@ const GAME_SUBSCRIPTION = gql`
   }
 `
 
+const GAME_REQUEST_SUBSCRIPTION = gql`
+  subscription onGameRequestUpdated($mutation: String) {
+    gameRequestSubscription(mutation: $mutation) {
+      gameRequest {
+        id
+        playerRequestName
+        playerOfferedName
+        playerRequestId
+        playerOfferedId
+        category
+        accepted
+      }
+      mutation
+    }
+  }
+`
+
 function Lobby({ history, playerId, removePlayerId, player }) {
   const [category, setCategory] = useState()
-  const [requestPending, setRequestPending] = useState(false)
   const { category: categoryFromParams } = useParams()
 
   const [joinLobby] = useMutation(JOIN_LOBBY)
-  const [requestGame] = useMutation(REQUEST_GAME)
+  const [requestGame] = useMutation(REQUEST_GAME, {
+    refetchQueries: [
+      {
+        query: GAME_REQUEST,
+      },
+    ],
+  })
   const [answerGameRequest] = useMutation(ANSWER_GAME_REQUEST)
+  const [deleteGameRequest] = useMutation(DELETE_GAME_REQUEST)
 
   const { data: lobbyData, subscribeToMore: lobbySubscribeToMore } = useQuery(
     LOBBY,
@@ -123,7 +137,7 @@ function Lobby({ history, playerId, removePlayerId, player }) {
   const {
     data: gameRequestData,
     subscribeToMore: gameRequestSubscribeToMore,
-  } = useQuery(GET_GAME_REQUEST)
+  } = useQuery(GAME_REQUEST)
 
   const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
     GAME,
@@ -160,24 +174,18 @@ function Lobby({ history, playerId, removePlayerId, player }) {
 
   useEffect(() => {
     gameRequestSubscribeToMore({
-      document: GAME_REQUESTED,
+      document: GAME_REQUEST_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev
-        return {
-          gameRequest: subscriptionData.data.gameRequested,
+        const {
+          data: {
+            gameRequestSubscription: { gameRequest, mutation },
+          },
+        } = subscriptionData
+        const updatedGameRequest = {
+          gameRequest: mutation === 'DELETE' ? null : gameRequest,
         }
-      },
-    })
-  }, [gameRequestSubscribeToMore])
-
-  useEffect(() => {
-    gameRequestSubscribeToMore({
-      document: GAME_REQUEST_ANSWERED,
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev
-        return {
-          gameRequest: subscriptionData.data.gameRequestAnswered,
-        }
+        return updatedGameRequest
       },
     })
   }, [gameRequestSubscribeToMore])
@@ -194,14 +202,6 @@ function Lobby({ history, playerId, removePlayerId, player }) {
       },
     })
   }, [gameSubscribeToMore])
-
-  useEffect(() => {
-    if (R.path(['accepted'], gameRequestData)) {
-      alert('go to game')
-    } else {
-      setRequestPending(false)
-    }
-  }, [gameRequestData])
 
   const playerIdRef = useRef(null)
   playerIdRef.current = playerId
@@ -279,8 +279,27 @@ function Lobby({ history, playerId, removePlayerId, player }) {
   }, [category, history])
   const disabledCategories = []
   const joinedCurrentCategory = false
+  //console.log((R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(gameRequestData) && R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData)))
+
+  console.log(gameRequestData)
+  console.log(
+    R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(gameRequestData) &&
+      R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData),
+  )
 
   const memoSetCategory = useCallback(c => setCategory(c), [])
+
+  const deleteGameRequestCallback = useCallback(
+    _ => {
+      deleteGameRequest({
+        variables: {
+          gameRequestId: gameRequestData.gameRequest.id,
+        },
+      })
+    },
+    [deleteGameRequest, gameRequestData],
+  )
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-col">
@@ -299,17 +318,30 @@ function Lobby({ history, playerId, removePlayerId, player }) {
             Leave lobby
           </button>
         )}
-        {R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData) && (
-          <GameRequestModal
-            show
-            onDecline={declineGameRequest}
-            onAccept={acceptGameRequest}
-            playerRequestName={gameRequestData.gameRequest.playerRequestName}
-          />
-        )}
-        {requestPending && (
-          <p className="p-4">Waiting for player to accept challange...</p>
-        )}
+        {R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(
+          gameRequestData,
+        ) &&
+          R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData) && (
+            <GameRequestModal
+              title="Challenge!"
+              body={`${gameRequestData.gameRequest.playerRequestName} is challenging you`}
+              acceptText="Let's go!"
+              declineText="Rather not"
+              onDecline={declineGameRequest}
+              onAccept={acceptGameRequest}
+            />
+          )}
+        {R.pathEq(['gameRequest', 'playerRequestId'], playerId)(
+          gameRequestData,
+        ) &&
+          R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData) && (
+            <GameRequestModal
+              title="Challenge pending..."
+              body={`Waiting for ${gameRequestData.gameRequest.playerOfferedName} to accept challenge`}
+              declineText="Cancel challenge"
+              onDecline={deleteGameRequestCallback}
+            />
+          )}
       </div>
       <div className="mt-4">
         <PlayerList

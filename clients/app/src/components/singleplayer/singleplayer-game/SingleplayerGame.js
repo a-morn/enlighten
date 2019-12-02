@@ -186,7 +186,6 @@ function SingleplayerGame({ playerId, gameId, deleteGame }) {
   const endGame = useCallback(() => {
     deleteGame()
   }, [deleteGame])
-  console.log(questionData)
   return (
     <div>
       {/* <LimitBreak

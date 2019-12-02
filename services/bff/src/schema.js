@@ -33,13 +33,13 @@ const { gql } = require( 'apollo-server-express')
 			answerGameRequest(id: ID!, accepted: Boolean): GameRequest
 			answerQuestionMultiplayer(questionId: ID!, answerId: ID!): QuestionAnswer
 			deleteGameMultiplayer(id: ID!): GameMultiplayer
+			deleteGameRequest(id: ID!): GameRequest
 		}
 
 		type Subscription {
 			newQuestionSingleplayer: Question
 			playerJoined: Player
-			gameRequested: GameRequest
-			gameRequestAnswered: GameRequest
+			gameRequestSubscription(mutation: String): GameRequestSubscription
 			gameMultiplayer(mutation: String): GameMultiplayerSubscription
 			newQuestionMultiplayer: Question
 			newAnswerMultiplayer: QuestionAnswer
@@ -47,8 +47,13 @@ const { gql } = require( 'apollo-server-express')
 		}
 
 		type GameMultiplayerSubscription {
-			mutation: String!
+			mutation: String
 			game: GameMultiplayer!
+		}
+
+		type GameRequestSubscription {
+			mutation: String
+			gameRequest: GameRequest!
 		}
 
 		input PlayerInput {
@@ -75,6 +80,7 @@ const { gql } = require( 'apollo-server-express')
 			category: String!
 			playerRequestId: ID!
 			playerRequestName: String!
+			playerOfferedName: String!
 			playerOfferedId: ID!
 			accepted: Boolean
 		}
