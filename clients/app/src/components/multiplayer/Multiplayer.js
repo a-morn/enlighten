@@ -4,75 +4,130 @@ import MultiplayerGame from './multiplayer-game'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 
-const GAME_MULTIPLAYER = gql`
+const GAME = gql`
   query {
     gameMultiplayer {
       id
-    }
+			players {
+				id
+				score
+				name
+				won
+				hasLeft
+			}
+			currentQuestion {
+				id
+				type
+				text
+				src
+				alternatives {
+					id
+					type
+					text
+					src
+				}
+			}
+			lastQuestion {
+				id
+				answerId
+			}
+		}
   }
 `
 
-const DELETE_GAME = gql`
+const GAME_UPDATED = gql`
+	subscription onGameUpdated($mutation: String) {
+		gameMultiplayer(mutation: $mutation) {
+			game {
+				id
+				players {
+					id
+					score
+					name
+					won
+					hasLeft
+				}
+				currentQuestion {
+					id
+					type
+					text
+					src
+					alternatives {
+						id
+						type
+						text
+						src
+					}
+				}
+				lastQuestion {
+					id
+					answerId
+				}
+			}
+		}
+	}
+`
+
+const REMOVE_PLAYER_FROM_GAME = gql`
   mutation($id: ID!) {
-    deleteGameMultiplayer(id: $id) {
+    removePlayerFromGameMultiplayer(id: $id) {
       id
-    }
-  }
-`
-
-const GAME_SUBSCRIPTION = gql`
-  subscription onGameUpdated($mutation: String!) {
-    gameMultiplayer(mutation: $mutation) {
-      game {
-        id
-      }
     }
   }
 `
 
 function Multiplayer({ history, playerId }) {
-  const { data, subscribeToMore } = useQuery(GAME_MULTIPLAYER)
-  const [deleteGame] = useMutation(DELETE_GAME, {
+  const { data, subscribeToMore } = useQuery(GAME)
+  const [removePlayerFromGame] = useMutation(REMOVE_PLAYER_FROM_GAME, {
     refetchQueries: [
       {
-        query: GAME_MULTIPLAYER,
+        query: GAME,
       },
     ],
   })
   useEffect(() => {
     subscribeToMore({
-      document: GAME_SUBSCRIPTION,
-      variables: { mutation: 'DELETE' },
-      updateQuery: () => {
-        return { gameMultiplayer: null }
-      },
+      document: GAME_UPDATED,
+      updateQuery: (prev, { subscriptionData }) => {
+				if (!subscriptionData.data) {
+					return prev
+				} else {
+					switch(subscriptionData.data.gameMultiplayer.mutation) {
+						case 'DELETE': {
+							return { gameMultiplayer: null }
+						}
+						default: {
+							return { gameMultiplayer: subscriptionData.data.gameMultiplayer.game }
+						}
+					}
+				}
+      }
     })
   }, [subscribeToMore])
 
-  const gameDeleted = useCallback(() => {
+  const removePlayerFromGameCallback = useCallback(() => {
     if (data && data.gameMultiplayer) {
-      deleteGame({
+      removePlayerFromGame({
         variables: {
           id: data.gameMultiplayer.id,
         },
       })
     }
-    history.push('/lobby')
-  }, [data, deleteGame, history])
+  }, [data, removePlayerFromGame, history])
 
   useEffect(() => {
     if (!data || !data.gameMultiplayer) {
-      gameDeleted()
+			history.push('/lobby')
     }
-  }, [data, gameDeleted])
+  }, [data, removePlayerFromGame])
 
   return (
     <>
       {data && data.gameMultiplayer && (
         <MultiplayerGame
-          gameId={data.gameMultiplayer.id}
+          game={data.gameMultiplayer}
           playerId={playerId}
-          gameDeleted={gameDeleted}
+          leaveGame={removePlayerFromGameCallback}
         />
       )}
     </>

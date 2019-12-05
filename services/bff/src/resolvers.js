@@ -8,9 +8,6 @@ const {
     GAME_REQUEST,
     NEW_QUESTION_SINGLEPLAYER,
     GAME_MULTIPLAYER,
-    NEW_QUESTION_MULTIPLAYER,
-    NEW_ANSWER_MULTIPLAYER,
-    SCORE_UPDATED,
 } = require('./triggers')
 
 const {
@@ -40,7 +37,7 @@ const {
 	getLastAnswerByPlayerId: getLastAnswerByPlayerIdMultiplayer,
   updateQuestionByPlayerId: updateQuestionByPlayerIdMultiplayer,
   answerQuestion: answerQuestionMultiplayer,
-  deleteGameByGameId: deleteGameByGameIdMultiplayer,
+  removePlayerFromGame: removePlayerFromGameMultiplayer,
 } = require('./models/multiplayer')
 
 const pubsub = new PubSub()
@@ -93,21 +90,6 @@ const resolvers = ({
         }
       }
     },
-    currentQuestionMultiplayer: (_, __, context) => {
-      const { currentUser: { playerId }} = context
-      const question = getCurrentQuestionByPlayerIdMultiplayer(playerId)
-      return question
-    },
-    lastAnswerMultiplayer: (_, __, context) => {
-      const { currentUser: { playerId }} = context
-      const answer = getLastAnswerByPlayerIdMultiplayer(playerId);
-      return answer
-    },
-    score: (_, __, context) => {
-      const { currentUser: { playerId }} = context
-      const game = getGameByPlayerIdMultiplayer(playerId)
-      return game.players;
-    }
   },
   Mutation: {
     createGameSingleplayer: (_, { playerId, category }) => {
@@ -188,40 +170,30 @@ const resolvers = ({
     },
     answerQuestionMultiplayer: (_, { answerId, questionId }, context) => {
       const { currentUser: { playerId }} = context
-      const { correctAnswerId, players } = answerQuestionMultiplayer(playerId, questionId, answerId)
+      const game = answerQuestionMultiplayer(playerId, questionId, answerId)
         
-      const playerIds =
-        players
-        .map(({ id }) => id)
-
-      pubsub.publish(NEW_ANSWER_MULTIPLAYER, {
-        newAnswerMultiplayer: {
-          id: correctAnswerId,
-          playerIds,
-          questionId
+      pubsub.publish(GAME_MULTIPLAYER, {
+          gameMultiplayer: {
+          game,
+          mutation: 'UPDATE'
         }
-      })
-      pubsub.publish(SCORE_UPDATED, {
-        scoreUpdated: players         
       })
 
       setTimeout(() => {
-        updateQuestionByPlayerIdMultiplayer(playerId)
-        const { answerId: id, record, ...question } = getCurrentQuestionByPlayerIdMultiplayer(playerId)
+        const game = updateQuestionByPlayerIdMultiplayer(playerId)
 
-        pubsub.publish(NEW_QUESTION_MULTIPLAYER, {
-          newQuestionMultiplayer: {
-            playerIds,
-            ...question
+        pubsub.publish(GAME_MULTIPLAYER, {
+          gameMultiplayer: {
+            game,
+            mutation: 'UPDATE'
           }
         })
       }, 500)
       
-      return { playerId, id: correctAnswerId, questionId }
+      return game
     },
-    deleteGameMultiplayer: (_, { id }) => {
-      // use context for authorization
-      const game = deleteGameByGameIdMultiplayer(pubsub, id)
+    removePlayerFromGameMultiplayer: (_, { id }, { currentUser: { playerId }}) => {
+      const game = removePlayerFromGameMultiplayer(pubsub, playerId, id)
       
       return game
     },
@@ -268,32 +240,6 @@ const resolvers = ({
             (!variables.mutation || variables.mutation === mutation)
         })
     },
-    newQuestionMultiplayer: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(NEW_QUESTION_MULTIPLAYER),
-        (payload, _, context) => {
-          const { currentUser: { playerId } } = context
-          return payload.newQuestionMultiplayer.playerIds.includes(playerId)
-        })
-    },
-    newAnswerMultiplayer: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(NEW_ANSWER_MULTIPLAYER ),
-        (payload, _, context) => {
-          const { currentUser: { playerId }} = context
-          return payload.newAnswerMultiplayer.playerIds.includes(playerId)
-        }
-      )
-    },
-    scoreUpdated: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(SCORE_UPDATED),
-        (payload, _, context) => {
-          const { currentUser: { playerId }} = context
-          return payload.scoreUpdated.some(({ id }) => id === playerId)
-        }
-      )
-    }
   }
 })
 

@@ -7,9 +7,6 @@ const { gql } = require( 'apollo-server-express')
 			lobby: Lobby
 			gameRequest: GameRequest
 			gameMultiplayer: GameMultiplayer
-			currentQuestionMultiplayer: Question
-			lastAnswerMultiplayer: QuestionAnswer
-			score: [PlayerMultiplayer]
 			categories: [Category]
 		}
 
@@ -31,8 +28,8 @@ const { gql } = require( 'apollo-server-express')
 			joinLobby(player: PlayerInput!): Player
 			requestGame(gameRequest: GameRequestInput!): GameRequest
 			answerGameRequest(id: ID!, accepted: Boolean): GameRequest
-			answerQuestionMultiplayer(questionId: ID!, answerId: ID!): QuestionAnswer
-			deleteGameMultiplayer(id: ID!): GameMultiplayer
+			answerQuestionMultiplayer(questionId: ID!, answerId: ID!): GameMultiplayer
+			removePlayerFromGameMultiplayer(id: ID!): GameMultiplayer
 			deleteGameRequest(id: ID!): GameRequest
 		}
 
@@ -41,9 +38,6 @@ const { gql } = require( 'apollo-server-express')
 			playerJoined: Player
 			gameRequestSubscription(mutation: String): GameRequestSubscription
 			gameMultiplayer(mutation: String): GameMultiplayerSubscription
-			newQuestionMultiplayer: Question
-			newAnswerMultiplayer: QuestionAnswer
-			scoreUpdated: [PlayerMultiplayer]
 		}
 
 		type GameMultiplayerSubscription {
@@ -71,9 +65,9 @@ const { gql } = require( 'apollo-server-express')
 		type PlayerMultiplayer {
 			id: ID!
 			name: String
-			category: String
 			score: Int
 			won: Boolean
+			hasLeft: Boolean
 		}
 		type GameRequest {
 			id: ID!
@@ -91,9 +85,8 @@ const { gql } = require( 'apollo-server-express')
 			alternatives: [QuestionAlternative!]
 			text: String!
 			src: String	
-			playerId: ID
-			answerId: ID!
-		}
+			answerId: ID
+		} 
 
 		type QuestionAlternative {
 			type: String!
@@ -120,6 +113,8 @@ const { gql } = require( 'apollo-server-express')
 			id: ID!
 			category: String!
 			players: [PlayerMultiplayer]
+			currentQuestion: Question!
+			lastQuestion: Question
 		}
 
 		input GameRequestInput {

@@ -11,16 +11,18 @@ const allQuestions = {
   'game-of-thrones': got,
   'periodic-table': periodicTable
 };
+const R = require('ramda')
 
 const games = []
 
 const getGameByPlayerId = playerId => {
 	const game = games
-		.find(spg => spg.players.some(p => p.id === playerId))
+    .find(spg => spg.players.some(({ id, hasLeft }) => !hasLeft && id === playerId))
+
   if (!game) {
     throw new GameNotFoundError(`No game with playerId ${playerId}`);
   }
-	return game
+	return filterGame(game)
 }
 
 const getGameByGameId = gameId => {
@@ -29,13 +31,13 @@ const getGameByGameId = gameId => {
   if (!game) {
     throw new GameNotFoundError(`No game with playerId ${gameId}`);
   }
-	return game
+	return filterGame(game)
 }
 
 const createGame = (players, category) => {
 	const id = ''+Math.random()
 	const game = {
-		players: players.map(p => ({ score: 0, ...p})),
+		players: players.map(p => ({ score: 0, won: false, hasLeft: false, ...p})),
 		category,
 		id,
 		questions: shuffle(
@@ -44,28 +46,27 @@ const createGame = (players, category) => {
 					acc.concat(questions)
 				), [])
 		),
-		questionIndex: 0
-	}
+    questionIndex: 0
+  }
+  
+  game.currentQuestion = game.questions[0]
 	games.push(game)
 
-	return game	
+	return filterGame(game)	
 }
 
 const updateQuestionByPlayerId = playerId => {
-	const game = getGameByPlayerId(playerId)
-	game.questionIndex++
-}
-
-const getCurrentQuestionByPlayerId = playerId => {
-	const game = getGameByPlayerId(playerId)
-	const question = game.questions[game.questionIndex]
-	return question
+  const game = getGameByPlayerId(playerId)
+  game.lastQuestion = game.questions[game.questionIndex]
+  game.questionIndex++
+  game.currentQuestion = game.questions[game.questionIndex]
+  return filterGame(game);
 }
 
 const getLastAnswerByPlayerId = playerId => {
 	const game = getGameByPlayerId(playerId)
-	if (game.questionIndex > 0) {
-		const question =  game.questions[game.questionIndex - 1]
+	if (game.lastQuestion) {
+		const question = game.lastQuestion
 		return {
 			id: question.answerId,
 			questionId: question.id,
@@ -76,27 +77,51 @@ const getLastAnswerByPlayerId = playerId => {
 }
 
 const answerQuestion = (playerId, questionId, answerId) => {
-	let gameEnded = false;
   const game = getGameByPlayerId(playerId);
-  const question = getCurrentQuestionByPlayerId(playerId)
+  const question = game.currentQuestion
   if (questionId === question.id) {
     const player = getPlayersInGameById(game.id, playerId);
     const correct = answerId === question.answerId;
     player.score = Math.max(0, player.score + (correct ? 1 : -1));
-    if (player.score >= 10) {
+    if (player.score >= 20) {
       player.won = true;
       gameEnded = true;
     }
+    question.answered = true
   } else {
-    console.log(`Tried to answer invalid question`);
+    throw new Error(`Tried to answer invalid question`);
   }
-  return { correctAnswerId: question.answerId, players: game.players, gameEnded }
+  return filterGame(game)
 };
+
+const filterGame = game => {
+  if (!game.currentQuestion.answered) {
+
+    return {
+      currentQuestion: R.pickBy(k => k !== 'answerId', game.currentQuestion),
+      ...game
+    }
+  } else {  
+    return game
+  }
+}
 
 const getPlayersInGameById = (gameId, playerId) => {
   return getGameByGameId(gameId)
     .players
     .find(p => p.id === playerId)
+}
+
+const removePlayerFromGame  = (pubsub, playerId, gameId) => {
+  const game = getGameByGameId(gameId)
+  game.players
+    .find(({ id }) => id === playerId)
+    .hasLeft = true
+
+  if (game.players.every(({ hasLeft }) => hasLeft)) {
+    return deleteGameByGameId(pubsub, gameId)
+  }
+  return filterGame(game)
 }
 
 const deleteGameByGameId = (pubsub, gameId) => {
@@ -111,15 +136,14 @@ const deleteGameByGameId = (pubsub, gameId) => {
       mutation: 'DELETE'
     }
   })
-  return game
+  return filterGame(game)
 }
 
 module.exports = {
 	getGameByPlayerId,
 	createGame,
-	getCurrentQuestionByPlayerId,
   getLastAnswerByPlayerId,
   answerQuestion,
   updateQuestionByPlayerId,
-  deleteGameByGameId
+  removePlayerFromGame,
 };

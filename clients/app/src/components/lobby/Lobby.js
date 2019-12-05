@@ -279,13 +279,6 @@ function Lobby({ history, playerId, removePlayerId, player }) {
   }, [category, history])
   const disabledCategories = []
   const joinedCurrentCategory = false
-  //console.log((R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(gameRequestData) && R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData)))
-
-  console.log(gameRequestData)
-  console.log(
-    R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(gameRequestData) &&
-      R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData),
-  )
 
   const memoSetCategory = useCallback(c => setCategory(c), [])
 
@@ -299,6 +292,11 @@ function Lobby({ history, playerId, removePlayerId, player }) {
     },
     [deleteGameRequest, gameRequestData],
   )
+
+	console.log(playerId, gameRequestData)
+	console.log(R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(
+          gameRequestData,
+        ))
 
   return (
     <div className="flex flex-col">
