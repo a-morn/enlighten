@@ -1,14 +1,79 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import CategoryPicker from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import * as R from 'ramda'
 
-const GET_SINGLEPLAYER_GAME = gql`
+const ANSWER = gql`
+  mutation($questionId: ID!, $id: ID!) {
+    answerQuestionSingleplayer(questionId: $questionId, answerId: $id) {
+      id
+      currentQuestion {
+        id
+        type
+        text
+        src
+        answerId
+        alternatives {
+          id
+          type
+          text
+          src
+        }
+      }
+    }
+  }
+`
+
+const GAME = gql`
   query {
     gameSingleplayer {
       id
+      lastQuestion {
+        id
+        answerId
+      }
+      currentQuestion {
+        id
+        type
+        text
+        src
+        answerId
+        alternatives {
+          id
+          type
+          text
+          src
+        }
+      }
+    }
+  }
+`
+
+const GAME_UPDATED = gql`
+  subscription {
+    gameSingleplayer {
+      game {
+        id
+        lastQuestion {
+          id
+          answerId
+        }
+        currentQuestion {
+          id
+          type
+          text
+          src
+          answerId
+          alternatives {
+            id
+            type
+            text
+            src
+          }
+        }
+      }
     }
   }
 `
@@ -35,21 +100,48 @@ function Singleplayer({ playerId }) {
   const [isStartingGame, setIsStartingGame] = useState()
   const [category, setCategory] = useState()
 
-  const { data: gameData } = useQuery(GET_SINGLEPLAYER_GAME)
+  const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
+    GAME,
+  )
+  useEffect(() => {
+    gameSubscribeToMore({
+      document: GAME_UPDATED,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev
+        } else {
+          switch (subscriptionData.data.gameSingleplayer.mutation) {
+            case 'DELETE': {
+              return {
+                gameSingleplayer: null,
+              }
+            }
+            default: {
+              return {
+                gameSingleplayer: subscriptionData.data.gameSingleplayer.game,
+              }
+            }
+          }
+        }
+      },
+    })
+  }, [gameSubscribeToMore])
+
   const [createGame] = useMutation(CREATE_SINGLEPLAYER_GAME, {
     refetchQueries: [
       {
-        query: GET_SINGLEPLAYER_GAME,
+        query: GAME,
       },
     ],
   })
   const [deleteGame] = useMutation(DELETE_SINGLEPLAYER_GAME, {
     refetchQueries: [
       {
-        query: GET_SINGLEPLAYER_GAME,
+        query: GAME,
       },
     ],
   })
+  const [answer] = useMutation(ANSWER)
 
   const startGameRequest = useCallback(async () => {
     if (!isStartingGame) {
@@ -78,6 +170,18 @@ function Singleplayer({ playerId }) {
     setIsStartingGame(false)
   }, [deleteGame, gameData])
 
+  const answerCallback = useCallback(
+    id => {
+      answer({
+        variables: {
+          id,
+          questionId: gameData.gameSingleplayer.currentQuestion.id,
+        },
+      })
+    },
+    [answer, gameData],
+  )
+
   return (
     <div className="flex flex-col items-center">
       {!R.path(['gameSingleplayer', 'id'], gameData) && (
@@ -92,8 +196,9 @@ function Singleplayer({ playerId }) {
       {R.path(['gameSingleplayer', 'id'], gameData) && (
         <SingleplayerGame
           playerId={playerId}
-          gameId={gameData.gameSingleplayer.gameId}
+          game={gameData.gameSingleplayer}
           deleteGame={deleteGameCallback}
+          answer={answerCallback}
         />
       )}
     </div>

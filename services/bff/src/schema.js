@@ -3,7 +3,6 @@ const { gql } = require( 'apollo-server-express')
 	const typeDefs = gql`
 		type Query {
 			gameSingleplayer: GameSingleplayer
-			lastAnswerSingleplayer: QuestionAnswer
 			lobby: Lobby
 			gameRequest: GameRequest
 			gameMultiplayer: GameMultiplayer
@@ -23,7 +22,7 @@ const { gql } = require( 'apollo-server-express')
 		type Mutation {
 			createGameSingleplayer(playerId: ID!, category: String!): GameSingleplayer
 			deleteGameSingleplayer(id: ID!): GameSingleplayer
-			answerQuestionSingleplayer(answerId: ID!, questionId: ID!): QuestionAnswer
+			answerQuestionSingleplayer(answerId: ID!, questionId: ID!): GameSingleplayer
 			addPlayer(id: ID!): Player
 			joinLobby(player: PlayerInput!): Player
 			requestGame(gameRequest: GameRequestInput!): GameRequest
@@ -34,10 +33,15 @@ const { gql } = require( 'apollo-server-express')
 		}
 
 		type Subscription {
-			newQuestionSingleplayer: Question
+			gameSingleplayer: GameSingleplayerSubscription
 			playerJoined: Player
-			gameRequestSubscription(mutation: String): GameRequestSubscription
+			gameRequest(mutation: String): GameRequestSubscription
 			gameMultiplayer(mutation: String): GameMultiplayerSubscription
+		}
+
+		type GameSingleplayerSubscription {
+			mutation: String
+			game: GameSingleplayer!
 		}
 
 		type GameMultiplayerSubscription {

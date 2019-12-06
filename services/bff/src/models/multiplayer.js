@@ -11,7 +11,7 @@ const allQuestions = {
   'game-of-thrones': got,
   'periodic-table': periodicTable
 };
-const R = require('ramda')
+const { filterGame } = require('./utils')
 
 const games = []
 
@@ -93,18 +93,6 @@ const answerQuestion = (playerId, questionId, answerId) => {
   }
   return filterGame(game)
 };
-
-const filterGame = game => {
-  if (!game.currentQuestion.answered) {
-
-    return {
-      currentQuestion: R.pickBy(k => k !== 'answerId', game.currentQuestion),
-      ...game
-    }
-  } else {  
-    return game
-  }
-}
 
 const getPlayersInGameById = (gameId, playerId) => {
   return getGameByGameId(gameId)

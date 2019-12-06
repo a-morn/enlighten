@@ -101,7 +101,7 @@ const GAME_SUBSCRIPTION = gql`
 
 const GAME_REQUEST_SUBSCRIPTION = gql`
   subscription onGameRequestUpdated($mutation: String) {
-    gameRequestSubscription(mutation: $mutation) {
+    gameRequest(mutation: $mutation) {
       gameRequest {
         id
         playerRequestName
@@ -292,11 +292,6 @@ function Lobby({ history, playerId, removePlayerId, player }) {
     },
     [deleteGameRequest, gameRequestData],
   )
-
-	console.log(playerId, gameRequestData)
-	console.log(R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(
-          gameRequestData,
-        ))
 
   return (
     <div className="flex flex-col">

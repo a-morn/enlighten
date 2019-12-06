@@ -8,64 +8,64 @@ const GAME = gql`
   query {
     gameMultiplayer {
       id
-			players {
-				id
-				score
-				name
-				won
-				hasLeft
-			}
-			currentQuestion {
-				id
-				type
-				text
-				src
-				alternatives {
-					id
-					type
-					text
-					src
-				}
-			}
-			lastQuestion {
-				id
-				answerId
-			}
-		}
+      players {
+        id
+        score
+        name
+        won
+        hasLeft
+      }
+      currentQuestion {
+        id
+        type
+        text
+        src
+        alternatives {
+          id
+          type
+          text
+          src
+        }
+      }
+      lastQuestion {
+        id
+        answerId
+      }
+    }
   }
 `
 
 const GAME_UPDATED = gql`
-	subscription onGameUpdated($mutation: String) {
-		gameMultiplayer(mutation: $mutation) {
-			game {
-				id
-				players {
-					id
-					score
-					name
-					won
-					hasLeft
-				}
-				currentQuestion {
-					id
-					type
-					text
-					src
-					alternatives {
-						id
-						type
-						text
-						src
-					}
-				}
-				lastQuestion {
-					id
-					answerId
-				}
-			}
-		}
-	}
+  subscription onGameUpdated($mutation: String) {
+    gameMultiplayer(mutation: $mutation) {
+      game {
+        id
+        players {
+          id
+          score
+          name
+          won
+          hasLeft
+        }
+        currentQuestion {
+          id
+          type
+          text
+          src
+          alternatives {
+            id
+            type
+            text
+            src
+          }
+        }
+        lastQuestion {
+          id
+          answerId
+        }
+      }
+    }
+  }
 `
 
 const REMOVE_PLAYER_FROM_GAME = gql`
@@ -89,19 +89,21 @@ function Multiplayer({ history, playerId }) {
     subscribeToMore({
       document: GAME_UPDATED,
       updateQuery: (prev, { subscriptionData }) => {
-				if (!subscriptionData.data) {
-					return prev
-				} else {
-					switch(subscriptionData.data.gameMultiplayer.mutation) {
-						case 'DELETE': {
-							return { gameMultiplayer: null }
-						}
-						default: {
-							return { gameMultiplayer: subscriptionData.data.gameMultiplayer.game }
-						}
-					}
-				}
-      }
+        if (!subscriptionData.data) {
+          return prev
+        } else {
+          switch (subscriptionData.data.gameMultiplayer.mutation) {
+            case 'DELETE': {
+              return { gameMultiplayer: null }
+            }
+            default: {
+              return {
+                gameMultiplayer: subscriptionData.data.gameMultiplayer.game,
+              }
+            }
+          }
+        }
+      },
     })
   }, [subscribeToMore])
 
@@ -113,13 +115,13 @@ function Multiplayer({ history, playerId }) {
         },
       })
     }
-  }, [data, removePlayerFromGame, history])
+  }, [data, removePlayerFromGame])
 
   useEffect(() => {
     if (!data || !data.gameMultiplayer) {
-			history.push('/lobby')
+      history.push('/lobby')
     }
-  }, [data, removePlayerFromGame])
+  }, [data, history, removePlayerFromGame])
 
   return (
     <>

@@ -6,17 +6,15 @@ const {
 const {
   PLAYER_JOINED,
     GAME_REQUEST,
-    NEW_QUESTION_SINGLEPLAYER,
+    GAME_SINGLEPLAYER,
     GAME_MULTIPLAYER,
 } = require('./triggers')
 
 const {
 	getGameByPlayerId: getGameByPlayerIdSingleplayer,
 	createGame: createGameSingleplayer,
-	getCurrentQuestionByPlayerId: getCurrentQuestionByPlayerIdSingleplayer,
 	deleteGame: deleteGameSingleplayer,
 	answerQuestion: answerQuestionSingleplayer,
-	getLastAnswerByPlayerId: getLastAnswerByPlayerIdSingleplayer,
 	updateQuestionByPlayerId: updateQuestionByPlayerIdSingleplayer,
  } = require('./models/singleplayer')
 
@@ -33,8 +31,6 @@ const {
 const {
 	getGameByPlayerId: getGameByPlayerIdMultiplayer,
 	createGame: createGameMultiplayer,
-	getCurrentQuestionByPlayerId: getCurrentQuestionByPlayerIdMultiplayer,
-	getLastAnswerByPlayerId: getLastAnswerByPlayerIdMultiplayer,
   updateQuestionByPlayerId: updateQuestionByPlayerIdMultiplayer,
   answerQuestion: answerQuestionMultiplayer,
   removePlayerFromGame: removePlayerFromGameMultiplayer,
@@ -58,11 +54,6 @@ const resolvers = ({
           throw e
         }
       }
-    },
-    lastAnswerSingleplayer: (_, __, context) => {
-      const { currentUser: { playerId }} = context
-      const answer = getLastAnswerByPlayerIdSingleplayer(playerId);
-      return answer
     },
     lobby: (_, __, context) => {
       const { currentUser: { playerId }} = context
@@ -101,18 +92,26 @@ const resolvers = ({
     },
     answerQuestionSingleplayer: (_, { answerId, questionId }, context) => {
       const { currentUser: { playerId }} = context
-      const id = answerQuestionSingleplayer(playerId, questionId, answerId)
-      updateQuestionByPlayerIdSingleplayer(playerId)
-      const { answer, record, ...question } = getCurrentQuestionByPlayerIdSingleplayer(playerId)
+
+      const game = answerQuestionSingleplayer(playerId, questionId, answerId)
+
+      pubsub.publish(GAME_SINGLEPLAYER, {
+        gameSingleplayer: {
+        game,
+        mutation: 'UPDATE'
+        }
+      })
+
       setTimeout(() => {
-        pubsub.publish(NEW_QUESTION_SINGLEPLAYER, {
-          newQuestionSingleplayer: {
-            playerId,
-            ...question
+        const gameNewQuestion = updateQuestionByPlayerIdSingleplayer(playerId)
+        pubsub.publish(GAME_SINGLEPLAYER, {
+          gameSingleplayer: {
+            mutation: 'UPDATE',
+            game: gameNewQuestion
           }
         })
       }, 500)
-      return { playerId, id }
+      return game
     },
     addPlayer: (_, { id }) => {
       let player
@@ -204,18 +203,19 @@ const resolvers = ({
 		}
   },
   Subscription: {
-    newQuestionSingleplayer: {
+    gameSingleplayer: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(NEW_QUESTION_SINGLEPLAYER),
+        () => pubsub.asyncIterator(GAME_SINGLEPLAYER),
         (payload, _, context) => {
           const { currentUser: { playerId } } = context
-          return playerId === payload.newQuestionSingleplayer.playerId
+          const { gameSingleplayer: { game } } = payload
+          return playerId === game.playerId
         })
     },
     playerJoined: {
       subscribe: () => pubsub.asyncIterator(PLAYER_JOINED)
     },
-    gameRequestSubscription: {
+    gameRequest: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(GAME_REQUEST),
         (payload, variables, context) => {

@@ -17,7 +17,6 @@ const allQuestionsArray = Object.values(allQuestions).reduce(
 	.filter(q => q);
 
 const getQuestionById = questionId => {
-	console.log(questionId)
   const question = allQuestionsArray.find(
     ({ id }) => id === questionId
   );

@@ -2,125 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react'
 //import LimitBreak from './limit-break'
 import Question from '../../question'
 import gql from 'graphql-tag'
-import { useQuery, useMutation } from '@apollo/react-hooks'
 import * as R from 'ramda'
 
-const GET_LAST_ANSWER = gql`
-  query {
-    gameSingleplayer {
-      id
-      lastQuestion {
-        id
-        answerId
-      }
-    }
-  }
-`
-
-const GET_CURRENT_QUESTION = gql`
-  query {
-    gameSingleplayer {
-      id
-      currentQuestion {
-        id
-        type
-        text
-        src
-        alternatives {
-          id
-          type
-          text
-          src
-        }
-      }
-    }
-  }
-`
-
-const ANSWER = gql`
-  mutation($questionId: ID!, $id: ID!) {
-    answerQuestionSingleplayer(questionId: $questionId, answerId: $id) {
-      id
-      questionId
-    }
-  }
-`
-
-const NEW_QUESTION = gql`
-  subscription {
-    newQuestionSingleplayer {
-      id
-      type
-      text
-      src
-      alternatives {
-        id
-        type
-        text
-        src
-      }
-    }
-  }
-`
-
-function SingleplayerGame({ playerId, gameId, deleteGame }) {
-  const {
-    data: questionData,
-    subscribeToMore: questionSubscribeToMore,
-  } = useQuery(GET_CURRENT_QUESTION)
-  useEffect(() => {
-    questionSubscribeToMore({
-      document: NEW_QUESTION,
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) {
-          return prev
-        } else {
-          return R.mergeDeepLeft(
-            {
-              gameSingleplayer: {
-                currentQuestion: subscriptionData.data.newQuestionSingleplayer,
-              },
-            },
-            prev,
-          )
-        }
-      },
-    })
-  }, [questionSubscribeToMore])
-  const { data: answerData } = useQuery(GET_LAST_ANSWER)
-
-  const [answer] = useMutation(ANSWER, {
-    refetchQueries: [
-      {
-        query: GET_LAST_ANSWER,
-      },
-    ],
-  })
-
+function SingleplayerGame({ playerId, game, deleteGame, answer }) {
   const [correctAnswerId, setCorrectAnswerId] = useState()
 
   useEffect(() => {
-    const answerQuestionId = R.pathOr(
+    const currentQuestionAnswerId = R.pathOr(
       null,
-      ['gameSingleplayer', 'lastQuestion', 'id'],
-      answerData,
+      ['currentQuestion', 'answerId'],
+      game,
     )
-    const currentQuestionId = R.pathOr(
-      null,
-      ['gameSingleplayer', 'currentQuestion', 'id'],
-      questionData,
-    )
-    const answerId = R.pathOr(
-      null,
-      ['gameSingleplayer', 'lastQuestion', 'answerId'],
-      answerData,
-    )
-    if (answerQuestionId === currentQuestionId) {
-      setCorrectAnswerId(answerId)
-    } else {
-      setCorrectAnswerId(null)
-    }
-  }, [answerData, questionData])
+    setCorrectAnswerId(currentQuestionAnswerId)
+  }, [game])
 
   const [selectedAnswerId, setSelectedAlternativeId] = useState()
   const [isLoading] = useState(false)
@@ -169,23 +63,18 @@ function SingleplayerGame({ playerId, gameId, deleteGame }) {
     limitBreakStatus,
   ])
 */
-  const alternativeSelected = useCallback(
-    id => {
-      answer({
-        variables: {
-          id,
-          questionId: questionData.gameSingleplayer.currentQuestion.id,
-        },
-      })
-      setSelectedAlternativeId(id)
-      // mutate
-    },
-    [answer, questionData],
-  )
 
   const endGame = useCallback(() => {
     deleteGame()
   }, [deleteGame])
+
+  const answerCallback = useCallback(
+    id => {
+      answer(id)
+      setSelectedAlternativeId(id)
+    },
+    [answer],
+  )
   return (
     <div>
       {/* <LimitBreak
@@ -194,14 +83,14 @@ function SingleplayerGame({ playerId, gameId, deleteGame }) {
         status={limitBreakStatus}
         max={100}
       /> */}
-      {questionData && (
+      {game && (
         <Question
           className="pt-4"
           disabled={isLoading /*|| limitBreakStatus === 'decharge' */}
-          question={questionData.gameSingleplayer.currentQuestion}
+          question={game.currentQuestion}
           selectedAnswerId={selectedAnswerId}
           correctAnswerId={correctAnswerId}
-          onAlternativeSelected={alternativeSelected}
+          onAlternativeSelected={answerCallback}
         />
       )}
       <button
