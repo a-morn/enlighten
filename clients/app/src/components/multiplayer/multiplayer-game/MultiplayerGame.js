@@ -3,7 +3,7 @@ import Question from '../../question'
 import FullscreenModal from '../../fullscreen-modal'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import { useMutation } from '@apollo/react-hooks'
 
 const ANSWER = gql`
   mutation($questionId: ID!, $id: ID!) {
@@ -25,7 +25,7 @@ function MultiplayerGame({ playerId, game, leaveGame }) {
   useEffect(() => {
     const answerQuestionId = R.pathOr(null, ['lastQuestion', 'id'], game)
     const currentQuestionId = R.pathOr(null, ['currentQuestion', 'id'], game)
-    const answerId = R.pathOr(null, [, 'lastQuestion', 'answerId'], game)
+    const answerId = R.pathOr(null, ['lastQuestion', 'answerId'], game)
     if (answerQuestionId === currentQuestionId) {
       setCorrectAnswerId(answerId)
     } else {

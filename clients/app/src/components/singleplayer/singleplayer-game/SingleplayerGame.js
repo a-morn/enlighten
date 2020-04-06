@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 //import LimitBreak from './limit-break'
 import Question from '../../question'
-import gql from 'graphql-tag'
 import * as R from 'ramda'
 
 function SingleplayerGame({ playerId, game, deleteGame, answer }) {

@@ -19,14 +19,14 @@ if (!playerId) sessionStorage.setItem('playerId', '' + Math.random())
 playerId = sessionStorage.getItem('playerId')
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:3000/graphql',
+  uri: `http://${process.env.REACT_APP_BFF_URL}/graphql`,
   headers: {
     authorization: playerId,
   },
 })
 
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:3000/graphql`,
+  uri: `ws://${process.env.REACT_APP_BFF_URL}/graphql`,
   options: {
     reconnect: true,
     connectionParams: { playerId },

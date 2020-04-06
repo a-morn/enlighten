@@ -215,7 +215,7 @@ const resolvers = ({
     playerJoined: {
       subscribe: () => pubsub.asyncIterator(PLAYER_JOINED)
     },
-    gameRequest: {
+    gameRequestSubscription: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(GAME_REQUEST),
         (payload, variables, context) => {

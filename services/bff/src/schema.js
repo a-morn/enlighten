@@ -35,7 +35,7 @@ const { gql } = require( 'apollo-server-express')
 		type Subscription {
 			gameSingleplayer: GameSingleplayerSubscription
 			playerJoined: Player
-			gameRequest(mutation: String): GameRequestSubscription
+			gameRequestSubscription(mutation: String): GameRequestSubscription
 			gameMultiplayer(mutation: String): GameMultiplayerSubscription
 		}
 

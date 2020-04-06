@@ -100,8 +100,8 @@ const GAME_SUBSCRIPTION = gql`
 `
 
 const GAME_REQUEST_SUBSCRIPTION = gql`
-  subscription onGameRequestUpdated($mutation: String) {
-    gameRequest(mutation: $mutation) {
+  subscription {
+    gameRequestSubscription {
       gameRequest {
         id
         playerRequestName
@@ -116,7 +116,7 @@ const GAME_REQUEST_SUBSCRIPTION = gql`
   }
 `
 
-function Lobby({ history, playerId, removePlayerId, player }) {
+function Lobby({ history, playerId }) {
   const [category, setCategory] = useState()
   const { category: categoryFromParams } = useParams()
 
