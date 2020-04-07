@@ -109,6 +109,13 @@ const removePlayerFromGame  = (pubsub, playerId, gameId) => {
   if (game.players.every(({ hasLeft }) => hasLeft)) {
     return deleteGameByGameId(pubsub, gameId)
   }
+
+  pubsub.publish(GAME_MULTIPLAYER, {
+    gameMultiplayer: {
+      game,
+      mutation: 'UPDATE'
+    }
+  })
   return filterGame(game)
 }
 
