@@ -1,6 +1,6 @@
+import { mount } from 'enzyme'
 import React from 'react'
 import { MultiplayerGame } from './MultiplayerGame'
-import { mount } from 'enzyme'
 
 const baseGame = {
   currentQuestion: { type: 'text', alternatives: [] },

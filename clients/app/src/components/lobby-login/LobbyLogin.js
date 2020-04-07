@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
-import { LobbyComponent } from '../lobby'
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
+import React, { useEffect } from 'react'
+import { LobbyComponent } from '../lobby'
 
 const ADD_PLAYER = gql`
   mutation($playerId: ID!) {

@@ -1,5 +1,5 @@
 // https://usehooks.com
-import { useRef, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 function useWhyDidYouUpdate(name, props) {
   // Get a mutable ref object where we can store props ...

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import * as R from 'ramda'
+import React, { useCallback, useEffect, useState } from 'react'
 //import LimitBreak from './limit-break'
 import Question from '../../question'
-import * as R from 'ramda'
 
 function SingleplayerGame({ playerId, game, deleteGame, answer }) {
   const [correctAnswerId, setCorrectAnswerId] = useState()

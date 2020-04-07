@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import Question from '../../question'
-import FullscreenModal from '../../fullscreen-modal'
+import { useMutation } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
-import { useMutation } from '@apollo/react-hooks'
+import React, { useCallback, useEffect, useState } from 'react'
+import FullscreenModal from '../../fullscreen-modal'
+import Question from '../../question'
 
 export const ANSWER = gql`
   mutation($questionId: ID!, $id: ID!) {

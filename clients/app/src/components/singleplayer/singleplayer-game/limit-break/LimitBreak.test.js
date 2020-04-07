@@ -1,6 +1,6 @@
 import React from 'react'
-import LimitBreak from './LimitBreak'
 import { create } from 'react-test-renderer'
+import LimitBreak from './LimitBreak'
 
 describe('LimitBreak component', () => {
   it('matches the snapshot', () => {

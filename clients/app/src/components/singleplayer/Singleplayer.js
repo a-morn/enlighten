@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import { useMutation, useQuery } from '@apollo/react-hooks'
+import gql from 'graphql-tag'
+import * as R from 'ramda'
+import React, { useCallback, useEffect, useState } from 'react'
 import { CategoryPicker } from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
-import gql from 'graphql-tag'
-import { useQuery, useMutation } from '@apollo/react-hooks'
-import * as R from 'ramda'
 
 const ANSWER = gql`
   mutation($questionId: ID!, $id: ID!) {

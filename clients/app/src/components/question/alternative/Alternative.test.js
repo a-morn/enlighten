@@ -1,8 +1,8 @@
 import React from 'react'
 import { render, unmountComponentAtNode } from 'react-dom'
-import Alternative from './Alternative'
-import { create } from 'react-test-renderer'
 import { act } from 'react-dom/test-utils'
+import { create } from 'react-test-renderer'
+import Alternative from './Alternative'
 
 describe('Alternative component', () => {
   describe('snapshot', () => {

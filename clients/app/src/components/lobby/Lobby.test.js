@@ -1,18 +1,18 @@
-import React from 'react'
-import {
-  GAME_REQUEST_SUBSCRIPTION,
-  LobbyComponent,
-  Lobby,
-  LOBBY,
-  PLAYER_JOINED,
-  GAME_SUBSCRIPTION,
-  GAME,
-} from './Lobby'
 import { MockedProvider } from '@apollo/react-testing'
+import { act, findByTestId, render } from '@testing-library/react'
+import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { GET_CATEGORIES } from '../category-picker'
-import { act, render, findByTestId } from '@testing-library/react'
 import wait from 'waait'
+import { GET_CATEGORIES } from '../category-picker'
+import {
+  GAME,
+  GAME_REQUEST_SUBSCRIPTION,
+  GAME_SUBSCRIPTION,
+  LOBBY,
+  Lobby,
+  LobbyComponent,
+  PLAYER_JOINED,
+} from './Lobby'
 
 const mocks = ({ sentChallange = false }) => [
   {

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import * as R from 'ramda'
-import PlayerList from './player-list'
-import GameRequestModal from './game-request-modal'
-import { CategoryPicker } from '../category-picker'
-import { withRouter, useParams } from 'react-router-dom'
+import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import * as R from 'ramda'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useParams, withRouter } from 'react-router-dom'
+import { CategoryPicker } from '../category-picker'
+import GameRequestModal from './game-request-modal'
+import PlayerList from './player-list'
 
 export const LOBBY = gql`
   query {

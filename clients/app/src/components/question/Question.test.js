@@ -1,6 +1,6 @@
 import React from 'react'
-import Question from './Question'
 import { create } from 'react-test-renderer'
+import Question from './Question'
 
 describe('Question component', () => {
   it('matches the snapshot', () => {

@@ -3,6 +3,15 @@
 		"react-app",
 		"plugin:prettier/recommended"
 	],
-	"plugins": [
-	]
+	"rules": {
+		"import/order": [
+			"error",
+			{
+				"alphabetize": {
+					"order": "asc",
+					"caseInsensitive": false
+				}
+			}
+		]
+	}
 }
