@@ -5,7 +5,7 @@ import gql from 'graphql-tag'
 import * as R from 'ramda'
 import { useMutation } from '@apollo/react-hooks'
 
-const ANSWER = gql`
+export const ANSWER = gql`
   mutation($questionId: ID!, $id: ID!) {
     answerQuestionMultiplayer(questionId: $questionId, answerId: $id) {
       id
@@ -13,7 +13,7 @@ const ANSWER = gql`
   }
 `
 
-function MultiplayerGame({ playerId, game, leaveGame }) {
+export function MultiplayerGame({ playerId, game, leaveGame }) {
   const [selectedAnswerId, setSelectedAnswerId] = useState()
   const [isLoading] = useState(false)
 
@@ -33,7 +33,6 @@ function MultiplayerGame({ playerId, game, leaveGame }) {
     }
 
     const otherPlayer = game.players.find(({ id }) => id !== playerId)
-    console.log(otherPlayer)
     if (otherPlayer.hasLeft) {
       setOtherPlayerLeft(`${otherPlayer.name} has left the game`)
     }
@@ -57,6 +56,7 @@ function MultiplayerGame({ playerId, game, leaveGame }) {
         <>
           {winner && (
             <FullscreenModal
+              data-testid="winner-modal"
               title={`${winner.name} won!`}
               declineText="Ok"
               onDecline={leaveGameCallback}
@@ -64,6 +64,7 @@ function MultiplayerGame({ playerId, game, leaveGame }) {
           )}
           {!winner && otherPlayerLeft && (
             <FullscreenModal
+              data-testid="opponent-left-modal"
               title="Opponent left!"
               body={otherPlayerLeft}
               declineText="Ok"
@@ -72,7 +73,10 @@ function MultiplayerGame({ playerId, game, leaveGame }) {
           )}
           <div className="flex justify-between text-lg">
             {game.players.map(({ name, score, id }) => (
-              <span key={id}>{`${name}: ${score || 0}`}</span>
+              <div key={id}>
+                <span className="font-bold">{`${name}:`}</span>
+                <span className="m-8">{score || 0}</span>
+              </div>
             ))}
           </div>
           <Question
@@ -94,5 +98,3 @@ function MultiplayerGame({ playerId, game, leaveGame }) {
     </div>
   )
 }
-
-export default MultiplayerGame

@@ -1,1 +1,1 @@
-export { default } from './MultiplayerGame'
+export { MultiplayerGame } from './MultiplayerGame'

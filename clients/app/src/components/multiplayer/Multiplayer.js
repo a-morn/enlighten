@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { withRouter } from 'react-router-dom'
-import MultiplayerGame from './multiplayer-game'
+import { MultiplayerGame } from './multiplayer-game'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 
