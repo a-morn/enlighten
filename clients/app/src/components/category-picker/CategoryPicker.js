@@ -3,7 +3,7 @@ import CategorySelect from './category-select'
 import gql from 'graphql-tag'
 import { useQuery } from '@apollo/react-hooks'
 
-const GET_CATEGORIES = gql`
+export const GET_CATEGORIES = gql`
   query {
     categories {
       id
@@ -12,7 +12,7 @@ const GET_CATEGORIES = gql`
   }
 `
 
-function CategoryPicker({
+export function CategoryPicker({
   category,
   setCategory,
   className,
@@ -81,5 +81,3 @@ function CategoryPicker({
     </div>
   )
 }
-
-export default CategoryPicker

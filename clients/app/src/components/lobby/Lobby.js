@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import * as R from 'ramda'
 import PlayerList from './player-list'
 import GameRequestModal from './game-request-modal'
-import CategoryPicker from '../category-picker'
+import { CategoryPicker } from '../category-picker'
 import { withRouter, useParams } from 'react-router-dom'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 
-const LOBBY = gql`
+export const LOBBY = gql`
   query {
     lobby {
       players {
@@ -33,7 +33,7 @@ const GAME_REQUEST = gql`
   }
 `
 
-const PLAYER_JOINED = gql`
+export const PLAYER_JOINED = gql`
   subscription {
     playerJoined {
       name
@@ -81,7 +81,7 @@ const DELETE_GAME_REQUEST = gql`
   }
 `
 
-const GAME = gql`
+export const GAME = gql`
   query {
     gameMultiplayer {
       id
@@ -89,7 +89,7 @@ const GAME = gql`
   }
 `
 
-const GAME_SUBSCRIPTION = gql`
+export const GAME_SUBSCRIPTION = gql`
   subscription onGameUpdated($mutation: String) {
     gameMultiplayer(mutation: $mutation) {
       game {
@@ -99,7 +99,7 @@ const GAME_SUBSCRIPTION = gql`
   }
 `
 
-const GAME_REQUEST_SUBSCRIPTION = gql`
+export const GAME_REQUEST_SUBSCRIPTION = gql`
   subscription {
     gameRequestSubscription {
       gameRequest {
@@ -116,7 +116,7 @@ const GAME_REQUEST_SUBSCRIPTION = gql`
   }
 `
 
-function Lobby({ history, playerId }) {
+export function Lobby({ history, playerId }) {
   const [category, setCategory] = useState()
   const { category: categoryFromParams } = useParams()
 
@@ -316,6 +316,7 @@ function Lobby({ history, playerId }) {
         ) &&
           R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData) && (
             <GameRequestModal
+              data-testid="game-request-challenged-modal"
               title="Challenge!"
               body={`${gameRequestData.gameRequest.playerRequestName} is challenging you`}
               acceptText="Let's go!"
@@ -329,6 +330,7 @@ function Lobby({ history, playerId }) {
         ) &&
           R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData) && (
             <GameRequestModal
+              data-testid="game-request-pending-modal"
               title="Challenge pending..."
               body={`Waiting for ${gameRequestData.gameRequest.playerOfferedName} to accept challenge`}
               declineText="Cancel challenge"
@@ -351,4 +353,4 @@ function Lobby({ history, playerId }) {
   )
 }
 
-export default withRouter(Lobby)
+export const LobbyComponent = withRouter(Lobby)

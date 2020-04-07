@@ -1,1 +1,1 @@
-export { default } from './CategoryPicker'
+export { CategoryPicker, GET_CATEGORIES } from './CategoryPicker'

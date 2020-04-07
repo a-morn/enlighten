@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Lobby from './Lobby'
+import GameRequestModal from './GameRequestModal'
 
 it('renders without crashing', () => {
   const div = document.createElement('div')
-  ReactDOM.render(<Lobby />, div)
+  ReactDOM.render(<GameRequestModal />, div)
   ReactDOM.unmountComponentAtNode(div)
 })

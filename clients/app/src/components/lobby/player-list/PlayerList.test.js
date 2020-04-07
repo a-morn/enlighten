@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Lobby from './Lobby'
+import PlayerList from './PlayerList'
 
 it('renders without crashing', () => {
   const div = document.createElement('div')
-  ReactDOM.render(<Lobby />, div)
+  ReactDOM.render(<PlayerList />, div)
   ReactDOM.unmountComponentAtNode(div)
 })

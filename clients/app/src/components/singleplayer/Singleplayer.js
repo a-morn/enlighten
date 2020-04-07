@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import CategoryPicker from '../category-picker'
+import { CategoryPicker } from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/react-hooks'

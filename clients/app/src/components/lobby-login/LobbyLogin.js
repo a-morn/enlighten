@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import Lobby from '../lobby'
+import { LobbyComponent } from '../lobby'
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 
@@ -33,7 +33,7 @@ function LobbyLogin({ playerId }) {
 
   const removePlayerId = () => {}
 
-  return <Lobby playerId={playerId} removePlayerId={removePlayerId} />
+  return <LobbyComponent playerId={playerId} removePlayerId={removePlayerId} />
 }
 
 export default LobbyLogin

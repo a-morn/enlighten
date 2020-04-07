@@ -1,9 +1,6 @@
 import React from 'react'
-import { MultiplayerGame, ANSWER } from './MultiplayerGame'
-import { MockedProvider } from '@apollo/react-testing'
+import { MultiplayerGame } from './MultiplayerGame'
 import { mount } from 'enzyme'
-
-const mocks = []
 
 const baseGame = {
   currentQuestion: { type: 'text', alternatives: [] },
@@ -12,7 +9,6 @@ const baseGame = {
 let container
 
 it('show winner-modal when someone won', () => {
-  // Test first render and effect
   const gameWherePlayerWon = {
     ...baseGame,
     players: [{ id: 'id', won: true }, { id: 'other-id' }],
