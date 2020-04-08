@@ -45,9 +45,9 @@
 				animation-fill-mode: forwards;  
 				content: "";
 				position: absolute;
-				top: -50%;
+				top: 45%;
 				left: -50%;
-				width: 50%;
+				width: 25%;
 	  			height: 30%;
 				transform: rotate(110deg);
 				
@@ -77,16 +77,14 @@
 
 @keyframes shine{
 	70% {
-	  top: 110%;
-	  left: 90%;
-	  transition-property: left, top;
+	  left: 130%;
+	  transition-property: left;
 	  transition-duration: 0.7s, 0.7s;
 	  transition-timing-function: ease;
 	}
 	100% {
-	  top: 110%;
-	  left: 90%;
-	  transition-property: left, top;
+	  left: 130%;
+	  transition-property: left;
 	}
 }
 

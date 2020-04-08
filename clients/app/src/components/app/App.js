@@ -60,7 +60,7 @@ function App() {
           <Router>
             <Header />
             <div className="p-6 md:m-auto max-w-full flex-grow">
-              <section className="flex h-full">
+              <section className="flex h-full justify-center">
                 <SessionProvider>
                   <Switch>
                     <Route path="/(|landingpage)/">
