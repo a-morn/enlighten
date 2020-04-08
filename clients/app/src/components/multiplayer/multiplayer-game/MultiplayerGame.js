@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState } from 'react'
+import Confetti from 'react-confetti'
 import FullscreenModal from '../../fullscreen-modal'
 import Question from '../../question'
 
@@ -13,9 +14,11 @@ export const ANSWER = gql`
   }
 `
 
+const width = window.innerWidth
+const height = window.innerHeight
+
 export function MultiplayerGame({ playerId, game, leaveGame }) {
   const [selectedAnswerId, setSelectedAnswerId] = useState()
-  const [answeredQuestionId, setAnsweredQuestionId] = useState()
   const [isLoading] = useState(false)
 
   const [answer] = useMutation(ANSWER)
@@ -50,22 +53,31 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
       },
     })
     setSelectedAnswerId(id)
-    setAnsweredQuestionId(game.currentQuestion.id)
   }
-  const winner = game ? game.players.find(({ won }) => won) : null
+  const winner = { id: playerId } // game ? game.players.find(({ won }) => won) : null
   const leaveGameCallback = useCallback(() => leaveGame(), [leaveGame])
-
   return (
     <div className="flex flex-col">
       {game && (
         <>
           {winner && (
-            <FullscreenModal
-              data-testid="winner-modal"
-              title={`${winner.name} won!`}
-              declineText="Ok"
-              onDecline={leaveGameCallback}
-            />
+            <>
+              {winner.id === playerId && (
+                <Confetti
+                  style={{ zIndex: 100 }}
+                  width={width}
+                  height={height}
+                />
+              )}
+              <FullscreenModal
+                data-testid="winner-modal"
+                title={`${winner.id === playerId ? 'You' : winner.name} won! ${
+                  winner.id === playerId ? '😃' : '😢'
+                }`}
+                declineText="Ok"
+                onDecline={leaveGameCallback}
+              />
+            </>
           )}
           {!winner && otherPlayerLeft && (
             <FullscreenModal
