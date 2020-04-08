@@ -10,6 +10,7 @@ import React, { StrictMode } from 'react'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import About from '../about'
 import Header from '../header'
+import LandingPage from '../landing-page'
 import LobbyLogin from '../lobby-login'
 import Multiplayer from '../multiplayer'
 import Singleplayer from '../singleplayer'
@@ -62,7 +63,10 @@ function App() {
               <section>
                 <SessionProvider>
                   <Switch>
-                    <Route path="/(|singleplayer)/">
+                    <Route path="/(|landingpage)/">
+                      <LandingPage />
+                    </Route>
+                    <Route path="/singleplayer/">
                       <Singleplayer playerId={playerId} />
                     </Route>
                     <Route path="/lobby/:category?">

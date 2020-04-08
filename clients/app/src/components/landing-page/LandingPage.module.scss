@@ -1,0 +1,20 @@
+@import 'src/styles/style.scss';
+
+.nerd-face {
+  transform: rotate(20deg);
+}
+
+.tutorial-text-wrapper {
+  background-color: rgba(211,209,208, 0.5);
+}
+
+.thinking-face {
+  transform: rotate(-15deg);
+  left: -20px;
+}
+
+.arm {
+  right: 0;
+  top: 0;
+  transform: rotate(45deg);
+}

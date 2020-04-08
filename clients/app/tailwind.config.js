@@ -1,6 +1,42 @@
 module.exports = {
 	theme: {
-		extend: {},
+		extend: {
+			colors: {
+				'white': '#ffffff',
+				'gray-lightest': '#fbf8f8',
+				'gray-lighter': '#e7e5e4',
+				'gray-light': '#d3d1d0',
+				'gray': '#c0bebd',
+				'gray-dark': '#999796',
+				'gray-darker': '#716f6e',
+				'gray-darkest': '#4a4848',
+				'black': '#222120',
+
+				'brand-light': '#ffd7c6',
+				'brand': '#ff5722',
+				'brand-dark': '#7a3018',
+
+				'cta-light': '#d9fff1',
+				'cta': '#22ffc6',
+				'cta-dark': '#26775e',
+
+				'info-light': '#e6f1f4',
+				'info': '#9ac6d2',
+				'info-dark': '#4b5e63',
+
+				'warning-light': '#fff0cb',
+				'warning': '#ffc50f',
+				'warning-dark': '#795e18',
+
+				'success-light': '#e5f5d0',
+				'success': '#88d73c',
+				'success-dark': '#456624',
+
+				'danger-light': '#ffd4cb',
+				'danger': '#ff3c3e',
+				'danger-dark': '#792622'
+			}
+		},
 		inset: {
 			'1/2': '50%',
 		}

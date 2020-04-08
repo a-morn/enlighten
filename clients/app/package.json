@@ -28,7 +28,7 @@
     "subscriptions-transport-ws": "^0.9.16"
   },
   "scripts": {
-    "build:style": "postcss src/styles/index.css -o src/styles/tailwind.css",
+    "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
     "start": "npm run build:style && react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jest-environment-jsdom-sixteen",

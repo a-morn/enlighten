@@ -1,3 +1,5 @@
+@import 'src/styles/style.scss';
+
 .about {
   height: calc(100vh - 77px);
   overflow: hidden;
@@ -34,10 +36,4 @@
   position: relative;
   top: 50%;
   transform: translateY(-50%);
-}
-
-
-@keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
 }

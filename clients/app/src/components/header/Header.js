@@ -1,21 +1,25 @@
 import React, { useCallback, useState } from 'react'
 import { Link, withRouter } from 'react-router-dom'
+import EnlightenLogo from '../../assets/enlighten-logo.svg'
+import styles from './Header.module.scss'
 
 function Header({ history }) {
   const [open, setOpen] = useState()
   history.listen(() => setOpen(false))
   const onClick = useCallback(() => setOpen(open => !open), [])
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
+    <nav
+      className={`${styles.header} flex items-center justify-between flex-wrap brand p-6`}
+    >
       <Link to="/">
-        <div className="flex items-center flex-shrink-0 text-white mr-6 ">
-          <span className="font-semibold text-xl tracking-tight">Quiz App</span>
+        <div className="flex items-center flex-shrink-0 text-brand mr-6">
+          <img className="h-8" src={EnlightenLogo} alt="React Logo" />
         </div>
       </Link>
       <div className="block lg:hidden">
         <button
           onClick={onClick}
-          className="flex items-center px-3 py-2 border rounded text-teal-300 border-teal-light hover:text-white hover:border-white"
+          className="flex items-center px-3 py-2 border rounded text-brand border-brand-light hover:text-brand-light hover:border-white"
         >
           <svg
             className="fill-current h-3 w-3"
@@ -34,14 +38,14 @@ function Header({ history }) {
       >
         <div className="text-sm lg:flex-grow">
           <Link
-            to="/"
-            className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
+            to="/singleplayer"
+            className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4"
           >
             Singleplayer
           </Link>
           <Link
-            to="lobby"
-            className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
+            to="/lobby"
+            className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4"
           >
             Multiplayer
           </Link>
@@ -50,7 +54,7 @@ function Header({ history }) {
           <Link
             to="/about"
             href="#"
-            className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0"
+            className="inline-block text-sm px-4 py-2 leading-none border rounded text-brand border-brand hover:border-transparent hover:text-white hover:bg-brand mt-4 lg:mt-0"
           >
             About
           </Link>
