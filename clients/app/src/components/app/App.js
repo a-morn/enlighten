@@ -59,7 +59,7 @@ function App() {
           <Router>
             <Header />
             <div className="m:p-6 md:m-auto max-w-full">
-              <section className="p-8">
+              <section>
                 <SessionProvider>
                   <Switch>
                     <Route path="/(|singleplayer)/">

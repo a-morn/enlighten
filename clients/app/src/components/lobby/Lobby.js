@@ -61,6 +61,7 @@ const REQUEST_GAME = gql`
       category
       playerRequestName
       id
+      accepted
     }
   }
 `
@@ -227,20 +228,17 @@ export function Lobby({ history, playerId }) {
     [category, playerId, joinLobby],
   )
 
-  const requestGameCallback = useCallback(
-    playerOfferedId => {
-      requestGame({
-        variables: {
-          gameRequest: {
-            category,
-            playerRequestId: playerId,
-            playerOfferedId,
-          },
+  const requestGameCallback = playerOfferedId => {
+    requestGame({
+      variables: {
+        gameRequest: {
+          category,
+          playerRequestId: playerId,
+          playerOfferedId,
         },
-      })
-    },
-    [category, playerId, requestGame],
-  )
+      },
+    })
+  }
 
   useEffect(() => {
     if (R.path(['gameMultiplayer', 'id'], gameData)) {
@@ -293,6 +291,7 @@ export function Lobby({ history, playerId }) {
     [deleteGameRequest, gameRequestData],
   )
 
+  console.log(gameRequestData)
   return (
     <div className="flex flex-col">
       <div className="flex flex-col">

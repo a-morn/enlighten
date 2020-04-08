@@ -1,6 +1,6 @@
 const {
-  PlayerNotFoundError,
-  GameRequestNotFoundError
+	PlayerNotFoundError,
+	GameRequestNotFoundError
 } = require('../errors');
 
 const {
@@ -21,16 +21,21 @@ const getGameRequestById = gameRequestId => {
 
 const getGameRequestByPlayerId = playerId => {
 	return gameRequests
-		.find(({playerOfferedId, playerRequestId}) => playerOfferedId === playerId || playerRequestId === playerId)
+		.sort(({ date: d1 }, { date: d2 }) => new Date(d2) - new Date(d1))
+		.find(
+			({ playerOfferedId, playerRequestId }) =>
+				playerOfferedId === playerId
+				|| playerRequestId === playerId
+		)
 }
 
 const getPlayerById = playerId => {
-  const player = players.find(p => p.id == playerId);
-  if (!player) {
-    throw new PlayerNotFoundError(`No such player: ${playerId}`);
-  }
+	const player = players.find(p => p.id == playerId);
+	if (!player) {
+		throw new PlayerNotFoundError(`No such player: ${playerId}`);
+	}
 
-  return player;
+	return player;
 };
 
 const addPlayer = player => {
@@ -43,13 +48,14 @@ const addPlayer = player => {
 
 const getPlayers = (category) => {
 	return players
-		.filter(p => !category || p.category === category)	
+		.filter(p => !category || p.category === category)
 }
 
 const addGameRequest = (pubsub, playerRequestId, playerOfferedId, category) => {
 	const { name: playerRequestName } = getPlayerById(playerRequestId);
 	const { name: playerOfferedName } = getPlayerById(playerOfferedId);
-	const id = ''+Math.random()
+	const id = '' + Math.random()
+	const date = new Date()
 	const gameRequest = {
 		accepted: null,
 		id,
@@ -58,6 +64,7 @@ const addGameRequest = (pubsub, playerRequestId, playerOfferedId, category) => {
 		category,
 		playerRequestName,
 		playerOfferedName,
+		date
 	}
 	gameRequests.push(gameRequest)
 	pubsub.publish(GAME_REQUEST, {
@@ -72,7 +79,7 @@ const addGameRequest = (pubsub, playerRequestId, playerOfferedId, category) => {
 const deleteGameRequestById = (pubsub, playerId, id) => {
 	const { playerRequestId, playerOfferedId } = getGameRequestById(id)
 	if (![playerRequestId, playerOfferedId].includes(playerId)) {
-	  throw new Error('Unauthorized')
+		throw new Error('Unauthorized')
 	}
 
 	const index = gameRequests.findIndex(g => g.id === id)

@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
+import { CountDown } from './count-down'
 import { MultiplayerGame } from './multiplayer-game'
 
 const GAME = gql`
@@ -78,6 +79,7 @@ const REMOVE_PLAYER_FROM_GAME = gql`
 
 function Multiplayer({ history, playerId }) {
   const { data, subscribeToMore } = useQuery(GAME)
+  console.log(data)
   const [removePlayerFromGame] = useMutation(REMOVE_PLAYER_FROM_GAME, {
     refetchQueries: [
       {
@@ -118,20 +120,24 @@ function Multiplayer({ history, playerId }) {
   }, [data, removePlayerFromGame])
 
   useEffect(() => {
-    if (!data || !data.gameMultiplayer) {
+    if (data && !data.gameMultiplayer) {
       history.push('/lobby')
     }
   }, [data, history, removePlayerFromGame])
 
+  console.log(data)
   return (
     <>
-      {data && data.gameMultiplayer && (
+      {data && data.gameMultiplayer && data.gameMultiplayer.currentQuestion && (
         <MultiplayerGame
           game={data.gameMultiplayer}
           playerId={playerId}
           leaveGame={removePlayerFromGameCallback}
         />
       )}
+      {data &&
+        data.gameMultiplayer &&
+        !data.gameMultiplayer.currentQuestion && <CountDown duration={3} />}
     </>
   )
 }

@@ -1,6 +1,9 @@
 module.exports = {
 	theme: {
-		extend: {}
+		extend: {},
+		inset: {
+			'1/2': '50%',
+		}
 	},
 	variants: {
 
