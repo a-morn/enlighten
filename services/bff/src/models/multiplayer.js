@@ -7,9 +7,11 @@ const {
 const shuffle = require('shuffle-array');
 const periodicTable = require('../data/questions/periodic-table');
 const got = require('../data/questions/game-of-thrones');
+const countries = require('../data/questions/countries')
 const allQuestions = {
   'game-of-thrones': got,
-  'periodic-table': periodicTable
+  'periodic-table': periodicTable,
+  countries
 };
 const { filterGame } = require('./utils')
 

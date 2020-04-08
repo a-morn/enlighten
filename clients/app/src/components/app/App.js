@@ -59,7 +59,7 @@ function App() {
         <div className="h-screen flex flex-col bg-gray-100">
           <Router>
             <Header />
-            <div className="m:p-6 md:m-auto max-w-full flex-grow">
+            <div className="p-6 md:m-auto max-w-full flex-grow">
               <section className="flex h-full">
                 <SessionProvider>
                   <Switch>

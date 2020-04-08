@@ -9,10 +9,11 @@
 		&.incorrect.selected {
 			animation: bg-color-pulse-incorrect 0.8s ease infinite;
 			&:before {
-				content: "👎👎👎👎👎👎👎👎";
+				content: "👎👎👎👎👎👎";
 				opacity: 1;
 				top: 25%;
-				left: 15%;
+				left: 0;
+				right: 0;
 				position: absolute;
 				font-size: 32px;
 			}
@@ -90,14 +91,14 @@
 }
 
 @keyframes slide-in{
-	90% {
-		left: -10%;
+	70% {
+		left: -5%;
 		opacity: 1;
 		transition-property: left opacity;
 	}
 	100% {
-		left: -10%;
-		opacity: 1;
+		left: -20%;
+		opacity: 0;
 		transition-property: left;
 	}
 }

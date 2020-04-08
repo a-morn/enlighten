@@ -1,9 +1,11 @@
 const shuffle = require('shuffle-array');
 const periodicTable = require('../data/questions/periodic-table');
 const got = require('../data/questions/game-of-thrones');
+const countries = require('../data/questions/countries')
 const allQuestions = {
   'game-of-thrones': got,
-  'periodic-table': periodicTable
+  'periodic-table': periodicTable,
+  countries
 };
 
 const allQuestionsArray = Object.values(allQuestions).reduce(
@@ -14,18 +16,18 @@ const allQuestionsArray = Object.values(allQuestions).reduce(
         []
       )
     ), [])
-	.filter(q => q);
+  .filter(q => q);
 
 const getQuestionById = questionId => {
   const question = allQuestionsArray.find(
     ({ id }) => id === questionId
   );
 
-	if (!question) {
-		//throw
-	}
+  if (!question) {
+    //throw
+  }
 
-	const { alternatives, ...rest } = question
+  const { alternatives, ...rest } = question
 
   return {
     ...rest,

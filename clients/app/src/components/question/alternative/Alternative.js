@@ -22,7 +22,7 @@ const Alternative = memo(
     return (
       <div className="alternative">
         <button
-          className={`text-black w-full py-8 m:py-6 px-4 rounded bg-origin-content ${classNames}`}
+          className={`bg-gray-lighter text-black w-full py-8 m:py-6 px-4 rounded bg-origin-content ${classNames}`}
           onClick={onClick}
           disabled={disabled}
           style={{ backgroundImage: `url(${src})` }}

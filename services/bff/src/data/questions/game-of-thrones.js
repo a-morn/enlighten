@@ -59,7 +59,7 @@ const foo = (fromType, toType, el) => {
         type: 'text',
         text: `What is the __${toType.label}__ of the house with the ${
           fromType.label
-        } _${el[fromType.id]}_? `
+          } _${el[fromType.id]}_? `
       };
     case 'coat-of-arms':
       return {
@@ -118,11 +118,11 @@ const questions = Object.entries(config).reduce(
                       .map((el) => ({ ...bar(toType, el), id: uuidv1() }))
                   ,
                   category: 'game-of-thrones'
-								}))
-								.map(({ alternatives, ...question}) => ({
+                }))
+                .map(({ alternatives, ...question }) => ({
                   answerId: alternatives[0].id,
-									alternatives: shuffle(alternatives),
-									...question,
+                  alternatives: shuffle(alternatives),
+                  ...question,
                 }))
             ),
           []

@@ -43,7 +43,10 @@ const pubsub = new PubSub()
 const resolvers = ({
   Query: {
     categories: () => {
-      return [{ id: 'game-of-thrones', label: 'Game of Thrones' }]
+      return [
+        { id: 'game-of-thrones', label: 'Game of Thrones' },
+        { id: 'countries', label: 'Countries' }
+      ]
     },
     gameSingleplayer: (_, __, context) => {
       const { currentUser: { playerId } } = context
