@@ -59,7 +59,7 @@ function App() {
         <div className="h-screen flex flex-col bg-gray-100">
           <Router>
             <Header />
-            <div className="m:p-6 md:m-auto max-w-full">
+            <div className="m:p-6 md:m-auto max-w-full flex-grow">
               <section>
                 <SessionProvider>
                   <Switch>
@@ -82,7 +82,7 @@ function App() {
                 </SessionProvider>
               </section>
             </div>
-            <footer className="text-center p-16 w-100 bg-gray-darkest">
+            <footer className="text-center p-16 w-100 bg-gray-darkest text-gray-light">
               © 2020 Mörner Industries
             </footer>
           </Router>

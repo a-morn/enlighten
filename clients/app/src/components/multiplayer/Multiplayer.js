@@ -21,6 +21,7 @@ const GAME = gql`
         type
         text
         src
+        answerId
         alternatives {
           id
           type
@@ -53,6 +54,7 @@ const GAME_UPDATED = gql`
           type
           text
           src
+          answerId
           alternatives {
             id
             type
@@ -79,7 +81,6 @@ const REMOVE_PLAYER_FROM_GAME = gql`
 
 function Multiplayer({ history, playerId }) {
   const { data, subscribeToMore } = useQuery(GAME)
-  console.log(data)
   const [removePlayerFromGame] = useMutation(REMOVE_PLAYER_FROM_GAME, {
     refetchQueries: [
       {
@@ -124,8 +125,6 @@ function Multiplayer({ history, playerId }) {
       history.push('/lobby')
     }
   }, [data, history, removePlayerFromGame])
-
-  console.log(data)
   return (
     <>
       {data && data.gameMultiplayer && data.gameMultiplayer.currentQuestion && (

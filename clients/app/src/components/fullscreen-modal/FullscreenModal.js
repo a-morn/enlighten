@@ -5,7 +5,7 @@ import React, { memo } from 'react'
 const GameRequestModal = memo(
   ({ title, body, acceptText, declineText, onAccept, onDecline }) => {
     return (
-      <div className="border border-solid border-gray-500 bg-gray-200 bg-gray-500 fixed z-50 top-0 right-0 bottom-0 left-0 w-full h-full overflow-auto bg-smoke-dark flex">
+      <div className="border border-solid border-gray-500 bg-info fixed z-50 top-0 right-0 bottom-0 left-0 w-full h-full overflow-auto flex">
         <div className="fixed shadow-inner max-w-md md:relative right-0 left-0 top-0 bottom-0 h-64  align-top m-auto justify-end md:justify-center p-8 bg-white md:rounded w-full md:h-auto md:shadow flex flex-col">
           <h2 className="text-4xl text-center font-hairline md:leading-loose text-grey md:mt-8 mb-4">
             {title}
@@ -23,7 +23,7 @@ const GameRequestModal = memo(
             {declineText && (
               <button
                 onClick={onDecline}
-                className="bg-grey-lighter flex-1 md:flex-none border-b-2 border-red ml-2 hover:bg-red-lightest text-grey-darkest font-bold py-4 px-6 rounded"
+                className="bg-grey-lighter flex-1 md:flex-none border-b-2 border-red ml-2 hover:bg-cta hover:text-white text-grey-darkest font-bold py-4 px-6 rounded"
               >
                 {declineText}
               </button>

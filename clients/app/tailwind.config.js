@@ -35,11 +35,8 @@ module.exports = {
 				'danger-light': '#ffd4cb',
 				'danger': '#ff3c3e',
 				'danger-dark': '#792622'
-			}
+			},
 		},
-		inset: {
-			'1/2': '50%',
-		}
 	},
 	variants: {
 

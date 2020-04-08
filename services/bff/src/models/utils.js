@@ -1,14 +1,17 @@
 const R = require('ramda')
 
 const filterGame = game => {
-    if (R.pathEq(['currentQuestion', 'answered'], false)(game)) {
+    const { questions: _, ...noQuestionsGame } = game
+    if (!R.pathEq(['currentQuestion', 'answered'], true)(game)) {
         const censoredGame = {
-            ...game,
-            currentQuestion: R.pickBy((_, k) => k !== 'answerId', game.currentQuestion),
+            ...noQuestionsGame,
+            currentQuestion: game.currentQuestion
+                ? R.pickBy((_, k) => k !== 'answerId', game.currentQuestion)
+                : null,
         }
         return censoredGame
-    } else {  
-        return game
+    } else {
+        return noQuestionsGame
     }
 }
 

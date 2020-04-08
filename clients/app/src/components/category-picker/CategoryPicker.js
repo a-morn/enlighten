@@ -34,7 +34,7 @@ export function CategoryPicker({
   }, [autoPick, data, setCategory])
 
   let buttonClasses =
-    'bg-blue-500 text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
+    'bg-cta-dark text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
 
   const disabled =
     disabledCategories.some(c => c === category) ||
@@ -44,7 +44,7 @@ export function CategoryPicker({
   if (disabled) {
     buttonClasses += ' opacity-50 cursor-not-allowed'
   } else {
-    buttonClasses += ' hover:bg-blue-700'
+    buttonClasses += ' hover:bg-black'
   }
   return (
     <div className={`flex flex-col md:flex-row justify-center ${className}`}>

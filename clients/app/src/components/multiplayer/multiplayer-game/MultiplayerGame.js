@@ -15,6 +15,7 @@ export const ANSWER = gql`
 
 export function MultiplayerGame({ playerId, game, leaveGame }) {
   const [selectedAnswerId, setSelectedAnswerId] = useState()
+  const [answeredQuestionId, setAnsweredQuestionId] = useState()
   const [isLoading] = useState(false)
 
   const [answer] = useMutation(ANSWER)
@@ -23,11 +24,14 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
   const [otherPlayerLeft, setOtherPlayerLeft] = useState()
 
   useEffect(() => {
-    const answerQuestionId = R.pathOr(null, ['lastQuestion', 'id'], game)
-    const currentQuestionId = R.pathOr(null, ['currentQuestion', 'id'], game)
-    const answerId = R.pathOr(null, ['lastQuestion', 'answerId'], game)
-    if (answerQuestionId === currentQuestionId) {
-      setCorrectAnswerId(answerId)
+    const currentQuestionAnswerId = R.pathOr(
+      null,
+      ['currentQuestion', 'answerId'],
+      game,
+    )
+
+    if (currentQuestionAnswerId) {
+      setCorrectAnswerId(currentQuestionAnswerId)
     } else {
       setCorrectAnswerId(null)
     }
@@ -46,6 +50,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
       },
     })
     setSelectedAnswerId(id)
+    setAnsweredQuestionId(game.currentQuestion.id)
   }
   const winner = game ? game.players.find(({ won }) => won) : null
   const leaveGameCallback = useCallback(() => leaveGame(), [leaveGame])

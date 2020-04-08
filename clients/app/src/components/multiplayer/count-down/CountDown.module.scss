@@ -1,4 +1,5 @@
 // based on https://codepen.io/nw/pen/zvQVWM
+@import 'src/styles/style.scss';
 
 .countdown {
 	display: block;
@@ -28,22 +29,21 @@
 		position: absolute;
 		left: 0;
 		bottom: 0;
-		
-		background: #38b2ac;
+		background: $danger;
 		opacity: 1;
     }
     
     &__progress {
-		background: #FFF;
+		background: $danger-dark;
     }
 
     &__background {
-		background: #38b2ac;
+		background: $black;
     }
 	
 	&__digit {
 		width: 100%;
-		color: #38b2ac;;
+		color: $white;
 		text-align: center;
 		mix-blend-mode: difference;
 		pointer-events: none;

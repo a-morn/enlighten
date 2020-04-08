@@ -1,3 +1,5 @@
+@import 'src/styles/style.scss';
+
 .alternative {
 	button {
 		min-height: 50px;
@@ -8,10 +10,10 @@
 			animation-name: bg-color-pulse-correct;
 		}
 		&.correct.selected {
-			background-color: green;
+			background-color: $success;
 		}
 
-		animation-duration: 1s;
+		animation-duration: 10s;
 		animation-iteration-count: infinite;
 
 		&.alternative--image {
@@ -25,18 +27,18 @@
 
 @keyframes bg-color-pulse-incorrect {
 	0% {
-		background-color: red;
+		background-color: $danger;
 	}
 	100% {
-		background-color: darkred;
+		background-color: $danger-dark;
 	}
 }
 
 @keyframes bg-color-pulse-correct {
 	0% {
-		background-color: green;
+		background-color: $success;
 	}
 	100% {
-		background-color: darkgreen;
+		background-color: $success-dark;
 	}
 }

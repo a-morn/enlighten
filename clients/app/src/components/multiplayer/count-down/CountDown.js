@@ -29,7 +29,6 @@ export function CountDown({ duration }) {
     }, 1000)
     return () => (isSubscribed = false)
   }, [timeLeft])
-  console.log(styles)
   return (
     <div className={styles.countdown}>
       <div className={styles.countdown__background}></div>

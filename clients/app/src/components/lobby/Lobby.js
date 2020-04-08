@@ -291,7 +291,6 @@ export function Lobby({ history, playerId }) {
     [deleteGameRequest, gameRequestData],
   )
 
-  console.log(gameRequestData)
   return (
     <div className="flex flex-col">
       <div className="flex flex-col">

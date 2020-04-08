@@ -22,7 +22,7 @@ const getGameByPlayerId = playerId => {
   if (!game) {
     throw new GameNotFoundError(`No game with playerId ${playerId}`);
   }
-  return filterGame(game)
+  return game
 }
 
 const getGameByGameId = gameId => {
@@ -31,7 +31,7 @@ const getGameByGameId = gameId => {
   if (!game) {
     throw new GameNotFoundError(`No game with playerId ${gameId}`);
   }
-  return filterGame(game)
+  return game
 }
 
 const createGame = (pubsub, players, category) => {
@@ -127,11 +127,11 @@ const removePlayerFromGame = (pubsub, playerId, gameId) => {
 
   pubsub.publish(GAME_MULTIPLAYER, {
     gameMultiplayer: {
-      game,
+      game: filterGame(game),
       mutation: 'UPDATE'
     }
   })
-  return filterGame(game)
+  return game
 }
 
 const deleteGameByGameId = (pubsub, gameId) => {
@@ -142,7 +142,7 @@ const deleteGameByGameId = (pubsub, gameId) => {
   const [game] = games.splice(index, 1)
   pubsub.publish(GAME_MULTIPLAYER, {
     gameMultiplayer: {
-      game,
+      game: filterGame(game),
       mutation: 'DELETE'
     }
   })

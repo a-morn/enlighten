@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 //import LimitBreak from './limit-break'
 import Question from '../../question'
 
-function SingleplayerGame({ playerId, game, deleteGame, answer }) {
+function SingleplayerGame({ game, deleteGame, answer }) {
   const [correctAnswerId, setCorrectAnswerId] = useState()
 
   useEffect(() => {
@@ -74,6 +74,7 @@ function SingleplayerGame({ playerId, game, deleteGame, answer }) {
     },
     [answer],
   )
+
   return (
     <div>
       {/* <LimitBreak
@@ -93,7 +94,7 @@ function SingleplayerGame({ playerId, game, deleteGame, answer }) {
         />
       )}
       <button
-        className="bg-red-500 text-white rounded px-4 mt-10 shadow-lg p-4"
+        className="bg-danger-dark hover:bg-danger text-white rounded px-4 mt-10 shadow-lg p-4"
         onClick={endGame}
       >
         End game

@@ -36,6 +36,8 @@ const {
   removePlayerFromGame: removePlayerFromGameMultiplayer,
 } = require('./models/multiplayer')
 
+const { filterGame } = require('./models/utils')
+
 const pubsub = new PubSub()
 
 const resolvers = ({
@@ -72,7 +74,9 @@ const resolvers = ({
     gameMultiplayer: (_, __, context) => {
       const { currentUser: { playerId } } = context
       try {
-        return getGameByPlayerIdMultiplayer(playerId)
+        const game = getGameByPlayerIdMultiplayer(playerId);
+        const filteredGame = filterGame(game);
+        return filteredGame
       } catch (e) {
         if (e instanceof GameNotFoundError) {
           return null
@@ -87,17 +91,17 @@ const resolvers = ({
       return createGameSingleplayer(playerId, category)
     },
     deleteGameSingleplayer: (_, { id }) => {
-      const game = deleteGameSingleplayer(id)
-      return game
+      const filteredGame = filterGame(deleteGameSingleplayer(id))
+      return filteredGame
     },
     answerQuestionSingleplayer: (_, { answerId, questionId }, context) => {
       const { currentUser: { playerId } } = context
 
-      const game = answerQuestionSingleplayer(playerId, questionId, answerId)
+      const filteredGame = filterGame(answerQuestionSingleplayer(playerId, questionId, answerId))
 
       pubsub.publish(GAME_SINGLEPLAYER, {
         gameSingleplayer: {
-          game,
+          game: filteredGame,
           mutation: 'UPDATE'
         }
       })
@@ -111,7 +115,7 @@ const resolvers = ({
           }
         })
       }, 500)
-      return game
+      return filteredGame
     },
     addPlayer: (_, { id }) => {
       let player
@@ -163,32 +167,32 @@ const resolvers = ({
     },
     answerQuestionMultiplayer: (_, { answerId, questionId }, context) => {
       const { currentUser: { playerId } } = context
-      const game = answerQuestionMultiplayer(playerId, questionId, answerId)
+      const filteredGame = filterGame(answerQuestionMultiplayer(playerId, questionId, answerId))
 
       pubsub.publish(GAME_MULTIPLAYER, {
         gameMultiplayer: {
-          game,
+          game: filteredGame,
           mutation: 'UPDATE'
         }
       })
 
       setTimeout(() => {
-        const game = updateQuestionByPlayerIdMultiplayer(playerId)
+        const filteredGame = filterGame(updateQuestionByPlayerIdMultiplayer(playerId))
 
         pubsub.publish(GAME_MULTIPLAYER, {
           gameMultiplayer: {
-            game,
+            game: filteredGame,
             mutation: 'UPDATE'
           }
         })
       }, 500)
 
-      return game
+      return filteredGame
     },
     removePlayerFromGameMultiplayer: (_, { id }, { currentUser: { playerId } }) => {
-      const game = removePlayerFromGameMultiplayer(pubsub, playerId, id)
+      const filteredGame = filterGame(removePlayerFromGameMultiplayer(pubsub, playerId, id))
 
-      return game
+      return filteredGame
     },
     deleteGameRequest: (_, { id }, { currentUser: { playerId } }) => {
       const gameRequest = deleteGameRequestByIdLobby(pubsub, playerId, id)
