@@ -3,6 +3,7 @@ import gql from 'graphql-tag'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState } from 'react'
 import Confetti from 'react-confetti'
+import correct from '../../../assets/correct.wav'
 import FullscreenModal from '../../fullscreen-modal'
 import Question from '../../question'
 
@@ -33,8 +34,11 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
       game,
     )
 
-    if (currentQuestionAnswerId) {
+    if (currentQuestionAnswerId && !correctAnswerId) {
       setCorrectAnswerId(currentQuestionAnswerId)
+      if (currentQuestionAnswerId === correctAnswerId) {
+        new Audio(correct).play()
+      }
     } else {
       setCorrectAnswerId(null)
     }
@@ -43,7 +47,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
     if (otherPlayer.hasLeft) {
       setOtherPlayerLeft(`${otherPlayer.name} has left the game`)
     }
-  }, [game, playerId])
+  }, [correctAnswerId, game, playerId])
 
   const alternativeSelected = id => {
     answer({

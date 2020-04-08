@@ -1,10 +1,16 @@
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState } from 'react'
 //import LimitBreak from './limit-break'
+import correct from '../../../assets/correct.wav'
 import Question from '../../question'
+
+const correctSound = new Audio(correct)
+correctSound.volume = 0.05
 
 function SingleplayerGame({ game, deleteGame, answer }) {
   const [correctAnswerId, setCorrectAnswerId] = useState()
+  const [selectedAnswerId, setSelectedAlternativeId] = useState()
+  const [isLoading] = useState(false)
 
   useEffect(() => {
     const currentQuestionAnswerId = R.pathOr(
@@ -13,10 +19,11 @@ function SingleplayerGame({ game, deleteGame, answer }) {
       game,
     )
     setCorrectAnswerId(currentQuestionAnswerId)
-  }, [game])
+    if (currentQuestionAnswerId === selectedAnswerId) {
+      correctSound.play()
+    }
+  }, [game, selectedAnswerId])
 
-  const [selectedAnswerId, setSelectedAlternativeId] = useState()
-  const [isLoading] = useState(false)
   /*
   const [limitBreakLevel, setLimitBreakLevel] = useState(0)
   const [limitBreakTimerActive, setLimitBreakTimerActive] = useState(false)
