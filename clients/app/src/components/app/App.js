@@ -82,6 +82,9 @@ function App() {
                 </SessionProvider>
               </section>
             </div>
+            <footer className="text-center p-16 w-100 bg-gray-darkest">
+              © 2020 Mörner Industries
+            </footer>
           </Router>
         </div>
       </ApolloProvider>

@@ -35,7 +35,7 @@ function LandingPage() {
           <div
             className={`${
               styles['tutorial-text-wrapper']
-            } bg-gray-light relative`}
+            } bg-gray-light relative mb-16`}
           >
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
               1. Challange other players
