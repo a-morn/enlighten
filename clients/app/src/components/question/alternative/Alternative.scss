@@ -2,15 +2,63 @@
 
 .alternative {
 	button {
+		box-shadow: none;
+		outline: none;
 		min-height: 50px;
+		position: relative;
 		&.incorrect.selected {
-			animation-name: bg-color-pulse-incorrect;
+			animation: bg-color-pulse-incorrect 0.8s ease infinite;
+			&:before {
+				content: "👎👎👎👎👎👎👎👎";
+				opacity: 1;
+				top: 25%;
+				left: 15%;
+				position: absolute;
+				font-size: 32px;
+			}
 		}
 		&.correct:not(.selected) {
-			animation-name: bg-color-pulse-correct;
+			background-color: $info;
+			&:before {
+				content: "🤓";
+				font-size: 64px;
+				position: absolute;
+				top: 10%;
+				left: 10%;
+				animation: slide-across 0.8s linear infinite;
+			}
 		}
 		&.correct.selected {
 			background-color: $success;
+			&:before {
+				animation: slide-in 0.8s ease-in-out infinite;
+				content: "👍";
+				opacity: 0;
+				left: -100%;
+				top: 30%;
+				position: absolute;
+				font-size: 32px;
+			}
+			&:after {
+				animation: shine 0.8s ease-in-out infinite;
+				animation-fill-mode: forwards;  
+				content: "";
+				position: absolute;
+				top: -50%;
+				left: -50%;
+				width: 50%;
+	  			height: 30%;
+				transform: rotate(110deg);
+				
+				background: rgba(255, 255, 255, 0.13);
+				background: linear-gradient(
+				  to right, 
+				  rgba(255, 255, 255, 0.13) 0%,
+				  rgba(255, 255, 255, 0.13) 77%,
+				  rgba(255, 255, 255, 0.5) 92%,
+				  rgba(255, 255, 255, 0.0) 100%
+				);
+			  }
 		}
 
 		animation-duration: 10s;
@@ -25,20 +73,61 @@
 	}
 }
 
+
+@keyframes shine{
+	70% {
+	  top: 110%;
+	  left: 90%;
+	  transition-property: left, top;
+	  transition-duration: 0.7s, 0.7s;
+	  transition-timing-function: ease;
+	}
+	100% {
+	  top: 110%;
+	  left: 90%;
+	  transition-property: left, top;
+	}
+}
+
+@keyframes slide-in{
+	90% {
+		left: -10%;
+		opacity: 1;
+		transition-property: left opacity;
+	}
+	100% {
+		left: -10%;
+		opacity: 1;
+		transition-property: left;
+	}
+}
+
+@keyframes slide-across {
+	0% {
+		left: 10%;
+		opacity: 0;
+		transition-property: left, opacity;
+	}
+	30% {
+		opacity: 1;
+		transition-property: opacity;
+	}
+	80% {
+		opacity: 1;
+		transition-property: opacity;
+	}
+	  100% {
+		left: 70%;
+		opacity: 0;
+		transition-property: left, opacity;
+	  }
+}
+
 @keyframes bg-color-pulse-incorrect {
 	0% {
 		background-color: $danger;
 	}
 	100% {
 		background-color: $danger-dark;
-	}
-}
-
-@keyframes bg-color-pulse-correct {
-	0% {
-		background-color: $success;
-	}
-	100% {
-		background-color: $success-dark;
 	}
 }

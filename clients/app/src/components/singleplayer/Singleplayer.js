@@ -183,7 +183,7 @@ function Singleplayer({ playerId }) {
   )
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center">
       {!R.path(['gameSingleplayer', 'id'], gameData) && (
         <CategoryPicker
           onClick={startGameRequest}

@@ -114,7 +114,7 @@ const resolvers = ({
             game: gameNewQuestion
           }
         })
-      }, 500)
+      }, 800)
       return filteredGame
     },
     addPlayer: (_, { id }) => {
@@ -185,7 +185,7 @@ const resolvers = ({
             mutation: 'UPDATE'
           }
         })
-      }, 500)
+      }, 800)
 
       return filteredGame
     },

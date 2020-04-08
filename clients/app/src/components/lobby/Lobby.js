@@ -292,7 +292,7 @@ export function Lobby({ history, playerId }) {
   )
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col my-auto">
       <div className="flex flex-col">
         <CategoryPicker
           className=""
