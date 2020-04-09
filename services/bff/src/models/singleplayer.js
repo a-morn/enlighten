@@ -8,6 +8,12 @@ const allQuestions = {
   'periodic-table': periodicTable,
   countries
 };
+
+const backgrounds = {
+  'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
+  countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
+};
+
 const {
   GameNotFoundError,
 } = require('../errors');
@@ -30,6 +36,7 @@ const createGame = (playerId, category) => {
   const game = {
     playerId,
     category,
+    categoryBackground: backgrounds[category],
     id,
     levels: Object.entries(allQuestions[category]).reduce(
       (acc, [key, value]) => ({

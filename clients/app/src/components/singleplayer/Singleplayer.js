@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
+import { store } from '../../hooks/context/store.js'
 import { CategoryPicker } from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
 
@@ -30,6 +31,7 @@ const GAME = gql`
   query {
     gameSingleplayer {
       id
+      categoryBackground
       lastQuestion {
         id
         answerId
@@ -56,6 +58,7 @@ const GAME_UPDATED = gql`
     gameSingleplayer {
       game {
         id
+        categoryBackground
         lastQuestion {
           id
           answerId
@@ -99,10 +102,21 @@ const DELETE_SINGLEPLAYER_GAME = gql`
 function Singleplayer({ playerId }) {
   const [isStartingGame, setIsStartingGame] = useState()
   const [category, setCategory] = useState()
+  const globalState = useContext(store)
+  const { dispatch } = globalState
 
   const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
     GAME,
   )
+  useEffect(() => {
+    const url =
+      gameData && gameData.gameSingleplayer
+        ? gameData.gameSingleplayer.categoryBackground
+        : null
+    dispatch({ type: 'category-background-updated', url })
+    return () => dispatch({ type: 'category-background-updated', url: null })
+  }, [gameData, dispatch])
+
   useEffect(() => {
     gameSubscribeToMore({
       document: GAME_UPDATED,

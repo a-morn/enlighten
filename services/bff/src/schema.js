@@ -108,6 +108,7 @@ const typeDefs = gql`
 		type GameSingleplayer {
 			id: ID!
 			category: String!
+			categoryBackground: String!
 			playerId: ID!
 			currentQuestion: Question!
 			lastQuestion: Question
@@ -116,6 +117,7 @@ const typeDefs = gql`
 		type GameMultiplayer {
 			id: ID!
 			category: String!
+			categoryBackground: String!
 			players: [PlayerMultiplayer]
 			currentQuestion: Question
 			lastQuestion: Question

@@ -18,6 +18,7 @@ function LandingPage() {
             }`}
             style={{ clipPath: 'url(#clipPath)', minHeight: '184px' }}
             autoPlay
+            loop
             muted
             playsInline
           >

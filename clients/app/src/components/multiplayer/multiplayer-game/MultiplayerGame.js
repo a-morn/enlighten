@@ -39,7 +39,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
       if (currentQuestionAnswerId === correctAnswerId) {
         new Audio(correct).play()
       }
-    } else {
+    } else if (currentQuestionAnswerId === null && correctAnswerId !== null) {
       setCorrectAnswerId(null)
     }
 
@@ -58,10 +58,10 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
     })
     setSelectedAnswerId(id)
   }
-  const winner = { id: playerId } // game ? game.players.find(({ won }) => won) : null
+  const winner = game ? game.players.find(({ won }) => won) : null
   const leaveGameCallback = useCallback(() => leaveGame(), [leaveGame])
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col my-auto">
       {game && (
         <>
           {winner && (
@@ -92,7 +92,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
               onDecline={leaveGameCallback}
             />
           )}
-          <div className="flex justify-between text-lg">
+          <div className="flex justify-between text-lg bg-gray-lighter p-4 rounded">
             {game.players.map(({ name, score, id }) => (
               <div key={id}>
                 <span className="font-bold">{`${name}:`}</span>
@@ -101,7 +101,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
             ))}
           </div>
           <Question
-            className="pt-4"
+            className=""
             disabled={isLoading || winner}
             question={game.currentQuestion}
             selectedAnswerId={selectedAnswerId}

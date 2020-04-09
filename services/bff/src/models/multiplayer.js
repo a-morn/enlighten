@@ -13,6 +13,12 @@ const allQuestions = {
   'periodic-table': periodicTable,
   countries
 };
+
+const backgrounds = {
+  'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
+  countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
+};
+
 const { filterGame } = require('./utils')
 
 const games = []
@@ -41,6 +47,7 @@ const createGame = (pubsub, players, category) => {
   const game = {
     players: players.map(p => ({ score: 0, won: false, hasLeft: false, ...p })),
     category,
+    categoryBackground: backgrounds[category],
     id,
     questions: shuffle(
       Object.values(allQuestions[category])

@@ -2,7 +2,7 @@ const uuidv1 = require('uuid/v4');
 const shuffle = require('shuffle-array');
 const { countries, getEmojiFlag } = require('countries-list')
 const COUNTRIES = Object.entries(countries)
-  .map(([key, value]) => ({ ...value, flag: `${process.env.ASSETS_URL}/country-flags/${key.toLocaleLowerCase()}.svg` }))
+  .map(([key, value]) => ({ ...value, flag: `${process.env.ASSETS_URL}/countries/country-flags/${key.toLocaleLowerCase()}.svg` }))
 
 console.log(COUNTRIES[0].flag)
 

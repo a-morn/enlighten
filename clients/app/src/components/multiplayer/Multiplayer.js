@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useContext } from 'react'
 import { withRouter } from 'react-router-dom'
+import { store } from '../../hooks/context/store.js'
 import { CountDown } from './count-down'
 import { MultiplayerGame } from './multiplayer-game'
 
@@ -9,6 +10,7 @@ const GAME = gql`
   query {
     gameMultiplayer {
       id
+      categoryBackground
       players {
         id
         score
@@ -42,6 +44,7 @@ const GAME_UPDATED = gql`
     gameMultiplayer(mutation: $mutation) {
       game {
         id
+        categoryBackground
         players {
           id
           score
@@ -81,6 +84,8 @@ const REMOVE_PLAYER_FROM_GAME = gql`
 
 function Multiplayer({ history, playerId }) {
   const { data, subscribeToMore } = useQuery(GAME)
+  const globalState = useContext(store)
+  const { dispatch } = globalState
   const [removePlayerFromGame] = useMutation(REMOVE_PLAYER_FROM_GAME, {
     refetchQueries: [
       {
@@ -125,6 +130,15 @@ function Multiplayer({ history, playerId }) {
       history.push('/lobby')
     }
   }, [data, history, removePlayerFromGame])
+
+  useEffect(() => {
+    const url =
+      data && data.gameMultiplayer
+        ? data.gameMultiplayer.categoryBackground
+        : null
+    dispatch({ type: 'category-background-updated', url })
+    return () => dispatch({ type: 'category-background-updated', url: null })
+  }, [data, dispatch])
   return (
     <>
       {data && data.gameMultiplayer && data.gameMultiplayer.currentQuestion && (

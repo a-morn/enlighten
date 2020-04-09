@@ -2,6 +2,7 @@
 
 .alternative {
 	button {
+		overflow: hidden;
 		box-shadow: none;
 		outline: none;
 		min-height: 50px;
@@ -32,10 +33,10 @@
 		&.correct.selected {
 			background-color: $success;
 			&:before {
-				animation: slide-in 0.8s ease-in-out infinite;
+				animation: slide-in 0.8s linear infinite;
 				content: "👍";
 				opacity: 0;
-				left: -100%;
+				left: -10%;
 				top: 30%;
 				position: absolute;
 				font-size: 32px;
@@ -51,13 +52,13 @@
 	  			height: 30%;
 				transform: rotate(110deg);
 				
-				background: rgba(255, 255, 255, 0.13);
+				background: rgba(255, 255, 255, 0.2);
 				background: linear-gradient(
 				  to right, 
-				  rgba(255, 255, 255, 0.13) 0%,
-				  rgba(255, 255, 255, 0.13) 77%,
-				  rgba(255, 255, 255, 0.5) 92%,
-				  rgba(255, 255, 255, 0.0) 100%
+				  rgba(255, 255, 255, 0.1) 0%,
+				  rgba(255, 255, 255, 0.2) 77%,
+				  rgba(255, 255, 255, 0.8) 92%,
+				  rgba(255, 255, 255, 0.1) 100%
 				);
 			  }
 		}
@@ -76,7 +77,7 @@
 
 
 @keyframes shine{
-	70% {
+	90% {
 	  left: 130%;
 	  transition-property: left;
 	  transition-duration: 0.7s, 0.7s;
@@ -90,14 +91,14 @@
 
 @keyframes slide-in{
 	70% {
-		left: -5%;
+		left: 5%;
 		opacity: 1;
 		transition-property: left opacity;
 	}
 	100% {
-		left: -20%;
+		left: 5%;
 		opacity: 0;
-		transition-property: left;
+		transition-property: left opacity;
 	}
 }
 

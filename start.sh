@@ -10,5 +10,6 @@ BFF_PID=$!
 cd ../../clients/app
 trap 'kill $APP_PID; exit' INT
 npm start&
+# port 8000
 APP_PID=$!
 

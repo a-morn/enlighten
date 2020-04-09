@@ -8,7 +8,9 @@ import { getMainDefinition } from 'apollo-utilities'
 import { SessionProvider } from 'hooks/context/session'
 import React, { StrictMode } from 'react'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
+import { StateProvider } from '../../hooks/context/store.js'
 import About from '../about'
+import Body from '../body'
 import Header from '../header'
 import LandingPage from '../landing-page'
 import LobbyLogin from '../lobby-login'
@@ -56,37 +58,39 @@ function App() {
   return (
     <StrictMode>
       <ApolloProvider client={client}>
-        <div className="h-screen flex flex-col bg-gray-100">
-          <Router>
-            <Header />
-            <div className="p-6 md:m-auto max-w-full flex-grow">
-              <section className="flex h-full justify-center">
-                <SessionProvider>
-                  <Switch>
-                    <Route path="/(|landingpage)/">
-                      <LandingPage />
-                    </Route>
-                    <Route path="/singleplayer/">
-                      <Singleplayer playerId={playerId} />
-                    </Route>
-                    <Route path="/lobby/:category?">
-                      <LobbyLogin playerId={playerId} />
-                    </Route>
-                    <Route path="/multiplayer/:gameId/:playerId">
-                      <Multiplayer playerId={playerId} />
-                    </Route>
-                    <Route path="/about">
-                      <About />
-                    </Route>
-                  </Switch>
-                </SessionProvider>
-              </section>
-            </div>
-            <footer className="text-center p-16 w-100 bg-gray-darkest text-gray-light">
-              © 2020 Mörner Industries
-            </footer>
-          </Router>
-        </div>
+        <StateProvider>
+          <div className="h-screen flex flex-col bg-gray-100">
+            <Router>
+              <SessionProvider>
+                <Header />
+                <Body>
+                  <section className="flex h-full justify-center">
+                    <Switch>
+                      <Route path="/(|landingpage)/">
+                        <LandingPage />
+                      </Route>
+                      <Route path="/singleplayer/">
+                        <Singleplayer playerId={playerId} />
+                      </Route>
+                      <Route path="/lobby/:category?">
+                        <LobbyLogin playerId={playerId} />
+                      </Route>
+                      <Route path="/multiplayer/:gameId/:playerId">
+                        <Multiplayer playerId={playerId} />
+                      </Route>
+                      <Route path="/about">
+                        <About />
+                      </Route>
+                    </Switch>
+                  </section>
+                </Body>
+                <footer className="text-center p-16 w-100 bg-gray-darkest text-gray-light">
+                  © 2020 Mörner Industries
+                </footer>
+              </SessionProvider>
+            </Router>
+          </div>
+        </StateProvider>
       </ApolloProvider>
     </StrictMode>
   )

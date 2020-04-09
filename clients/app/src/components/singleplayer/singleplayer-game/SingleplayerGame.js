@@ -81,7 +81,6 @@ function SingleplayerGame({ game, deleteGame, answer }) {
     },
     [answer],
   )
-
   return (
     <div>
       {/* <LimitBreak

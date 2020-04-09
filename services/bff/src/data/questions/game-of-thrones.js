@@ -14,7 +14,7 @@ const HOUSES = [
   {
     name: 'Stark',
     seat: 'Winterfell',
-    coatOfArms: `${process.env.ASSETS_URL}/house-stark.png`,
+    coatOfArms: `${process.env.ASSETS_URL}/game-of-thrones/house-stark.png`,
     region: 'The North',
     words: 'Winter is Coming',
     "lord-asoiaf-start": "Eddard Stark"
@@ -22,7 +22,7 @@ const HOUSES = [
   {
     name: 'Lanister',
     seat: 'Casterly Rock',
-    coatOfArms: `${process.env.ASSETS_URL}/house-lannister.png`,
+    coatOfArms: `${process.env.ASSETS_URL}/game-of-thrones/house-lannister.png`,
     region: 'Westerlands',
     words: 'Hear Me Roar!',
     "lord-asoiaf-start": 'Tywin Lannister'
@@ -30,7 +30,7 @@ const HOUSES = [
   {
     name: 'Arryn',
     seat: 'The Eyrie',
-    coatOfArms: `${process.env.ASSETS_URL}/house-arryn.png`,
+    coatOfArms: `${process.env.ASSETS_URL}/game-of-thrones/house-arryn.png`,
     region: 'The Vale',
     words: 'As High as Honor',
     "lord-asoiaf-start": 'Robert Arryn'
@@ -38,7 +38,7 @@ const HOUSES = [
   {
     name: 'Tully',
     seat: 'Riverrun',
-    coatOfArms: `${process.env.ASSETS_URL}/house-tully.png`,
+    coatOfArms: `${process.env.ASSETS_URL}/game-of-thrones/house-tully.png`,
     region: 'Riverlands',
     words: 'Family, Duty, Honor',
     "lord-asoiaf-start": 'Hoster Tully'
@@ -46,7 +46,7 @@ const HOUSES = [
   {
     name: 'Baratheon',
     seat: 'Storms\'s end',
-    coatOfArms: `${process.env.ASSETS_URL}/house-baratheon.png`,
+    coatOfArms: `${process.env.ASSETS_URL}/game-of-thrones/house-baratheon.png`,
     region: 'Stormlands',
     words: 'Ours is the fury',
     "lord-asoiaf-start": 'Robert I Baratheon'

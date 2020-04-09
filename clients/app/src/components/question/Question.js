@@ -5,12 +5,12 @@ import Alternative from './alternative'
 const questionHeading = (type, src, text) => {
   switch (type) {
     case 'text':
-      return <ReactMarkdown source={text} className="markdown pb-4" />
+      return <ReactMarkdown source={text} className="markdown" />
     case 'image':
       return (
         <Fragment>
-          {text && <ReactMarkdown source={text} className=" markdown pb-4" />}
-          <img src={src} alt={text} className="h-20 pb-4" />
+          {text && <ReactMarkdown source={text} className=" markdown" />}
+          <img src={src} alt={text} className="h-32 p-4" />
         </Fragment>
       )
     default:
@@ -29,7 +29,7 @@ const Question = React.memo(
   }) => {
     return (
       <div className={`${className}`}>
-        <div className="flex flex-col items-center text-gray-900">
+        <div className="flex flex-col items-center bg-gray-lighter text-black my-4 p-4 rounded">
           {questionHeading(type, src, text)}
         </div>
         <ul className="question__alternatives shadow-lg">
