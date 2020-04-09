@@ -1,0 +1,28 @@
+.multiplayer__scoreboard__score-wrapper {
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  font-size: 2em;
+}
+
+.multiplayer__scoreboard__score-wrapper__score {
+  position: relative;
+  animation: spinit 0.2s 5;
+  transition: top;
+	transition-duration: 1s;
+}
+
+@keyframes spinit {
+  0% {
+    top: 0em;
+  }
+  50% {
+    top: -5em;
+  }
+  100% {
+    top: -9em;
+  }
+}

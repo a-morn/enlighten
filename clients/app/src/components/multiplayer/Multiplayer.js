@@ -40,9 +40,10 @@ const GAME = gql`
 `
 
 const GAME_UPDATED = gql`
-  subscription onGameUpdated($mutation: String) {
-    gameMultiplayer(mutation: $mutation) {
-      game {
+  subscription {
+    gameMultiplayerSubscription {
+      mutation
+      gameMultiplayer {
         id
         categoryBackground
         players {
@@ -100,13 +101,13 @@ function Multiplayer({ history, playerId }) {
         if (!subscriptionData.data) {
           return prev
         } else {
-          switch (subscriptionData.data.gameMultiplayer.mutation) {
+          switch (subscriptionData.data.gameMultiplayerSubscription.mutation) {
             case 'DELETE': {
               return { gameMultiplayer: null }
             }
             default: {
               return {
-                gameMultiplayer: subscriptionData.data.gameMultiplayer.game,
+                gameMultiplayer: subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
               }
             }
           }

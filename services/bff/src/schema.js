@@ -36,7 +36,7 @@ const typeDefs = gql`
 			gameSingleplayer: GameSingleplayerSubscription
 			playerJoined: Player
 			gameRequestSubscription(mutation: String): GameRequestSubscription
-			gameMultiplayer(mutation: String): GameMultiplayerSubscription
+			gameMultiplayerSubscription(mutation: String): GameMultiplayerSubscription
 		}
 
 		type GameSingleplayerSubscription {
@@ -46,7 +46,7 @@ const typeDefs = gql`
 
 		type GameMultiplayerSubscription {
 			mutation: String
-			game: GameMultiplayer!
+			gameMultiplayer: GameMultiplayer!
 		}
 
 		type GameRequestSubscription {

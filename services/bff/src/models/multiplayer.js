@@ -64,16 +64,16 @@ const createGame = (pubsub, players, category) => {
     const g = getGameByGameId(game.id)
     g.currentQuestion = g.questions[0]
     pubsub.publish(GAME_MULTIPLAYER, {
-      gameMultiplayer: {
-        game: filterGame(g),
+      gameMultiplayerSubscription: {
+        gameMultiplayer: filterGame(g),
         mutation: 'UPDATE'
       }
     })
   }, 4000)
 
   pubsub.publish(GAME_MULTIPLAYER, {
-    gameMultiplayer: {
-      game: filterGame(game),
+    gameMultiplayerSubscription: {
+      gameMultiplayer: filterGame(game),
       mutation: 'CREATE'
     }
   })
@@ -84,7 +84,7 @@ const updateQuestionByPlayerId = playerId => {
   game.lastQuestion = game.questions[game.questionIndex]
   game.questionIndex++
   game.currentQuestion = game.questions[game.questionIndex]
-  return filterGame(game);
+  return game;
 }
 
 const getLastAnswerByPlayerId = playerId => {
@@ -115,7 +115,7 @@ const answerQuestion = (playerId, questionId, answerId) => {
   } else {
     throw new Error(`Tried to answer invalid question`);
   }
-  return filterGame(game)
+  return game
 };
 
 const getPlayersInGameById = (gameId, playerId) => {
@@ -135,8 +135,8 @@ const removePlayerFromGame = (pubsub, playerId, gameId) => {
   }
 
   pubsub.publish(GAME_MULTIPLAYER, {
-    gameMultiplayer: {
-      game: filterGame(game),
+    gameMultiplayerSubscription: {
+      gameMultiplayer: filterGame(game),
       mutation: 'UPDATE'
     }
   })
@@ -150,12 +150,12 @@ const deleteGameByGameId = (pubsub, gameId) => {
   }
   const [game] = games.splice(index, 1)
   pubsub.publish(GAME_MULTIPLAYER, {
-    gameMultiplayer: {
-      game: filterGame(game),
+    gameMultiplayerSubscription: {
+      gameMultiplayer: filterGame(game),
       mutation: 'DELETE'
     }
   })
-  return filterGame(game)
+  return game
 }
 
 module.exports = {

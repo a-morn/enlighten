@@ -92,8 +92,8 @@ export const GAME = gql`
 
 export const GAME_SUBSCRIPTION = gql`
   subscription onGameUpdated($mutation: String) {
-    gameMultiplayer(mutation: $mutation) {
-      game {
+    gameMultiplayerSubscription(mutation: $mutation) {
+      gameMultiplayer {
         id
       }
     }
@@ -198,7 +198,7 @@ export function Lobby({ history, playerId }) {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev
         return {
-          gameMultiplayer: subscriptionData.data.gameMultiplayer.game,
+          gameMultiplayer: subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
         }
       },
     })
@@ -290,7 +290,6 @@ export function Lobby({ history, playerId }) {
     },
     [deleteGameRequest, gameRequestData],
   )
-  console.log(lobbyData, playerId)
   return (
     <div className="flex flex-col my-auto">
       <div className="flex flex-col">

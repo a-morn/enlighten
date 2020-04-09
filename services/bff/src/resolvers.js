@@ -173,8 +173,8 @@ const resolvers = ({
       const filteredGame = filterGame(answerQuestionMultiplayer(playerId, questionId, answerId))
 
       pubsub.publish(GAME_MULTIPLAYER, {
-        gameMultiplayer: {
-          game: filteredGame,
+        gameMultiplayerSubscription: {
+          gameMultiplayer: filteredGame,
           mutation: 'UPDATE'
         }
       })
@@ -183,8 +183,8 @@ const resolvers = ({
         const filteredGame = filterGame(updateQuestionByPlayerIdMultiplayer(playerId))
 
         pubsub.publish(GAME_MULTIPLAYER, {
-          gameMultiplayer: {
-            game: filteredGame,
+          gameMultiplayerSubscription: {
+            gameMultiplayer: filteredGame,
             mutation: 'UPDATE'
           }
         })
@@ -231,12 +231,12 @@ const resolvers = ({
         }
       )
     },
-    gameMultiplayer: {
+    gameMultiplayerSubscription: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(GAME_MULTIPLAYER),
         (payload, variables, context) => {
           const { currentUser: { playerId } } = context
-          const { gameMultiplayer: { game: { players }, mutation } } = payload
+          const { gameMultiplayerSubscription: { gameMultiplayer: { players }, mutation } } = payload
           return players.some(p => p.id === playerId) &&
             (!variables.mutation || variables.mutation === mutation)
         })
