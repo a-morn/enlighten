@@ -2,6 +2,7 @@ import { ApolloProvider } from '@apollo/react-common'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink, split } from 'apollo-link'
+import { onError } from 'apollo-link-error'
 import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
@@ -15,11 +16,26 @@ import Header from '../header'
 import LandingPage from '../landing-page'
 import LobbyLogin from '../lobby-login'
 import Multiplayer from '../multiplayer'
+import Page404 from '../page-404'
 import Singleplayer from '../singleplayer'
 
 let playerId = sessionStorage.getItem('playerId')
 if (!playerId) sessionStorage.setItem('playerId', '' + Math.random())
 playerId = sessionStorage.getItem('playerId')
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.map(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    )
+
+  if (networkError)
+    console.log(
+      `[Network error]: ${networkError}. Maybe we should display some type of message to the user 🤔`,
+    )
+})
 
 const httpLink = new HttpLink({
   uri: `http://${process.env.REACT_APP_BFF_URL}/graphql`,
@@ -45,7 +61,7 @@ const terminatingLink = split(
   httpLink,
 )
 
-const link = ApolloLink.from([terminatingLink])
+const link = errorLink.concat(ApolloLink.from([terminatingLink]))
 
 const cache = new InMemoryCache()
 
@@ -66,7 +82,7 @@ function App() {
                 <Body>
                   <section className="flex h-full justify-center">
                     <Switch>
-                      <Route path="/(|landingpage)/">
+                      <Route exact path="/(|landingpage)/">
                         <LandingPage />
                       </Route>
                       <Route path="/singleplayer/">
@@ -80,6 +96,9 @@ function App() {
                       </Route>
                       <Route path="/about">
                         <About />
+                      </Route>
+                      <Route>
+                        <Page404 />
                       </Route>
                     </Switch>
                   </section>
