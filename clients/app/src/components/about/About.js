@@ -10,7 +10,8 @@ function About() {
         <h2 className={`pb-10 text-2xl text-brand`}>About</h2>
         <p className={`text-brand`}>
           Portfolio project for Albin Sebastian Mörner. Need a web developer?
-          Contact albin[at]gmail[dot]com. Corona pandemic special sale!
+          Contact albin[dot]morner[at]gmail[dot]com. Corona pandemic special
+          sale!
         </p>
         <p className={`text-brand mt-8`}>
           Built with: React, CRA, Tailwind CSS, Node.js, express, Apollo GraphQL
