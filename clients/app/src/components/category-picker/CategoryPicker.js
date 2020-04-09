@@ -51,7 +51,7 @@ export function CategoryPicker({
       {isNameUsed && (
         <Fragment>
           <input
-            className="shadow appearance-none border rounded w-full py-6 px-3 text-gray-700 leading-tight focus:outline-none"
+            className="shadow appearance-none border rounded w-full py-6 px-3 text-gray-darker leading-tight focus:outline-none"
             placeholder="Enter your name"
             onChange={({ target: { value: name } }) => setName(name)}
           />

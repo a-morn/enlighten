@@ -290,7 +290,7 @@ export function Lobby({ history, playerId }) {
     },
     [deleteGameRequest, gameRequestData],
   )
-
+  console.log(lobbyData, playerId)
   return (
     <div className="flex flex-col my-auto">
       <div className="flex flex-col">
@@ -336,17 +336,19 @@ export function Lobby({ history, playerId }) {
             />
           )}
       </div>
-      <div className="mt-4">
-        <PlayerList
-          players={
-            lobbyData
-              ? lobbyData.lobby.players.filter(p => p.category === category)
-              : []
-          }
-          onClick={requestGameCallback}
-          currentPlayerId={playerId}
-        />
-      </div>
+      {lobbyData && lobbyData.lobby.players.some(({ id }) => id === playerId) && (
+        <div className="mt-4">
+          <PlayerList
+            players={
+              lobbyData
+                ? lobbyData.lobby.players.filter(p => p.category === category)
+                : []
+            }
+            onClick={requestGameCallback}
+            currentPlayerId={playerId}
+          />
+        </div>
+      )}
     </div>
   )
 }
