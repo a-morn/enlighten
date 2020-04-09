@@ -107,7 +107,9 @@ function Multiplayer({ history, playerId }) {
             }
             default: {
               return {
-                gameMultiplayer: subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
+                gameMultiplayer:
+                  subscriptionData.data.gameMultiplayerSubscription
+                    .gameMultiplayer,
               }
             }
           }

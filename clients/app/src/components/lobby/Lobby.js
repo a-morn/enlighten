@@ -198,7 +198,8 @@ export function Lobby({ history, playerId }) {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev
         return {
-          gameMultiplayer: subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
+          gameMultiplayer:
+            subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
         }
       },
     })

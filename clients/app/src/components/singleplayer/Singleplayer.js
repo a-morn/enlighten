@@ -10,19 +10,6 @@ const ANSWER = gql`
   mutation($questionId: ID!, $id: ID!) {
     answerQuestionSingleplayer(questionId: $questionId, answerId: $id) {
       id
-      currentQuestion {
-        id
-        type
-        text
-        src
-        answerId
-        alternatives {
-          id
-          type
-          text
-          src
-        }
-      }
     }
   }
 `
@@ -55,8 +42,9 @@ const GAME = gql`
 
 const GAME_UPDATED = gql`
   subscription {
-    gameSingleplayer {
-      game {
+    gameSingleplayerSubscription {
+      mutation
+      gameSingleplayer {
         id
         categoryBackground
         lastQuestion {
@@ -124,7 +112,7 @@ function Singleplayer({ playerId }) {
         if (!subscriptionData.data) {
           return prev
         } else {
-          switch (subscriptionData.data.gameSingleplayer.mutation) {
+          switch (subscriptionData.data.gameSingleplayerSubscription.mutation) {
             case 'DELETE': {
               return {
                 gameSingleplayer: null,
@@ -132,7 +120,9 @@ function Singleplayer({ playerId }) {
             }
             default: {
               return {
-                gameSingleplayer: subscriptionData.data.gameSingleplayer.game,
+                gameSingleplayer:
+                  subscriptionData.data.gameSingleplayerSubscription
+                    .gameSingleplayer,
               }
             }
           }
@@ -196,6 +186,7 @@ function Singleplayer({ playerId }) {
     [answer, gameData],
   )
 
+  useEffect(() => console.log(gameData), [gameData])
   return (
     <div className="flex flex-col items-center justify-center">
       {!R.path(['gameSingleplayer', 'id'], gameData) && (
