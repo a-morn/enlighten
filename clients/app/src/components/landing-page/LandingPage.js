@@ -7,15 +7,23 @@ function LandingPage() {
   return (
     <div className="">
       <div className="w-100 inline-block">
-        <video
-          className="w-100 inline-block"
-          style={{ clipPath: 'url(#clipPath)' }}
-          autoPlay
-          muted
-          playsInline
+        {/* This is to prevent reflow */}
+        <div
+          className="min-w-full h-full relative"
+          style={{ paddingBottom: '55%' }}
         >
-          <source src={bookcase} type="video/mp4" />
-        </video>
+          <video
+            className={`inline-block min-w-full absolute ${
+              styles['landing-page__video']
+            }`}
+            style={{ clipPath: 'url(#clipPath)', minHeight: '184px' }}
+            autoPlay
+            muted
+            playsInline
+          >
+            <source src={bookcase} type="video/mp4" />
+          </video>
+        </div>
         <svg className="w-0 h-0 absolute">
           <defs>
             <clipPath
