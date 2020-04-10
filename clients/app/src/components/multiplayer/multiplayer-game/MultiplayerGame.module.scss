@@ -10,9 +10,16 @@
 
 .multiplayer__scoreboard__score-wrapper__score {
   position: relative;
-  animation: spinit 0.2s 5;
   transition: top;
 	transition-duration: 1s;
+}
+
+.multiplayer__scoreboard__score-wrapper__score:nth-child(1) {
+  animation: spinit 0.1s 3;
+}
+
+.multiplayer__scoreboard__score-wrapper__score:nth-child(2) {
+  animation: spinit 0.3s 3;
 }
 
 @keyframes spinit {
