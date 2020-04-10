@@ -1,4 +1,5 @@
-const { gql } = require('apollo-server-express')
+import { gql } from 'apollo-server-express'
+import { DocumentNode } from 'graphql'
 
 const typeDefs = gql`
 		type Query {
@@ -110,7 +111,7 @@ const typeDefs = gql`
 			category: String!
 			categoryBackground: String!
 			playerId: ID!
-			currentQuestion: Question!
+			currentQuestion: Question
 			lastQuestion: Question
 		}
 
@@ -128,6 +129,6 @@ const typeDefs = gql`
 			playerRequestId: ID!
 			playerOfferedId: ID!
 		}
-	`
+	`  as DocumentNode
 
-module.exports = typeDefs
+export default typeDefs

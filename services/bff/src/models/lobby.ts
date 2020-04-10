@@ -1,16 +1,23 @@
-const {
+import {
 	PlayerNotFoundError,
 	GameRequestNotFoundError
-} = require('../errors');
-
-const {
+} from '../errors';
+import {
 	GAME_REQUEST,
-} = require('../triggers')
+} from '../triggers'
+import {
+	PlayerLobby,
+} from './player'
+import {
+	GameRequest
+} from './gameRequest'
+import { PubSub } from 'graphql-subscriptions';
+import { Category } from './category';
 
-const players = []
-const gameRequests = []
+const players: PlayerLobby[] = []
+const gameRequests: GameRequest[] = []
 
-const getGameRequestById = gameRequestId => {
+const getGameRequestById = (gameRequestId: string) => {
 	const gameRequest = gameRequests.find(gr => gr.id === gameRequestId)
 	if (!gameRequest) {
 		throw new GameRequestNotFoundError(`No such gameRequest: ${gameRequestId}`)
@@ -19,9 +26,13 @@ const getGameRequestById = gameRequestId => {
 	return gameRequest
 }
 
-const getGameRequestByPlayerId = playerId => {
+const getGameRequestByPlayerId = (playerId: string) => {
 	return gameRequests
-		.sort(({ date: d1 }, { date: d2 }) => new Date(d2) - new Date(d1))
+		.sort(({ date: d1 }, { date: d2 }) => d2 > d1
+			? 1
+			: d1 > d2
+				? -1
+				: 0)
 		.find(
 			({ playerOfferedId, playerRequestId }) =>
 				playerOfferedId === playerId
@@ -29,7 +40,7 @@ const getGameRequestByPlayerId = playerId => {
 		)
 }
 
-const getPlayerById = playerId => {
+const getPlayerById = (playerId: string) => {
 	const player = players.find(p => p.id == playerId);
 	if (!player) {
 		throw new PlayerNotFoundError(`No such player: ${playerId}`);
@@ -38,7 +49,7 @@ const getPlayerById = playerId => {
 	return player;
 };
 
-const addPlayer = player => {
+const addPlayer = (player: PlayerLobby) => {
 	if (player.name && players.some(({ name }) => name === player.name)) {
 		throw new Error('Duplicate name')
 	}
@@ -46,17 +57,17 @@ const addPlayer = player => {
 	players.push(player)
 }
 
-const getPlayers = (category) => {
+const getPlayers = (category?: string) => {
 	return players
 		.filter(p => !category || p.category === category)
 }
 
-const addGameRequest = (pubsub, playerRequestId, playerOfferedId, category) => {
+const addGameRequest = (pubsub: PubSub, playerRequestId: string, playerOfferedId: string, category: Category) => {
 	const { name: playerRequestName } = getPlayerById(playerRequestId);
 	const { name: playerOfferedName } = getPlayerById(playerOfferedId);
 	const id = '' + Math.random()
 	const date = new Date()
-	const gameRequest = {
+	const gameRequest: GameRequest = {
 		accepted: null,
 		id,
 		playerRequestId,
@@ -76,7 +87,7 @@ const addGameRequest = (pubsub, playerRequestId, playerOfferedId, category) => {
 	return gameRequest;
 }
 
-const deleteGameRequestById = (pubsub, playerId, id) => {
+const deleteGameRequestById = (pubsub: PubSub, playerId: string, id: string) => {
 	const { playerRequestId, playerOfferedId } = getGameRequestById(id)
 	if (![playerRequestId, playerOfferedId].includes(playerId)) {
 		throw new Error('Unauthorized')
@@ -98,7 +109,7 @@ const deleteGameRequestById = (pubsub, playerId, id) => {
 	return gameRequest
 }
 
-module.exports = {
+export {
 	getGameRequestById,
 	getPlayerById,
 	addPlayer,

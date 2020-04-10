@@ -1,6 +1,7 @@
-const NotFoundError = require('./errors/not-found');
+import NotFoundError from './errors/not-found'
+import { Response } from 'express';
 
-const errorHandledAction = (res, action) => {
+const errorHandledAction = (res: Response, action: () => unknown) => {
   try {
     action();
   } catch (e) {
@@ -12,6 +13,6 @@ const errorHandledAction = (res, action) => {
   }
 };
 
-module.exports = {
+export {
   errorHandledAction
 };

@@ -1,44 +1,106 @@
-const { PubSub, withFilter } = require('graphql-subscriptions')
-const {
+import { PubSub, withFilter } from 'graphql-subscriptions'
+import {
   GameNotFoundError,
-} = require('./errors');
+} from './errors';
 
-const {
+import {
   PLAYER_JOINED,
   GAME_REQUEST,
   GAME_SINGLEPLAYER,
   GAME_MULTIPLAYER,
-} = require('./triggers')
+} from './triggers'
+import { Player, PlayerLobby } from './models/player'
+import { Game, GameMultiplayer } from './models/game'
 
-const {
-  getGameByPlayerId: getGameByPlayerIdSingleplayer,
-  createGame: createGameSingleplayer,
-  deleteGame: deleteGameSingleplayer,
-  answerQuestion: answerQuestionSingleplayer,
-  updateQuestionByPlayerId: updateQuestionByPlayerIdSingleplayer,
-} = require('./models/singleplayer')
+import {
+  getGameByPlayerId as getGameByPlayerIdSingleplayer,
+  createGame as createGameSingleplayer,
+  deleteGame as deleteGameSingleplayer,
+  answerQuestion as answerQuestionSingleplayer,
+  updateQuestionByPlayerId as updateQuestionByPlayerIdSingleplayer,
+} from './models/singleplayer'
 
-const {
-  getGameRequestById: getGameRequestByIdLobby,
-  getPlayerById: getPlayerByIdLobby,
-  addPlayer: addPlayerLobby,
-  getPlayers: getPlayersLobby,
-  addGameRequest: addGameRequestLobby,
-  getGameRequestByPlayerId: getGameRequestByPlayerIdLobby,
-  deleteGameRequestById: deleteGameRequestByIdLobby
-} = require('./models/lobby')
+import {
+  getGameRequestById as getGameRequestByIdLobby,
+  getPlayerById as getPlayerByIdLobby,
+  addPlayer as addPlayerLobby,
+  getPlayers as getPlayersLobby,
+  addGameRequest as addGameRequestLobby,
+  getGameRequestByPlayerId as getGameRequestByPlayerIdLobby,
+  deleteGameRequestById as deleteGameRequestByIdLobby
+} from './models/lobby'
 
-const {
-  getGameByPlayerId: getGameByPlayerIdMultiplayer,
-  createGame: createGameMultiplayer,
-  updateQuestionByPlayerId: updateQuestionByPlayerIdMultiplayer,
-  answerQuestion: answerQuestionMultiplayer,
-  removePlayerFromGame: removePlayerFromGameMultiplayer,
-} = require('./models/multiplayer')
+import {
+  getGameByPlayerId as getGameByPlayerIdMultiplayer,
+  createGame as createGameMultiplayer,
+  updateQuestionByPlayerId as updateQuestionByPlayerIdMultiplayer,
+  answerQuestion as answerQuestionMultiplayer,
+  removePlayerFromGame as removePlayerFromGameMultiplayer,
+} from './models/multiplayer'
 
-const { filterGame } = require('./models/utils')
+import { Category } from './models/category'
+
+import { filterGame, isCategory } from './models/utils'
 
 const pubsub = new PubSub()
+
+export type Context = {
+  currentUser: {
+    playerId: string
+  }
+}
+
+type CreateGameSingleplayerInput = {
+  category: Category
+  playerId: string
+}
+
+type DeleteGameSingleplayerInput = {
+  id: string
+}
+
+type AnswerQuestionInput = {
+  questionId: string
+  answerId: string
+}
+
+type AddPlayerInput = {
+  id: string
+}
+
+type RemovePlayerInput = {
+  id: string
+}
+
+type JoinLobbyInput = {
+  player: {
+    id: string
+    category: string
+    name: string
+  }
+}
+
+type RequestGameInput = {
+  gameRequest: {
+    playerRequestId: string
+    playerOfferedId: string
+    category: string
+  }
+}
+
+type AnswerGameRequestInput = {
+  id: string,
+  accepted: boolean
+}
+
+type DeleteGameRequestInput = {
+  id: string,
+}
+
+type GameMultiPlayerSubscription = {
+  mutation: String
+  gameMultiplayer: GameMultiplayer
+}
 
 const resolvers = ({
   Query: {
@@ -48,10 +110,11 @@ const resolvers = ({
         { id: 'countries', label: 'Countries' }
       ]
     },
-    gameSingleplayer: (_, __, context) => {
+    gameSingleplayer: (_: unknown, __: unknown, context: Context) => {
       const { currentUser: { playerId } } = context
       try {
-        return getGameByPlayerIdSingleplayer(playerId)
+        const filteredGame = filterGame(getGameByPlayerIdSingleplayer(playerId))
+        return filteredGame
       } catch (e) {
         if (e instanceof GameNotFoundError) {
           return null
@@ -60,21 +123,21 @@ const resolvers = ({
         }
       }
     },
-    lobby: (_, __, context) => {
+    lobby: (_: unknown, __: unknown, context: Context) => {
       const { currentUser: { playerId } } = context
       const players = getPlayersLobby()
-      const hasJoined = players.some(p => p.id === playerId)
+      const hasJoined = players.some((p: Player) => p.id === playerId)
       return {
         players,
         hasJoined
       }
     },
-    gameRequest: (_, __, context) => {
+    gameRequest: (_: unknown, __: unknown, context: Context) => {
       const { currentUser: { playerId } } = context
       const gameRequest = getGameRequestByPlayerIdLobby(playerId)
       return gameRequest
     },
-    gameMultiplayer: (_, __, context) => {
+    gameMultiplayer: (_: unknown, __: unknown, context: Context) => {
       const { currentUser: { playerId } } = context
       try {
         const game = getGameByPlayerIdMultiplayer(playerId);
@@ -90,47 +153,47 @@ const resolvers = ({
     },
   },
   Mutation: {
-    createGameSingleplayer: (_, { playerId, category }) => {
+    createGameSingleplayer: (_: unknown, { playerId, category }: CreateGameSingleplayerInput) => {
       return createGameSingleplayer(playerId, category)
     },
-    deleteGameSingleplayer: (_, { id }) => {
+    deleteGameSingleplayer: (_: unknown, { id }: DeleteGameSingleplayerInput) => {
       const filteredGame = filterGame(deleteGameSingleplayer(id))
       return filteredGame
     },
-    answerQuestionSingleplayer: (_, { answerId, questionId }, context) => {
+    answerQuestionSingleplayer: (_: unknown, { answerId, questionId }: AnswerQuestionInput, context: Context) => {
       const { currentUser: { playerId } } = context
 
-      const filteredGame = filterGame(answerQuestionSingleplayer(playerId, questionId, answerId))
+      const game = answerQuestionSingleplayer(playerId, questionId, answerId)
 
       pubsub.publish(GAME_SINGLEPLAYER, {
         gameSingleplayerSubscription: {
-          gameSingleplayer: filteredGame,
+          gameSingleplayer: game,
           mutation: 'UPDATE'
         }
       })
 
       setTimeout(() => {
-        const gameNewQuestion = updateQuestionByPlayerIdSingleplayer(playerId)
+        const gameFiltered = filterGame(updateQuestionByPlayerIdSingleplayer(playerId))
         pubsub.publish(GAME_SINGLEPLAYER, {
           gameSingleplayerSubscription: {
             mutation: 'UPDATE',
-            gameSingleplayer: gameNewQuestion
+            gameSingleplayer: gameFiltered
           }
         })
       }, 800)
-      return filteredGame
+      return game
     },
-    addPlayer: (_, { id }) => {
+    addPlayer: (_: unknown, { id }: AddPlayerInput) => {
       let player
       try {
         player = getPlayerByIdLobby(id)
       } catch {
         player = { id }
-        addPlayerLobby(player)
+        addPlayerLobby(player as PlayerLobby)
       }
       return player
     },
-    joinLobby: (_, { player: { id, category, name } }) => {
+    joinLobby: (_: unknown, { player: { id, category, name } }: JoinLobbyInput) => {
       const player = getPlayerByIdLobby(id)
       player.category = category
       player.name = name
@@ -139,15 +202,18 @@ const resolvers = ({
       })
       return player
     },
-    requestGame: (_, { gameRequest: { playerRequestId, playerOfferedId, category } }) => {
+    requestGame: (_: unknown, { gameRequest: { playerRequestId, playerOfferedId, category } }: RequestGameInput) => {
+      if (!isCategory(category)) {
+        throw new Error('Incorrect category')
+      }
       const gameRequested = addGameRequestLobby(pubsub, playerRequestId, playerOfferedId, category)
 
       return gameRequested
     },
-    answerGameRequest: async (_, { id, accepted }, { currentUser: { playerId } }) => {
+    answerGameRequest: async (_: unknown, { id, accepted }: AnswerGameRequestInput, { currentUser: { playerId } }: Context) => {
       const gameRequestAnswered = getGameRequestByIdLobby(id)
-      if (!gameRequestAnswered.playerOfferedId === playerId) {
-        return gameRequestAnswered
+      if (gameRequestAnswered.playerOfferedId !== playerId) {
+        return null
       }
       gameRequestAnswered.accepted = accepted
       pubsub.publish(GAME_REQUEST, {
@@ -168,7 +234,7 @@ const resolvers = ({
       }
       return gameRequestAnswered
     },
-    answerQuestionMultiplayer: (_, { answerId, questionId }, context) => {
+    answerQuestionMultiplayer: (_: unknown, { answerId, questionId }: AnswerQuestionInput, context: Context) => {
       const { currentUser: { playerId } } = context
       const filteredGame = filterGame(answerQuestionMultiplayer(playerId, questionId, answerId))
 
@@ -180,11 +246,11 @@ const resolvers = ({
       })
 
       setTimeout(() => {
-        const filteredGame = filterGame(updateQuestionByPlayerIdMultiplayer(playerId))
+        const filteredGameWithNewQuestion = filterGame(updateQuestionByPlayerIdMultiplayer(playerId))
 
         pubsub.publish(GAME_MULTIPLAYER, {
           gameMultiplayerSubscription: {
-            gameMultiplayer: filteredGame,
+            gameMultiplayer: filteredGameWithNewQuestion,
             mutation: 'UPDATE'
           }
         })
@@ -192,12 +258,12 @@ const resolvers = ({
 
       return filteredGame
     },
-    removePlayerFromGameMultiplayer: (_, { id }, { currentUser: { playerId } }) => {
+    removePlayerFromGameMultiplayer: (_: unknown, { id }: RemovePlayerInput, { currentUser: { playerId } }: Context) => {
       const filteredGame = filterGame(removePlayerFromGameMultiplayer(pubsub, playerId, id))
 
       return filteredGame
     },
-    deleteGameRequest: (_, { id }, { currentUser: { playerId } }) => {
+    deleteGameRequest: (_: unknown, { id }: DeleteGameRequestInput, { currentUser: { playerId } }: Context) => {
       const gameRequest = deleteGameRequestByIdLobby(pubsub, playerId, id)
 
       return gameRequest
@@ -207,7 +273,7 @@ const resolvers = ({
     gameSingleplayerSubscription: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(GAME_SINGLEPLAYER),
-        (payload, _, context) => {
+        (payload, _: unknown, context) => {
           const { currentUser: { playerId } } = context
           const { gameSingleplayerSubscription: { gameSingleplayer } } = payload
           return playerId === gameSingleplayer.playerId
@@ -234,7 +300,7 @@ const resolvers = ({
     gameMultiplayerSubscription: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(GAME_MULTIPLAYER),
-        (payload, variables, context) => {
+        (payload: { gameMultiplayerSubscription: GameMultiPlayerSubscription }, variables, context: Context) => {
           const { currentUser: { playerId } } = context
           const { gameMultiplayerSubscription: { gameMultiplayer: { players }, mutation } } = payload
           return players.some(p => p.id === playerId) &&
@@ -244,4 +310,4 @@ const resolvers = ({
   }
 })
 
-module.exports = resolvers
+export default resolvers

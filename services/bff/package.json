@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "tsc": "tsc",
+    "start": "node ./src/www",
     "start:debug": "node --inspect-brk ./bin/www",
     "lint": "eslint --fix . && echo 'Lint complete.'"
   },
@@ -29,6 +30,12 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/morgan": "^1.9.0",
+    "@types/node": "^13.11.1",
+    "@types/ramda": "^0.27.3",
+    "@types/shuffle-array": "0.0.28",
+    "@types/uuid": "^7.0.2",
     "dotenv": "^8.2.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
@@ -36,7 +43,8 @@
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
-    "svg-country-flags": "^1.2.7"
+    "svg-country-flags": "^1.2.7",
+    "typescript": "^3.8.3"
   },
   "husky": {
     "hooks": {

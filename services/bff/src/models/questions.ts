@@ -1,15 +1,13 @@
-const shuffle = require('shuffle-array');
-const periodicTable = require('../data/questions/periodic-table');
-const got = require('../data/questions/game-of-thrones');
-const countries = require('../data/questions/countries')
+import got from '../data/questions/game-of-thrones';
+import countries from '../data/questions/countries'
+import { Question } from './question';
 const allQuestions = {
   'game-of-thrones': got,
-  'periodic-table': periodicTable,
   countries
 };
 
 const allQuestionsArray = Object.values(allQuestions).reduce(
-  (acc, { ...levels }) =>
+  (acc: Question[], { ...levels }) =>
     acc.concat(
       Object.values(levels).reduce(
         (acc2, { questions }) => acc2.concat(questions),
@@ -18,23 +16,23 @@ const allQuestionsArray = Object.values(allQuestions).reduce(
     ), [])
   .filter(q => q);
 
-const getQuestionById = questionId => {
+const getQuestionById = (questionId: string) => {
   const question = allQuestionsArray.find(
     ({ id }) => id === questionId
   );
 
   if (!question) {
-    //throw
+    throw new Error('Can\'t find question')
   }
 
   const { alternatives, ...rest } = question
 
   return {
     ...rest,
-    alternatives: shuffle(alternatives)
+    alternatives
   };
 };
 
-module.exports = {
+export {
   getQuestionById
 };

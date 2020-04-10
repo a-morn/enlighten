@@ -1,10 +1,17 @@
-const uuidv1 = require('uuid/v4');
-const shuffle = require('shuffle-array');
-const { countries, getEmojiFlag } = require('countries-list')
+import uuidv1 from 'uuid/v4';
+import shuffle from 'shuffle-array';
+import { countries } from 'countries-list'
+import { notUndefined } from '../../models/utils';
+import { Question, Alternative, QuestionEntityType, QuestionObject, QuestionDirection } from '../../models/question'
+
 const COUNTRIES = Object.entries(countries)
   .map(([key, value]) => ({ ...value, flag: `${process.env.ASSETS_URL}/countries/country-flags/${key.toLocaleLowerCase()}.svg` }))
 
-console.log(COUNTRIES[0].flag)
+type Country = {
+  name: string
+  capital: string
+  flag: string
+}
 
 const QUESTION_TYPE = {
   NAME: { id: 'name', label: 'name' },
@@ -21,7 +28,10 @@ const config = {
   }
 };
 
-const foo = (fromType, toType, el) => {
+const getQuestionProperties = (fromType: QuestionEntityType<Country> | QuestionEntityType<Country>[], toType: QuestionEntityType<Country>, el: Country) => {
+  if (Array.isArray(fromType)) {
+    throw new Error(`Array fromType is not supported for this category`)
+  }
   switch (fromType.id) {
     case 'name':
     case 'capital':
@@ -40,7 +50,7 @@ const foo = (fromType, toType, el) => {
   }
 };
 
-const bar = (toType, el) => {
+const bar = (toType: QuestionEntityType<Country>, el: Country) => {
   switch (toType.id) {
     case 'name':
     case 'capital':
@@ -53,28 +63,29 @@ const bar = (toType, el) => {
   }
 };
 
-const questions = Object.entries(config).reduce(
+const questions: QuestionObject = Object.entries(config).reduce(
   (acc, [level, { fromTypes, toTypes, countries, maxAlternatives }]) => ({
     ...acc,
     [level]: {
       questions: fromTypes
         .reduce(
-          (acc, fromType) =>
+          (acc: QuestionDirection<Country>[], fromType) =>
             acc.concat(
               toTypes
                 .filter(toType => toType !== fromType)
-                .map(toType => ({ fromType, toType }))
+                .map(toType => ({ fromType, toType } as QuestionDirection<Country>))
             ),
           []
         )
         .reduce(
-          (acc, { fromType, toType }) =>
+          (acc: Question[], { fromType, toType }) =>
             acc.concat(
               countries
                 .map(countryName => COUNTRIES.find(({ name }) => countryName === name))
+                .filter(notUndefined)
                 .map(el => ({
                   id: uuidv1(),
-                  ...foo(fromType, toType, el),
+                  ...getQuestionProperties(fromType, toType, el),
                   alternatives:
                     [el]
                       .concat(
@@ -83,15 +94,16 @@ const questions = Object.entries(config).reduce(
                           maxAlternatives
                         )
                       )
-                      .map((el) => ({ ...bar(toType, el), id: uuidv1() }))
+                      .map((el) => ({ ...bar(toType, el), id: uuidv1() })) as Alternative[]
                   ,
-                  category: 'countries'
-                }))
-                .map(({ alternatives, ...question }) => ({
+                  category: 'countries',
+                  record: 0,
+                } as Question))
+                .map(({ alternatives, ...question }: Question) => ({
                   answerId: alternatives[0].id,
                   alternatives: shuffle(alternatives),
                   ...question,
-                }))
+                } as Question))
             ),
           []
         )
@@ -100,4 +112,4 @@ const questions = Object.entries(config).reduce(
   {}
 );
 
-module.exports = { ...questions };
+export default questions;

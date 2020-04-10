@@ -1,10 +1,19 @@
-const { produce } = require('immer');
-const moment = require('moment');
-const { listGames, getGame } = require('./singleplayer');
+/*import { produce } from 'immer';
+import moment from 'moment';
+import { listGames, getGame } from './singleplayer'
 
-let limitBreaks = {};
+let limitBreaks: { [key: number]: Limitbreak } = {};
 
-const defaultLimitBreak = playerId => ({
+type Limitbreak = {
+  internalLevel: number
+  status: string;
+  charge: number
+  date: Date
+  streak: number
+  level: number
+}
+
+const defaultLimitBreak = (playerId: string) => ({
   status: 'charging',
   internalLevel: 5,
   charge: 0,
@@ -12,7 +21,7 @@ const defaultLimitBreak = playerId => ({
   playerId
 });
 
-const chargeDecreasePerSecondByStatus = status => {
+const chargeDecreasePerSecondByStatus = (status: string) => {
   switch (status) {
     case 'charging':
       return 0.1;
@@ -23,7 +32,7 @@ const chargeDecreasePerSecondByStatus = status => {
   }
 };
 
-const getUpdatedLevel = lb => {
+const getUpdatedLevel = (lb: Limitbreak) => {
   switch (lb.status) {
     case 'charging':
       return lb.internalLevel;
@@ -35,7 +44,7 @@ const getUpdatedLevel = lb => {
   }
 };
 
-const getUpdatedStatus = (lb, now) => {
+const getUpdatedStatus = (lb: Limitbreak, now?: Date) => {
   switch (lb.status) {
     case 'charging':
       if (lb.streak > 5 && lb.charge > 5) {
@@ -66,8 +75,8 @@ const getUpdatedStatus = (lb, now) => {
   }
 };
 
-const getUpdatedLimitBreak = (baseLb, isAnswerCorrect, date) =>
-  produce(baseLb, draftLb => {
+const getUpdatedLimitBreak = (baseLb: Limitbreak, isAnswerCorrect: boolean, date: Date) =>
+  produce((baseLb: Limitbreak, draftLb: Limitbreak) => {
     if (isAnswerCorrect) {
       draftLb.streak++;
       draftLb.charge++;
@@ -94,25 +103,26 @@ const getUpdatedLimitBreak = (baseLb, isAnswerCorrect, date) =>
 
 const limitBreakLoop = () =>
   setInterval(() => {
-    Object.values(listGames()).forEach(({ player: { wsClient, playerId } }) => {
-      const lb = limitBreaks[playerId] || defaultLimitBreak(playerId);
-      const updatedLb = produce(lb, draftLb => {
-        draftLb.charge = Math.max(
-          0,
-          draftLb.charge - chargeDecreasePerSecondByStatus(draftLb.status) / 2
+    Object.values(listGames())
+      .forEach(({ player: { wsClient, playerId } }) => {
+        const lb = limitBreaks[playerId] || defaultLimitBreak(playerId);
+        const updatedLb = produce(lb, draftLb => {
+          draftLb.charge = Math.max(
+            0,
+            draftLb.charge - chargeDecreasePerSecondByStatus(draftLb.status) / 2
+          );
+          draftLb.level = getUpdatedLevel(draftLb);
+          draftLb.status = getUpdatedStatus(draftLb);
+        });
+        wsClient.send(
+          JSON.stringify({
+            resource: 'limit-break',
+            method: 'PUT',
+            payload: updatedLb
+          })
         );
-        draftLb.level = getUpdatedLevel(draftLb);
-        draftLb.status = getUpdatedStatus(draftLb);
+        limitBreaks[playerId] = updatedLb;
       });
-      wsClient.send(
-        JSON.stringify({
-          resource: 'limit-break',
-          method: 'PUT',
-          payload: updatedLb
-        })
-      );
-      limitBreaks[playerId] = updatedLb;
-    });
   }, 500);
 
 const updateLimitBreakOnAnswer = (gameId, isAnswerCorrect, date) => {
@@ -129,7 +139,8 @@ const updateLimitBreakOnAnswer = (gameId, isAnswerCorrect, date) => {
   wsClient.send(JSON.stringify({ type: 'limit-break', payload: updatedLb }));
 };
 
-module.exports = {
+export {
   limitBreakLoop,
   updateLimitBreakOnAnswer
 };
+*/

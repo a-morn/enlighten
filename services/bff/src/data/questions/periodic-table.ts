@@ -1,10 +1,11 @@
-const { elements } = require('./atoms');
-const uuidv1 = require('uuid/v1');
+/*import { elements, AtomData } from './atoms';
+import uuidv1 from 'uuid/v1';
+import { notUndefined } from '../../utils';
 
 const ATOM_QUESTION_TYPE = {
-  SYMBOL: 'symbol',
-  NAME: 'name',
-  NUMBER: 'number'
+  SYMBOL: { id: 'symbol', label: 'symbol' },
+  NAME: { id: 'name', label: 'name' },
+  NUMBER: { id: 'number', label: 'number' }
 };
 
 const config = {
@@ -86,20 +87,20 @@ const config = {
   }
 };
 
-const fromTypeFoo = (fromType, el) => {
+const getQuestionEnding = (fromType: QuestionEntityType<AtomData> | QuestionEntityType<AtomData>[], el: AtomData) => {
   if (typeof fromType === 'string') {
     return `the ${fromType} ${el[fromType]}`;
-  } else {
+  } else if (Array.isArray(fromType)) {
     return `${fromType
       .map(
         (ft, i) =>
-          `${i + 1 === fromType.length ? 'and ' : ''}the ${ft} ${el[ft]}`
+          `${i + 1 === fromType.length ? 'and ' : ''}the ${ft} ${el[ft.id]}`
       )
       .join(', ')}`;
   }
 };
 
-const questions = Object.entries(config).reduce(
+const questions: QuestionObject = Object.entries(config).reduce(
   (
     acc,
     [
@@ -110,26 +111,27 @@ const questions = Object.entries(config).reduce(
     ...acc,
     [level]: {
       lastQuestionId: null,
-      questions: fromTypes
+      questions: (fromTypes as (QuestionEntityType<AtomData> | QuestionEntityType<AtomData>[])[])
         .reduce(
-          (acc, fromType) =>
+          (acc: QuestionDirection<AtomData>[], fromType: QuestionEntityType<AtomData> | QuestionEntityType<AtomData>[]) =>
             acc.concat(
-              toTypes
+              (toTypes as QuestionEntityType<AtomData>[])
                 .filter(toType => toType !== fromType)
                 .map(toType => ({ fromType, toType }))
             ),
           []
         )
         .reduce(
-          (acc, { fromType, toType }) =>
+          (acc: Question[], { fromType, toType }) =>
             acc.concat(
               Array.from(Array(atomEndNumber - atomStartNumber))
                 .map((_, i) => i + atomStartNumber)
                 .map(no => elements.find(({ number }) => number === no))
+                .filter(notUndefined)
                 .map(el => ({
                   id: uuidv1(),
                   type: 'text',
-                  text: `What is the ${toType} of the element with ${fromTypeFoo(
+                  text: `What is the ${toType.id} of the element with ${getQuestionEnding(
                     fromType,
                     el
                   )}?`,
@@ -140,10 +142,9 @@ const questions = Object.entries(config).reduce(
                       )
                     )
                     .slice(0, maxAlternatives)
-                    .map((el, id) => ({ type: 'text', text: el[toType], id })),
-                  answerId: 0,
+                    .map((el, id) => ({ type: 'text', text: el[toType.id], id } as Alternative)),
                   category: 'periodic-table'
-                }))
+                } as Question))
             ),
           []
         )
@@ -152,4 +153,5 @@ const questions = Object.entries(config).reduce(
   {}
 );
 
-module.exports = { ...questions, userLevel: 1 };
+export default { ...questions, userLevel: 1 };
+*/

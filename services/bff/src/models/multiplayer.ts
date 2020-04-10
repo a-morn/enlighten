@@ -1,16 +1,18 @@
-const {
-  GameNotFoundError,
-} = require('../errors');
-const {
-  GAME_MULTIPLAYER
-} = require('../triggers')
-const shuffle = require('shuffle-array');
-const periodicTable = require('../data/questions/periodic-table');
-const got = require('../data/questions/game-of-thrones');
-const countries = require('../data/questions/countries')
+import { GameNotFoundError, PlayerNotFoundError, } from '../errors';
+import { GAME_MULTIPLAYER } from '../triggers';
+import shuffle from 'shuffle-array';
+//import periodicTable from '../data/questions/periodic-table';
+import got from '../data/questions/game-of-thrones';
+import countries from '../data/questions/countries';
+import { GameMultiplayer } from './game'
+import { PubSub } from 'graphql-subscriptions';
+import { PlayerLobby } from './player';
+import { Category } from './category';
+import { Question } from './question'
+import { isUndefined } from 'util';
 const allQuestions = {
   'game-of-thrones': got,
-  'periodic-table': periodicTable,
+  //'periodic-table': periodicTable,
   countries
 };
 
@@ -19,11 +21,11 @@ const backgrounds = {
   countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
 };
 
-const { filterGame } = require('./utils')
+import { filterGame } from './utils'
 
-const games = []
+const games: GameMultiplayer[] = []
 
-const getGameByPlayerId = playerId => {
+const getGameByPlayerId = (playerId: string) => {
   const game = games
     .find(spg => spg.players.some(({ id, hasLeft }) => !hasLeft && id === playerId))
 
@@ -33,7 +35,7 @@ const getGameByPlayerId = playerId => {
   return game
 }
 
-const getGameByGameId = gameId => {
+const getGameByGameId = (gameId: string) => {
   const game = games
     .find(spg => spg.id === gameId)
   if (!game) {
@@ -42,7 +44,7 @@ const getGameByGameId = gameId => {
   return game
 }
 
-const createGame = (pubsub, players, category) => {
+const createGame = (pubsub: PubSub, players: PlayerLobby[], category: Category) => {
   const id = '' + Math.random()
   const game = {
     players: players.map(p => ({ score: 0, won: false, hasLeft: false, ...p })),
@@ -51,14 +53,14 @@ const createGame = (pubsub, players, category) => {
     id,
     questions: shuffle(
       Object.values(allQuestions[category])
-        .reduce((acc, { questions }) => (
+        .reduce((acc: Question[], { questions }) => (
           acc.concat(questions)
         ), [])
     ),
     questionIndex: 0
   }
 
-  games.push(game)
+  games.push(game as GameMultiplayer)
 
   setTimeout(() => {
     const g = getGameByGameId(game.id)
@@ -79,7 +81,7 @@ const createGame = (pubsub, players, category) => {
   })
 }
 
-const updateQuestionByPlayerId = playerId => {
+const updateQuestionByPlayerId = (playerId: string) => {
   const game = getGameByPlayerId(playerId)
   game.lastQuestion = game.questions[game.questionIndex]
   game.questionIndex++
@@ -87,7 +89,7 @@ const updateQuestionByPlayerId = playerId => {
   return game;
 }
 
-const getLastAnswerByPlayerId = playerId => {
+const getLastAnswerByPlayerId = (playerId: string) => {
   const game = getGameByPlayerId(playerId)
   if (game.lastQuestion) {
     const question = game.lastQuestion
@@ -100,16 +102,18 @@ const getLastAnswerByPlayerId = playerId => {
   }
 }
 
-const answerQuestion = (playerId, questionId, answerId) => {
+const answerQuestion = (playerId: string, questionId: string, answerId: string) => {
   const game = getGameByPlayerId(playerId);
   const question = game.currentQuestion
-  if (questionId === question.id) {
+  if (questionId === question?.id) {
     const player = getPlayersInGameById(game.id, playerId);
+    if (isUndefined(player)) {
+      throw new PlayerNotFoundError()
+    }
     const correct = answerId === question.answerId;
     player.score = Math.max(0, player.score + (correct ? 1 : -1));
     if (player.score >= 20) {
       player.won = true;
-      gameEnded = true;
     }
     question.answered = true
   } else {
@@ -118,17 +122,21 @@ const answerQuestion = (playerId, questionId, answerId) => {
   return game
 };
 
-const getPlayersInGameById = (gameId, playerId) => {
+const getPlayersInGameById = (gameId: string, playerId: string) => {
   return getGameByGameId(gameId)
     .players
     .find(p => p.id === playerId)
 }
 
-const removePlayerFromGame = (pubsub, playerId, gameId) => {
+const removePlayerFromGame = (pubsub: PubSub, playerId: string, gameId: string) => {
   const game = getGameByGameId(gameId)
-  game.players
-    .find(({ id }) => id === playerId)
-    .hasLeft = true
+  const player = game.players
+    .find(({ id }) => id === playerId);
+  if (isUndefined(player)) {
+    throw new PlayerNotFoundError()
+  }
+
+  player.hasLeft = true
 
   if (game.players.every(({ hasLeft }) => hasLeft)) {
     return deleteGameByGameId(pubsub, gameId)
@@ -143,7 +151,7 @@ const removePlayerFromGame = (pubsub, playerId, gameId) => {
   return game
 }
 
-const deleteGameByGameId = (pubsub, gameId) => {
+const deleteGameByGameId = (pubsub: PubSub, gameId: string) => {
   const index = games.findIndex(g => g.id === gameId)
   if (index === -1) {
     throw new GameNotFoundError('Tried deleting non existent game')
@@ -158,7 +166,7 @@ const deleteGameByGameId = (pubsub, gameId) => {
   return game
 }
 
-module.exports = {
+export {
   getGameByPlayerId,
   createGame,
   getLastAnswerByPlayerId,
