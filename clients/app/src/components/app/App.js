@@ -82,7 +82,7 @@ function App() {
                 <Body>
                   <section className="flex h-full justify-center">
                     <Switch>
-                      <Route exact path="/(|landingpage)/">
+                      <Route exact path="/(|index.html|landingpage)/">
                         <LandingPage />
                       </Route>
                       <Route path="/singleplayer/">

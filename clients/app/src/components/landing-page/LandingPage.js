@@ -15,7 +15,7 @@ function LandingPage() {
           <video
             className={`inline-block min-w-full absolute ${
               styles['landing-page__video']
-            }`}
+              }`}
             style={{ clipPath: 'url(#clipPath)', minHeight: '184px' }}
             autoPlay
             loop
@@ -44,10 +44,10 @@ function LandingPage() {
           <div
             className={`${
               styles['tutorial-text-wrapper']
-            } bg-gray-light relative mb-16`}
+              } bg-gray-light relative mb-16`}
           >
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
-              1. Challange other players
+              1. Challenge other players
             </p>
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
               2. Compete and see who knows the most
@@ -64,7 +64,7 @@ function LandingPage() {
             <span
               className={`${
                 styles['nerd-face']
-              } absolute text-6xl left-1/2 left-1/2`}
+                } absolute text-6xl left-1/2 left-1/2`}
             >
               🤓
             </span>
