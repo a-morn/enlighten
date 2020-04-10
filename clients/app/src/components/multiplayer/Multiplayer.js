@@ -87,7 +87,7 @@ function Multiplayer({ history, playerId }) {
   const { data, startPolling, subscribeToMore } = useQuery(GAME)
 
   useEffect(() => {
-    startPolling(1000);
+    startPolling(2000);
   }, []);
 
   const globalState = useContext(store)

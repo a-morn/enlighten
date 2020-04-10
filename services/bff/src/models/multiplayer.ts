@@ -188,12 +188,12 @@ const startFilterInactive = () => {
             .players
             .forEach(p => {
               const diff = moment().diff(p.timestamp, 'seconds');
-              if (diff > 3) {
+              if (diff > 5) {
                 p.hasLeft = true
               }
             })
         )
-    }, 500)
+    }, 1000)
   }
 }
 startFilterInactive()
