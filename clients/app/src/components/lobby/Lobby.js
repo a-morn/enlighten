@@ -1,23 +1,10 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams, withRouter } from 'react-router-dom'
-import { CategoryPicker } from '../category-picker'
+import React, { useCallback, useEffect } from 'react'
+import { withRouter } from 'react-router-dom'
 import GameRequestModal from './game-request-modal'
 import PlayerList from './player-list'
-
-export const LOBBY = gql`
-  query {
-    lobby {
-      players {
-        name
-        id
-        category
-      }
-    }
-  }
-`
 
 const GAME_REQUEST = gql`
   query {
@@ -29,26 +16,6 @@ const GAME_REQUEST = gql`
       playerRequestName
       playerOfferedName
       accepted
-    }
-  }
-`
-
-export const PLAYER_JOINED = gql`
-  subscription {
-    playerJoined {
-      name
-      id
-      category
-    }
-  }
-`
-
-const JOIN_LOBBY = gql`
-  mutation($player: PlayerInput!) {
-    joinLobby(player: $player) {
-      id
-      name
-      category
     }
   }
 `
@@ -82,24 +49,6 @@ const DELETE_GAME_REQUEST = gql`
   }
 `
 
-export const GAME = gql`
-  query {
-    gameMultiplayer {
-      id
-    }
-  }
-`
-
-export const GAME_SUBSCRIPTION = gql`
-  subscription onGameUpdated($mutation: String) {
-    gameMultiplayerSubscription(mutation: $mutation) {
-      gameMultiplayer {
-        id
-      }
-    }
-  }
-`
-
 export const GAME_REQUEST_SUBSCRIPTION = gql`
   subscription {
     gameRequestSubscription {
@@ -117,11 +66,7 @@ export const GAME_REQUEST_SUBSCRIPTION = gql`
   }
 `
 
-export function Lobby({ history, playerId }) {
-  const [category, setCategory] = useState()
-  const { category: categoryFromParams } = useParams()
-
-  const [joinLobby] = useMutation(JOIN_LOBBY)
+export function Lobby({ playerId, category, players }) {
   const [requestGame] = useMutation(REQUEST_GAME, {
     refetchQueries: [
       {
@@ -132,46 +77,10 @@ export function Lobby({ history, playerId }) {
   const [answerGameRequest] = useMutation(ANSWER_GAME_REQUEST)
   const [deleteGameRequest] = useMutation(DELETE_GAME_REQUEST)
 
-  const { data: lobbyData, subscribeToMore: lobbySubscribeToMore } = useQuery(
-    LOBBY,
-  )
   const {
     data: gameRequestData,
     subscribeToMore: gameRequestSubscribeToMore,
   } = useQuery(GAME_REQUEST)
-
-  const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
-    GAME,
-  )
-
-  useEffect(() => {
-    lobbySubscribeToMore({
-      document: PLAYER_JOINED,
-      updateQuery: (prev, { subscriptionData }) => {
-        if (
-          !subscriptionData.data ||
-          (prev &&
-            prev.lobby.players.some(
-              p => p.id === subscriptionData.data.playerJoined.id,
-            ))
-        ) {
-          return prev
-        }
-
-        return R.mergeDeepLeft(
-          {
-            lobby: {
-              players: [
-                ...prev.lobby.players,
-                subscriptionData.data.playerJoined,
-              ],
-            },
-          },
-          prev,
-        )
-      },
-    })
-  }, [lobbySubscribeToMore])
 
   useEffect(() => {
     gameRequestSubscribeToMore({
@@ -191,44 +100,6 @@ export function Lobby({ history, playerId }) {
     })
   }, [gameRequestSubscribeToMore])
 
-  useEffect(() => {
-    gameSubscribeToMore({
-      document: GAME_SUBSCRIPTION,
-      variables: { mutation: 'CREATE' },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev
-        return {
-          gameMultiplayer:
-            subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
-        }
-      },
-    })
-  }, [gameSubscribeToMore])
-
-  const playerIdRef = useRef(null)
-  playerIdRef.current = playerId
-
-  const leave = useCallback(async () => {
-    //setPlayers(players => players.filter(p => p.playerId !== playerId))
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      leave()
-    }
-  }, [leave])
-
-  if (!category && categoryFromParams) {
-    setCategory(categoryFromParams)
-  }
-
-  const joinLobbyCallback = useCallback(
-    name => {
-      joinLobby({ variables: { player: { id: playerId, category, name } } })
-    },
-    [category, playerId, joinLobby],
-  )
-
   const requestGameCallback = playerOfferedId => {
     requestGame({
       variables: {
@@ -241,12 +112,6 @@ export function Lobby({ history, playerId }) {
     })
   }
 
-  useEffect(() => {
-    if (R.path(['gameMultiplayer', 'id'], gameData)) {
-      history.push(`/multiplayer/${gameData.gameMultiplayer.id}/${playerId}`)
-    }
-  }, [gameData, history, playerId])
-
   const acceptGameRequest = useCallback(() => {
     answerGameRequest({
       variables: {
@@ -255,6 +120,7 @@ export function Lobby({ history, playerId }) {
       },
     })
   }, [answerGameRequest, gameRequestData])
+
   const declineGameRequest = useCallback(() => {
     answerGameRequest({
       variables: {
@@ -263,23 +129,6 @@ export function Lobby({ history, playerId }) {
       },
     })
   }, [answerGameRequest, gameRequestData])
-
-  let leaveLobbyButtonClassName =
-    'hover:bg-red-600 bg-red-500 text-white rounded px-4 mt-4 disabled:opacity-50 shadow-lg p-6 md:p-4'
-
-  if (false) {
-    leaveLobbyButtonClassName += ' cursor-not-allowed opacity-50'
-  }
-
-  useEffect(() => {
-    if (category) {
-      history.push(`/lobby/${category}`)
-    }
-  }, [category, history])
-  const disabledCategories = []
-  const joinedCurrentCategory = false
-
-  const memoSetCategory = useCallback(c => setCategory(c), [])
 
   const deleteGameRequestCallback = useCallback(
     _ => {
@@ -294,21 +143,6 @@ export function Lobby({ history, playerId }) {
   return (
     <div className="flex flex-col my-auto">
       <div className="flex flex-col">
-        <CategoryPicker
-          className=""
-          onClick={joinLobbyCallback}
-          buttonLabel={'Join lobby'}
-          disabledCategories={disabledCategories}
-          category={category}
-          setCategory={memoSetCategory}
-          isNameUsed={true}
-          autoPick
-        />
-        {joinedCurrentCategory && (
-          <button className={leaveLobbyButtonClassName} onClick={leave}>
-            Leave lobby
-          </button>
-        )}
         {R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(
           gameRequestData,
         ) &&
@@ -336,19 +170,15 @@ export function Lobby({ history, playerId }) {
             />
           )}
       </div>
-      {lobbyData && lobbyData.lobby.players.some(({ id }) => id === playerId) && (
-        <div className="mt-4">
-          <PlayerList
-            players={
-              lobbyData
-                ? lobbyData.lobby.players.filter(p => p.category === category)
-                : []
-            }
-            onClick={requestGameCallback}
-            currentPlayerId={playerId}
-          />
-        </div>
-      )}
+      <div className="mt-4">
+        <PlayerList
+          players={
+            players
+          }
+          onClick={requestGameCallback}
+          currentPlayerId={playerId}
+        />
+      </div>
     </div>
   )
 }

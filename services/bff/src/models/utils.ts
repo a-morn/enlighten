@@ -2,7 +2,10 @@ import R from 'ramda'
 import { Game, GameSingeplayer } from './game'
 import { Category } from './category'
 
-const filterGame = (game: Game | GameSingeplayer) => {
+const filterGame = (game: Game | GameSingeplayer | null) => {
+    if (game === null) {
+        return null
+    }
     const { questions: _, ...noQuestionsGame } = game
     if (!R.pathEq(['currentQuestion', 'answered'], true)(game)) {
         const censoredGame = {

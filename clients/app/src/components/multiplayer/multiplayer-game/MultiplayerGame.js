@@ -12,6 +12,31 @@ export const ANSWER = gql`
   mutation($questionId: ID!, $id: ID!) {
     answerQuestionMultiplayer(questionId: $questionId, answerId: $id) {
       id
+      categoryBackground
+      players {
+        id
+        score
+        name
+        won
+        hasLeft
+      }
+      currentQuestion {
+        id
+        type
+        text
+        src
+        answerId
+        alternatives {
+          id
+          type
+          text
+          src
+        }
+      }
+      lastQuestion {
+        id
+        answerId
+      }
     }
   }
 `
@@ -78,7 +103,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
                 data-testid="winner-modal"
                 title={`${winner.id === playerId ? 'You' : winner.name} won! ${
                   winner.id === playerId ? '😃' : '😢'
-                }`}
+                  }`}
                 declineText="Ok"
                 onDecline={leaveGameCallback}
               />
@@ -96,14 +121,14 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
           <div
             className={`flex justify-between text-lg bg-gray-lighter p-4 rounded ${
               styles['multiplayer__scoreboard']
-            }`}
+              }`}
           >
             {game.players.map(({ name, score, id }) => (
               <div key={id} className="flex items-center text-brand-dark">
                 <span
                   className={`font-bold mr-4 ${
                     styles['multiplayer__scoreboard__name']
-                  }`}
+                    }`}
                 >{`${name}:`}</span>
                 <div
                   className={styles['multiplayer__scoreboard__score-wrapper']}
@@ -111,7 +136,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
                   <span
                     className={`${
                       styles['multiplayer__scoreboard__score-wrapper__score']
-                    }`}
+                      }`}
                     style={{
                       top: `${(-2 * ((score - (score % 10)) % 100)) / 10 ||
                         0}em`,
@@ -123,7 +148,7 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
                   <span
                     className={`${
                       styles['multiplayer__scoreboard__score-wrapper__score']
-                    }`}
+                      }`}
                     style={{ top: `${-2 * (score % 10) || 0}em` }}
                   >
                     0 1 2 3 4 5 6 7 8 9

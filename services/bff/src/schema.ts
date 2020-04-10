@@ -17,15 +17,13 @@ const typeDefs = gql`
 
 		type Lobby {
 			players: [Player]
-			hasJoined: Boolean!
 		}
 
 		type Mutation {
 			createGameSingleplayer(playerId: ID!, category: String!): GameSingleplayer
 			deleteGameSingleplayer(id: ID!): GameSingleplayer
 			answerQuestionSingleplayer(answerId: ID!, questionId: ID!): GameSingleplayer
-			addPlayer(id: ID!): Player
-			joinLobby(player: PlayerInput!): Player
+			joinLobby(player: PlayerInput!): Player!
 			requestGame(gameRequest: GameRequestInput!): GameRequest
 			answerGameRequest(id: ID!, accepted: Boolean): GameRequest
 			answerQuestionMultiplayer(questionId: ID!, answerId: ID!): GameMultiplayer
@@ -35,9 +33,10 @@ const typeDefs = gql`
 
 		type Subscription {
 			gameSingleplayerSubscription: GameSingleplayerSubscription
-			playerJoined: Player
+			lobby: Lobby!
+			pingLobby: Player!
 			gameRequestSubscription(mutation: String): GameRequestSubscription
-			gameMultiplayerSubscription(mutation: String): GameMultiplayerSubscription
+			gameMultiplayerSubscription: GameMultiplayerSubscription
 		}
 
 		type GameSingleplayerSubscription {
@@ -47,7 +46,7 @@ const typeDefs = gql`
 
 		type GameMultiplayerSubscription {
 			mutation: String
-			gameMultiplayer: GameMultiplayer!
+			gameMultiplayer: GameMultiplayer
 		}
 
 		type GameRequestSubscription {

@@ -84,7 +84,12 @@ const REMOVE_PLAYER_FROM_GAME = gql`
 `
 
 function Multiplayer({ history, playerId }) {
-  const { data, subscribeToMore } = useQuery(GAME)
+  const { data, startPolling, subscribeToMore } = useQuery(GAME)
+
+  useEffect(() => {
+    startPolling(1000);
+  }, []);
+
   const globalState = useContext(store)
   const { dispatch } = globalState
   const [removePlayerFromGame] = useMutation(REMOVE_PLAYER_FROM_GAME, {
@@ -103,12 +108,19 @@ function Multiplayer({ history, playerId }) {
         } else {
           switch (subscriptionData.data.gameMultiplayerSubscription.mutation) {
             case 'DELETE': {
-              return { gameMultiplayer: null }
+              return {
+                ...prev,
+                // for some reason I couldn't remove gameMultiplayer from the cache here
+                // works anyway since it will be removed on removePlayerFromGame
+                // gameMultiplayer: null
+              }
             }
             default: {
               return {
                 gameMultiplayer:
-                  subscriptionData.data.gameMultiplayerSubscription
+                  subscriptionData
+                    .data
+                    .gameMultiplayerSubscription
                     .gameMultiplayer,
               }
             }

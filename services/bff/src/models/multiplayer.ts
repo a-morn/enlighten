@@ -10,6 +10,7 @@ import { PlayerLobby } from './player';
 import { Category } from './category';
 import { Question } from './question'
 import { isUndefined } from 'util';
+import moment from 'moment'
 const allQuestions = {
   'game-of-thrones': got,
   //'periodic-table': periodicTable,
@@ -22,6 +23,7 @@ const backgrounds = {
 };
 
 import { filterGame } from './utils'
+import { forEach } from 'ramda';
 
 const games: GameMultiplayer[] = []
 
@@ -47,7 +49,7 @@ const getGameByGameId = (gameId: string) => {
 const createGame = (pubsub: PubSub, players: PlayerLobby[], category: Category) => {
   const id = '' + Math.random()
   const game = {
-    players: players.map(p => ({ score: 0, won: false, hasLeft: false, ...p })),
+    players: players.map(p => ({ score: 0, won: false, hasLeft: false, timestamp: moment().add(5, 'seconds'), ...p })),
     category,
     categoryBackground: backgrounds[category],
     id,
@@ -163,8 +165,38 @@ const deleteGameByGameId = (pubsub: PubSub, gameId: string) => {
       mutation: 'DELETE'
     }
   })
-  return game
+  return null
 }
+
+const updateTimestampForPlayer = (playerId: string) => {
+  const player = getGameByPlayerId(playerId)
+    .players
+    .find(({ id }) => id === playerId)
+  if (!player) {
+    throw new PlayerNotFoundError()
+  }
+  player.timestamp = new Date()
+}
+
+let interval: NodeJS.Timeout
+const startFilterInactive = () => {
+  if (!interval) {
+    interval = setInterval(() => {
+      games
+        .forEach(game =>
+          game
+            .players
+            .forEach(p => {
+              const diff = moment().diff(p.timestamp, 'seconds');
+              if (diff > 3) {
+                p.hasLeft = true
+              }
+            })
+        )
+    }, 500)
+  }
+}
+startFilterInactive()
 
 export {
   getGameByPlayerId,
@@ -173,4 +205,5 @@ export {
   answerQuestion,
   updateQuestionByPlayerId,
   removePlayerFromGame,
+  updateTimestampForPlayer
 };

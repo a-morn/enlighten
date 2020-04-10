@@ -4,13 +4,14 @@ import {
 } from './errors';
 
 import {
-  PLAYER_JOINED,
+  LOBBY_SUBSCRIPTION,
+  LOBBY_PING,
   GAME_REQUEST,
   GAME_SINGLEPLAYER,
   GAME_MULTIPLAYER,
 } from './triggers'
-import { Player, PlayerLobby } from './models/player'
-import { Game, GameMultiplayer } from './models/game'
+import { PlayerLobby } from './models/player'
+import { GameMultiplayer } from './models/game'
 
 import {
   getGameByPlayerId as getGameByPlayerIdSingleplayer,
@@ -24,6 +25,7 @@ import {
   getGameRequestById as getGameRequestByIdLobby,
   getPlayerById as getPlayerByIdLobby,
   addPlayer as addPlayerLobby,
+  removePlayer as removePlayerLobby,
   getPlayers as getPlayersLobby,
   addGameRequest as addGameRequestLobby,
   getGameRequestByPlayerId as getGameRequestByPlayerIdLobby,
@@ -36,6 +38,7 @@ import {
   updateQuestionByPlayerId as updateQuestionByPlayerIdMultiplayer,
   answerQuestion as answerQuestionMultiplayer,
   removePlayerFromGame as removePlayerFromGameMultiplayer,
+  updateTimestampForPlayer as updateTimestampForPlayerMultiplayer
 } from './models/multiplayer'
 
 import { Category } from './models/category'
@@ -62,10 +65,6 @@ type DeleteGameSingleplayerInput = {
 type AnswerQuestionInput = {
   questionId: string
   answerId: string
-}
-
-type AddPlayerInput = {
-  id: string
 }
 
 type RemovePlayerInput = {
@@ -125,11 +124,16 @@ const resolvers = ({
     },
     lobby: (_: unknown, __: unknown, context: Context) => {
       const { currentUser: { playerId } } = context
+      try {
+        const player = getPlayerByIdLobby(playerId)
+        player.timestamp = new Date()
+      } catch {
+        // Player not in lobbyy
+      }
+
       const players = getPlayersLobby()
-      const hasJoined = players.some((p: Player) => p.id === playerId)
       return {
         players,
-        hasJoined
       }
     },
     gameRequest: (_: unknown, __: unknown, context: Context) => {
@@ -140,6 +144,7 @@ const resolvers = ({
     gameMultiplayer: (_: unknown, __: unknown, context: Context) => {
       const { currentUser: { playerId } } = context
       try {
+        updateTimestampForPlayerMultiplayer(playerId)
         const game = getGameByPlayerIdMultiplayer(playerId);
         const filteredGame = filterGame(game);
         return filteredGame
@@ -183,23 +188,15 @@ const resolvers = ({
       }, 800)
       return game
     },
-    addPlayer: (_: unknown, { id }: AddPlayerInput) => {
+    joinLobby: (_: unknown, { player: { id, category, name } }: JoinLobbyInput) => {
       let player
       try {
         player = getPlayerByIdLobby(id)
+        player.timestamp = new Date()
       } catch {
-        player = { id }
-        addPlayerLobby(player as PlayerLobby)
+        player = { id, category, name, timestamp: new Date() }
+        addPlayerLobby(pubsub, player as PlayerLobby)
       }
-      return player
-    },
-    joinLobby: (_: unknown, { player: { id, category, name } }: JoinLobbyInput) => {
-      const player = getPlayerByIdLobby(id)
-      player.category = category
-      player.name = name
-      pubsub.publish(PLAYER_JOINED, {
-        playerJoined: player
-      })
       return player
     },
     requestGame: (_: unknown, { gameRequest: { playerRequestId, playerOfferedId, category } }: RequestGameInput) => {
@@ -279,8 +276,17 @@ const resolvers = ({
           return playerId === gameSingleplayer.playerId
         })
     },
-    playerJoined: {
-      subscribe: () => pubsub.asyncIterator(PLAYER_JOINED)
+    lobby: {
+      subscribe: () => pubsub.asyncIterator(LOBBY_SUBSCRIPTION)
+    },
+    pingLobby: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(LOBBY_PING),
+        (payload: { player: PlayerLobby }, _: unknown, context: Context) => {
+          const { currentUser: { playerId } } = context
+          const { player: { id } } = payload
+          return id === playerId
+        })
     },
     gameRequestSubscription: {
       subscribe: withFilter(
@@ -300,11 +306,10 @@ const resolvers = ({
     gameMultiplayerSubscription: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(GAME_MULTIPLAYER),
-        (payload: { gameMultiplayerSubscription: GameMultiPlayerSubscription }, variables, context: Context) => {
+        (payload: { gameMultiplayerSubscription: GameMultiPlayerSubscription }, _: unknown, context: Context) => {
           const { currentUser: { playerId } } = context
-          const { gameMultiplayerSubscription: { gameMultiplayer: { players }, mutation } } = payload
-          return players.some(p => p.id === playerId) &&
-            (!variables.mutation || variables.mutation === mutation)
+          const { gameMultiplayerSubscription: { gameMultiplayer: { players } } } = payload
+          return players.some(p => p.id === playerId)
         })
     },
   }

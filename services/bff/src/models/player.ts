@@ -5,10 +5,12 @@ export type Player = {
 
 export type PlayerLobby = Player & {
     category: string
+    timestamp: Date
 }
 
 export type PlayerMultiplayer = Player & {
     hasLeft: boolean
     score: number
     won: boolean
+    timestamp: Date
 }

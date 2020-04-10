@@ -1,1 +1,1 @@
-export { default } from './LobbyLogin'
+export { LobbyLoginComponent } from './LobbyLogin'

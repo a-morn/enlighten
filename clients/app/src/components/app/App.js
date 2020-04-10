@@ -14,7 +14,7 @@ import About from '../about'
 import Body from '../body'
 import Header from '../header'
 import LandingPage from '../landing-page'
-import LobbyLogin from '../lobby-login'
+import { LobbyLoginComponent } from '../lobby-login'
 import Multiplayer from '../multiplayer'
 import Page404 from '../page-404'
 import Singleplayer from '../singleplayer'
@@ -89,7 +89,7 @@ function App() {
                         <Singleplayer playerId={playerId} />
                       </Route>
                       <Route path="/lobby/:category?">
-                        <LobbyLogin playerId={playerId} />
+                        <LobbyLoginComponent playerId={playerId} />
                       </Route>
                       <Route path="/multiplayer/:gameId/:playerId">
                         <Multiplayer playerId={playerId} />

@@ -4,6 +4,7 @@ import {
 } from '../errors';
 import {
 	GAME_REQUEST,
+	LOBBY_SUBSCRIPTION,
 } from '../triggers'
 import {
 	PlayerLobby,
@@ -13,8 +14,9 @@ import {
 } from './gameRequest'
 import { PubSub } from 'graphql-subscriptions';
 import { Category } from './category';
+import moment from 'moment'
 
-const players: PlayerLobby[] = []
+const playersInLobby: { [key: string]: PlayerLobby } = {}
 const gameRequests: GameRequest[] = []
 
 const getGameRequestById = (gameRequestId: string) => {
@@ -41,7 +43,7 @@ const getGameRequestByPlayerId = (playerId: string) => {
 }
 
 const getPlayerById = (playerId: string) => {
-	const player = players.find(p => p.id == playerId);
+	const player = Object.values(playersInLobby).find(p => p.id == playerId);
 	if (!player) {
 		throw new PlayerNotFoundError(`No such player: ${playerId}`);
 	}
@@ -49,16 +51,30 @@ const getPlayerById = (playerId: string) => {
 	return player;
 };
 
-const addPlayer = (player: PlayerLobby) => {
-	if (player.name && players.some(({ name }) => name === player.name)) {
+const addPlayer = (pubSub: PubSub, player: PlayerLobby) => {
+	if (player.name && Object.values(playersInLobby).some(({ name }) => name === player.name)) {
 		throw new Error('Duplicate name')
 	}
+	playersInLobby[player.id] = player
+	pubSub.publish(LOBBY_SUBSCRIPTION, {
+		lobby: {
+			players: getPlayers(player.category)
+		}
+	})
+}
 
-	players.push(player)
+const removePlayer = (pubSub: PubSub, playerId: string) => {
+	const category = playersInLobby[playerId].category
+	delete playersInLobby[playerId]
+	pubSub.publish(LOBBY_SUBSCRIPTION, {
+		lobby: {
+			players: getPlayers(category)
+		}
+	})
 }
 
 const getPlayers = (category?: string) => {
-	return players
+	return Object.values(playersInLobby)
 		.filter(p => !category || p.category === category)
 }
 
@@ -109,12 +125,30 @@ const deleteGameRequestById = (pubsub: PubSub, playerId: string, id: string) => 
 	return gameRequest
 }
 
+let interval: NodeJS.Timeout
+const startFilterInactive = () => {
+	if (!interval) {
+		interval = setInterval(() => {
+			Object.values(playersInLobby)
+				.filter(({ timestamp }) => {
+					const diff = moment().diff(timestamp, 'seconds');
+					return diff > 3
+				}).forEach(({ id }) => {
+					delete playersInLobby[id]
+				})
+		}, 500)
+	}
+}
+startFilterInactive()
+
 export {
 	getGameRequestById,
 	getPlayerById,
 	addPlayer,
+	removePlayer,
 	getPlayers,
 	addGameRequest,
 	getGameRequestByPlayerId,
-	deleteGameRequestById
+	deleteGameRequestById,
+	startFilterInactive
 };
