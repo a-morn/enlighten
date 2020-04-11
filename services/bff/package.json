@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "tsc": "tsc",
-    "start": "node ./src/www",
+    "start:develop": "NODE_ENV=development node ./dist/index",
+    "start:production": "NODE_ENV=production node ./dist/index",
     "start:debug": "node --inspect-brk ./bin/www",
     "lint": "eslint --fix . && echo 'Lint complete.'"
   },
@@ -36,7 +37,7 @@
     "@types/ramda": "^0.27.3",
     "@types/shuffle-array": "0.0.28",
     "@types/uuid": "^7.0.2",
-    "dotenv": "^8.2.0",
+    "dotenv-flow": "^3.1.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-prettier": "^3.1.1",

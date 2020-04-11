@@ -38,14 +38,14 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 })
 
 const httpLink = new HttpLink({
-  uri: `http://${process.env.REACT_APP_BFF_URL}/graphql`,
+  uri: `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/graphql`,
   headers: {
     authorization: playerId,
   },
 })
 
 const wsLink = new WebSocketLink({
-  uri: `ws://${process.env.REACT_APP_BFF_URL}/graphql`,
+  uri: `${process.env.REACT_APP_BFF_WS_PROTOCOL}${process.env.REACT_APP_BFF_URL}/graphql`,
   options: {
     reconnect: true,
     connectionParams: { playerId },
