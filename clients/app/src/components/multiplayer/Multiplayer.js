@@ -88,7 +88,7 @@ function Multiplayer({ history, playerId }) {
 
   useEffect(() => {
     startPolling(2000);
-  }, []);
+  }, [startPolling]);
 
   const globalState = useContext(store)
   const { dispatch } = globalState

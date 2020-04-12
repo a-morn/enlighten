@@ -84,7 +84,7 @@ export function LobbyLogin({ history, playerId }) {
 
   useEffect(() => {
     startPolling(1000);
-  }, []);
+  }, [startPolling]);
 
   if (!category && categoryFromParams) {
     setCategory(categoryFromParams)

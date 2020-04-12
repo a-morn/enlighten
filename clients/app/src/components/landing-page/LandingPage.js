@@ -55,9 +55,10 @@ function LandingPage() {
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
               3. Climb the ranks and become the top nerd
             </p>
-            <span className={`${styles['arm']} absolute text-6xl`}>💪</span>
+            <span className={`${styles['arm']} absolute text-6xl`} role="img" aria-label="arm">💪</span>
             <span
               className={`${styles['thinking-face']} absolute text-6xl top-1/2`}
+              role="img" aria-label="thinking"
             >
               🤔
             </span>
@@ -65,6 +66,7 @@ function LandingPage() {
               className={`${
                 styles['nerd-face']
                 } absolute text-6xl left-1/2 left-1/2`}
+              role="img" aria-label="nerd"
             >
               🤓
             </span>
