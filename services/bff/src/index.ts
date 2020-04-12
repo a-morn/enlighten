@@ -4,9 +4,16 @@
  * Module dependencies.
  */
 
+import { resolve } from 'path'
+
+const dotenv = require('dotenv-flow')
+dotenv.config({ path: resolve(__dirname, '..') });
 import app from './app';
+import ws from './ws';
+
 import d from 'debug';
 import http from 'http';
+import { createTerminus } from '@godaddy/terminus';
 
 const debug = d('services:server');
 
@@ -15,7 +22,7 @@ const debug = d('services:server');
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '3001');
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -23,6 +30,28 @@ app.set('port', port);
  */
 
 const server = http.createServer(app);
+
+ws(app, server)
+
+/**
+ * Health check
+ */
+async function onHealthCheck() {
+  // Add health check here
+  return Promise.resolve(true)
+}
+
+function onSignal() {
+  // Graceful shutdown goes here
+  return Promise.resolve()
+}
+
+createTerminus(server, {
+  signal: 'SIGINT',
+  healthChecks: { '/healthcheck': onHealthCheck },
+  onSignal
+})
+
 
 /**
  * Listen on provided port, on all network interfaces.

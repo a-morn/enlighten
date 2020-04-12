@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build:dev": "NODE_ENV=development npm run tsc",
+    "build:prod": "NODE_ENV=production npm run tsc",
     "tsc": "tsc",
-    "start:develop": "NODE_ENV=development node ./dist/index",
-    "start:production": "NODE_ENV=production node ./dist/index",
-    "start:debug": "node --inspect-brk ./bin/www",
+    "start:dev": "NODE_ENV=development node ./dist/index",
+    "start:prod": "./prod-scripts/start.sh",
     "lint": "eslint --fix . && echo 'Lint complete.'"
   },
   "dependencies": {
+    "@godaddy/terminus": "^4.3.1",
     "apollo-server": "^2.9.9",
     "apollo-server-express": "^2.9.9",
     "cookie-parser": "~1.4.4",
@@ -43,6 +45,7 @@
     "eslint-plugin-prettier": "^3.1.1",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
+    "pm2": "^4.2.3",
     "prettier": "^1.18.2",
     "svg-country-flags": "^1.2.7",
     "typescript": "^3.8.3"

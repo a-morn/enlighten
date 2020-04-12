@@ -2,12 +2,9 @@ import typeDefs from './schema'
 import resolvers from './resolvers'
 import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
 import * as http from 'http'
+import { Express } from 'express'
 
-type SubscriptionInput = {
-	playerId: string
-}
-
-export default (app: any) => {
+export default (app: Express, httpServer: http.Server) => {
 	const apolloServer = new ApolloServer({
 		typeDefs,
 		resolvers,
@@ -28,12 +25,8 @@ export default (app: any) => {
 		}
 	} as ApolloServerExpressConfig)
 
-	apolloServer.applyMiddleware({ app, path: '/graphql' })
+	apolloServer.applyMiddleware({ app, path: '/graphql' });
 
-	const httpServer = http.createServer(app);
 	// I wonder what went wrong here 🤔
 	(apolloServer as any).installSubscriptionHandlers(httpServer)
-
-	httpServer
-		.listen({ port: process.env.WS_PORT })
 }

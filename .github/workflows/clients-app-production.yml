@@ -1,13 +1,15 @@
-name: Production Build
+name: clients/app Production Build
 on:
   pull_request:
   push:
     branches:
       - master
+    paths:
+      - "clients/app/**"
+      - ".github/workflows/clients-app-production.yml"
 jobs:
-  build:
+  deploy-client:
     runs-on: ubuntu-latest
-    
     strategy:
       matrix:
         node-version: [12.x]
@@ -31,8 +33,16 @@ jobs:
       with:
         args: --acl public-read --delete
       env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
+        AWS_S3_BUCKET: "enlighten.rip"
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         SOURCE_DIR: "clients/app/build"
+    - name: Invalidate cache
+      uses: chetan/invalidate-cloudfront-action@master
+      env:
+        DISTRIBUTION: ELHX0YJVBLA1S
+        PATHS: '/*'
+        AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

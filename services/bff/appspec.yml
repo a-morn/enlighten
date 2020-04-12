@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+files:
+  - source: package.json
+    destination: /srv
+  - source: package-lock.json
+    destination: /srv
+  - source: ecosystem.config.js
+    destination: /srv
+  - source: dist
+    destination: /srv/dist
+  - source: .env.production
+    destination: /srv
+hooks:
+  AfterInstall:
+    - location: prod-scripts/npm-install.sh
+      runas: root
+      timeout: 300
+  ApplicationStart:
+    - location: prod-scripts/start.sh
+      runas: ubuntu
+      timeout: 60

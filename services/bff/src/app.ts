@@ -6,7 +6,6 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan'
 import cors from 'cors';
-import ws from './ws';
 //const { limitBreakLoop } = require('./src/models/limit-break');
 
 const app = express();
@@ -20,7 +19,5 @@ app.use(cors() as any);
 //limitBreakLoop();
 //cleanUpLoop();
 //startGameLoop();
-
-ws(app);
 
 export default app;
