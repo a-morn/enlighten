@@ -1,3 +1,4 @@
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 import {
 	PlayerNotFoundError,
 	GameRequestNotFoundError
@@ -12,7 +13,6 @@ import {
 import {
 	GameRequest
 } from './gameRequest'
-import { PubSub } from 'graphql-subscriptions';
 import { Category } from './category';
 import moment from 'moment'
 
@@ -51,7 +51,7 @@ const getPlayerById = (playerId: string) => {
 	return player;
 };
 
-const addPlayer = (pubSub: PubSub, player: PlayerLobby) => {
+const addPlayer = (pubSub: RedisPubSub, player: PlayerLobby) => {
 	if (player.name && Object.values(playersInLobby).some(({ name }) => name === player.name)) {
 		throw new Error('Duplicate name')
 	}
@@ -63,7 +63,7 @@ const addPlayer = (pubSub: PubSub, player: PlayerLobby) => {
 	})
 }
 
-const removePlayer = (pubSub: PubSub, playerId: string) => {
+const removePlayer = (pubSub: RedisPubSub, playerId: string) => {
 	const category = playersInLobby[playerId].category
 	delete playersInLobby[playerId]
 	pubSub.publish(LOBBY_SUBSCRIPTION, {
@@ -78,7 +78,7 @@ const getPlayers = (category?: string) => {
 		.filter(p => !category || p.category === category)
 }
 
-const addGameRequest = (pubsub: PubSub, playerRequestId: string, playerOfferedId: string, category: Category) => {
+const addGameRequest = (pubsub: RedisPubSub, playerRequestId: string, playerOfferedId: string, category: Category) => {
 	const { name: playerRequestName } = getPlayerById(playerRequestId);
 	const { name: playerOfferedName } = getPlayerById(playerOfferedId);
 	const id = '' + Math.random()
@@ -103,7 +103,7 @@ const addGameRequest = (pubsub: PubSub, playerRequestId: string, playerOfferedId
 	return gameRequest;
 }
 
-const deleteGameRequestById = (pubsub: PubSub, playerId: string, id: string) => {
+const deleteGameRequestById = (pubsub: RedisPubSub, playerId: string, id: string) => {
 	const { playerRequestId, playerOfferedId } = getGameRequestById(id)
 	if (![playerRequestId, playerOfferedId].includes(playerId)) {
 		throw new Error('Unauthorized')

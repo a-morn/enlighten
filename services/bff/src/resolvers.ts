@@ -1,4 +1,7 @@
-import { PubSub, withFilter } from 'graphql-subscriptions'
+import { isUndefined } from 'util';
+import { withFilter } from 'graphql-subscriptions'
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import Redis from 'ioredis';
 import {
   GameNotFoundError,
 } from './errors';
@@ -45,7 +48,29 @@ import { Category } from './models/category'
 
 import { filterGame, isCategory } from './models/utils'
 
-const pubsub = new PubSub()
+const options = {
+  retryStrategy: (times: number) => {
+    // reconnect after
+    return Math.min(times * 50, 2000);
+  }
+};
+
+if (isUndefined(process.env.REDIS_PORT_NUMBER)) {
+  throw new Error()
+}
+
+const pubsub = new RedisPubSub({
+  publisher: new Redis(
+    parseInt(process.env.REDIS_PORT_NUMBER, 10),
+    process.env.REDIS_DOMAIN_NAME,
+    options
+  ),
+  subscriber: new Redis(
+    parseInt(process.env.REDIS_PORT_NUMBER, 10),
+    process.env.REDIS_DOMAIN_NAME,
+    options
+  )
+})
 
 export type Context = {
   currentUser: {

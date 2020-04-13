@@ -1,3 +1,4 @@
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { GameNotFoundError, PlayerNotFoundError, } from '../errors';
 import { GAME_MULTIPLAYER } from '../triggers';
 import shuffle from 'shuffle-array';
@@ -5,7 +6,6 @@ import shuffle from 'shuffle-array';
 import got from '../data/questions/game-of-thrones';
 import countries from '../data/questions/countries';
 import { GameMultiplayer } from './game'
-import { PubSub } from 'graphql-subscriptions';
 import { PlayerLobby } from './player';
 import { Category } from './category';
 import { Question } from './question'
@@ -46,7 +46,7 @@ const getGameByGameId = (gameId: string) => {
   return game
 }
 
-const createGame = (pubsub: PubSub, players: PlayerLobby[], category: Category) => {
+const createGame = (pubsub: RedisPubSub, players: PlayerLobby[], category: Category) => {
   const id = '' + Math.random()
   const game = {
     players: players.map(p => ({ score: 0, won: false, hasLeft: false, timestamp: moment().add(5, 'seconds'), ...p })),
@@ -130,7 +130,7 @@ const getPlayersInGameById = (gameId: string, playerId: string) => {
     .find(p => p.id === playerId)
 }
 
-const removePlayerFromGame = (pubsub: PubSub, playerId: string, gameId: string) => {
+const removePlayerFromGame = (pubsub: RedisPubSub, playerId: string, gameId: string) => {
   const game = getGameByGameId(gameId)
   const player = game.players
     .find(({ id }) => id === playerId);
@@ -153,7 +153,7 @@ const removePlayerFromGame = (pubsub: PubSub, playerId: string, gameId: string) 
   return game
 }
 
-const deleteGameByGameId = (pubsub: PubSub, gameId: string) => {
+const deleteGameByGameId = (pubsub: RedisPubSub, gameId: string) => {
   const index = games.findIndex(g => g.id === gameId)
   if (index === -1) {
     throw new GameNotFoundError('Tried deleting non existent game')
