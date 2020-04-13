@@ -1,7 +1,5 @@
 import { resolve } from 'path'
 
-require('dotenv').config({ path: resolve(__dirname, '../.env') });
-
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan'

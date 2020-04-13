@@ -15,7 +15,7 @@ function LandingPage() {
           <video
             className={`inline-block min-w-full absolute ${
               styles['landing-page__video']
-              }`}
+            }`}
             style={{ clipPath: 'url(#clipPath)', minHeight: '184px' }}
             autoPlay
             loop
@@ -44,7 +44,7 @@ function LandingPage() {
           <div
             className={`${
               styles['tutorial-text-wrapper']
-              } bg-gray-light relative mb-16`}
+            } bg-gray-light relative mb-16`}
           >
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
               1. Challenge other players
@@ -55,18 +55,26 @@ function LandingPage() {
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
               3. Climb the ranks and become the top nerd
             </p>
-            <span className={`${styles['arm']} absolute text-6xl`} role="img" aria-label="arm">💪</span>
+            <span
+              className={`${styles['arm']} absolute text-6xl`}
+              role="img"
+              aria-label="arm"
+            >
+              💪
+            </span>
             <span
               className={`${styles['thinking-face']} absolute text-6xl top-1/2`}
-              role="img" aria-label="thinking"
+              role="img"
+              aria-label="thinking"
             >
               🤔
             </span>
             <span
               className={`${
                 styles['nerd-face']
-                } absolute text-6xl left-1/2 left-1/2`}
-              role="img" aria-label="nerd"
+              } absolute text-6xl left-1/2 left-1/2`}
+              role="img"
+              aria-label="nerd"
             >
               🤓
             </span>

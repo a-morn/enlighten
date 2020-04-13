@@ -12,6 +12,7 @@
 					"caseInsensitive": false
 				}
 			}
-		]
+		],
+		"no-console": 1
 	}
 }

@@ -6,9 +6,9 @@ import { onError } from 'apollo-link-error'
 import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
-import { SessionProvider } from '../../hooks/context/session'
 import React, { StrictMode } from 'react'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
+import { SessionProvider } from '../../hooks/context/session'
 import { StateProvider } from '../../hooks/context/store.js'
 import About from '../about'
 import Body from '../body'
@@ -26,12 +26,14 @@ playerId = sessionStorage.getItem('playerId')
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
     graphQLErrors.map(({ message, locations, path }) =>
+      //eslint-disable-next-line no-console
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
       ),
     )
 
   if (networkError)
+    //eslint-disable-next-line no-console
     console.log(
       `[Network error]: ${networkError}. Maybe we should display some type of message to the user 🤔`,
     )

@@ -65,26 +65,25 @@ export function LobbyLogin({ history, playerId }) {
           case 'DELETE': {
             return {
               ...prev,
-              gameMultiplayer: null
+              gameMultiplayer: null,
             }
           }
           default:
             return {
               gameMultiplayer:
-                subscriptionData.data.gameMultiplayerSubscription.gameMultiplayer,
+                subscriptionData.data.gameMultiplayerSubscription
+                  .gameMultiplayer,
             }
         }
       },
     })
   }, [gameSubscribeToMore])
 
-  const { data: lobbyData, startPolling } = useQuery(
-    LOBBY
-  )
+  const { data: lobbyData, startPolling } = useQuery(LOBBY)
 
   useEffect(() => {
-    startPolling(1000);
-  }, [startPolling]);
+    startPolling(1000)
+  }, [startPolling])
 
   if (!category && categoryFromParams) {
     setCategory(categoryFromParams)
@@ -142,13 +141,17 @@ export function LobbyLogin({ history, playerId }) {
             Leave lobby
           </button>
         )}
-        {R.pathOr([], ['lobby', 'players'], lobbyData).some(({ id }) => id === playerId) &&
+        {R.pathOr([], ['lobby', 'players'], lobbyData).some(
+          ({ id }) => id === playerId,
+        ) && (
           <LobbyComponent
             playerId={playerId}
             category={category}
-            players={R.pathOr([], ['lobby', 'players'], lobbyData).filter(p => p.category === category)}
+            players={R.pathOr([], ['lobby', 'players'], lobbyData).filter(
+              p => p.category === category,
+            )}
           />
-        }
+        )}
       </div>
     </div>
   )

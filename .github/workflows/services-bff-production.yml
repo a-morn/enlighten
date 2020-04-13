@@ -36,8 +36,7 @@ jobs:
     - name: AWS Create Deploy
       id: aws_create_deploy
       run: |
-        DEPLOYMENT_ID=$(aws deploy create-deployment --application-name enlighten-bff --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name prod --file-exists-behavior OVERWRITE --s3-location bucket=artefacts.enlighten,key=enlighten-bff-prod.zip,bundleType=zip)
-        echo ::set-output name=deployment_id::$DEPLOYMENT_ID
+        echo ::set-output name=deployment_id::$(aws deploy create-deployment --application-name enlighten-bff --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name prod --file-exists-behavior OVERWRITE --s3-location bucket=artefacts.enlighten,key=enlighten-bff-prod.zip,bundleType=zip)
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

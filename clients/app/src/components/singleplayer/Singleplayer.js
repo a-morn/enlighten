@@ -186,7 +186,6 @@ function Singleplayer({ playerId }) {
     [answer, gameData],
   )
 
-  useEffect(() => console.log(gameData), [gameData])
   return (
     <div className="flex flex-col items-center justify-center">
       {!R.path(['gameSingleplayer', 'id'], gameData) && (

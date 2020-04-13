@@ -172,9 +172,7 @@ export function Lobby({ playerId, category, players }) {
       </div>
       <div className="mt-4">
         <PlayerList
-          players={
-            players
-          }
+          players={players}
           onClick={requestGameCallback}
           currentPlayerId={playerId}
         />
