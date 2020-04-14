@@ -1,12 +1,12 @@
-name: services/assets Production Build
+name: clients/assets Production Build
 on:
   pull_request:
   push:
     branches:
       - master
     paths:
-      - "services/assets/**"
-      - ".github/workflows/services-assets-production.yml"
+      - "clients/assets/**"
+      - ".github/workflows/clients-assets-production.yml"
 jobs:
   deploy-client:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        SOURCE_DIR: "services/assets/public"
+        SOURCE_DIR: "clients/assets/public"
     - name: Invalidate cache
       uses: chetan/invalidate-cloudfront-action@master
       env:
