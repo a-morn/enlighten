@@ -1,8 +1,8 @@
 import uuidv1 from 'uuid/v4';
 import shuffle from 'shuffle-array';
 import { countries } from 'countries-list'
-import { notUndefined } from '../../models/utils';
-import { Question, Alternative, QuestionEntityType, QuestionObject, QuestionDirection } from '../../models/question'
+import { notUndefined } from '../src/models/utils';
+import { Question, Alternative, QuestionEntityType, QuestionObject, QuestionDirection } from '../src/models/question'
 
 const COUNTRIES = Object.entries(countries)
   .map(([key, value]) => ({ ...value, flag: `${process.env.ASSETS_URL}/countries/country-flags/${key.toLocaleLowerCase()}.svg` }))
@@ -97,7 +97,6 @@ const questions: QuestionObject = Object.entries(config).reduce(
                       .map((el) => ({ ...bar(toType, el), id: uuidv1() })) as Alternative[]
                   ,
                   category: 'countries',
-                  record: 0,
                 } as Question))
                 .map(({ alternatives, ...question }: Question) => ({
                   answerId: alternatives[0].id,

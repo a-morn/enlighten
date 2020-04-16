@@ -18,14 +18,17 @@ export type Question = {
     category: string
     answerId: string
     text: string
-    record: number
-    answered: boolean
 } & ({
     type: 'text'
 } | {
     type: 'image'
     src: string
 })
+
+export type GameQuestion = Question & {
+    record: number
+    answered: boolean
+}
 
 export type Alternative = {
     id: string
@@ -38,5 +41,5 @@ export type Alternative = {
 })
 
 export type QuestionObject = {
-    [key: number]: { questions: Question[] }
+    [key: string]: { questions: Question[] }
 }

@@ -90,7 +90,7 @@ function App() {
                       <Route path="/singleplayer/">
                         <Singleplayer playerId={playerId} />
                       </Route>
-                      <Route path="/lobby/:category?">
+                      <Route path="/lobby/:categoryId?">
                         <LobbyLoginComponent playerId={playerId} />
                       </Route>
                       <Route path="/multiplayer/:gameId/:playerId">

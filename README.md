@@ -20,13 +20,20 @@ This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase
 - Redis (running on port 6379).
 
 ### Running the app
+- Start Redis
 - `cd services/bff && npm install && npm run build:dev && npm run start:develop`
-- `cd clients/assets && npm install && cd public && npx serve -l 8080`
+- `cd services/worker && npm install &`
+- `cd clients/assets && npm install && npm start`
 - `cd clients/app && npm install && npm start`
 - Direct you browser to localhost:8000
 
 ### Debugging BFF
-Build the project (`npm run build:dev`) and run the service with VS Code and the BFF configuration.
+
+#### Single instace
+Run the service with VS Code and the `Launch BFF` configuration.
+
+#### Multiple debuggable instances
+Run the service with VS Code and the `Launch BFFs` configuration.
 
 ## Production
 The workflows defined in `.github/workflows/*-production.yml` deploy to production. There's currently no staging env. Cloud formation coming soon...

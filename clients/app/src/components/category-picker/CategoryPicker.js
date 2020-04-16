@@ -13,8 +13,8 @@ export const GET_CATEGORIES = gql`
 `
 
 export function CategoryPicker({
-  category,
-  setCategory,
+  categoryId,
+  setCategoryId,
   className,
   buttonLabel,
   onClick,
@@ -29,16 +29,16 @@ export function CategoryPicker({
 
   useEffect(() => {
     if (autoPick && data && data.categories.length) {
-      setCategory(category => category || data.categories[0].id)
+      setCategoryId(categoryId => categoryId || data.categories[0].id)
     }
-  }, [autoPick, data, setCategory])
+  }, [autoPick, data, setCategoryId])
 
   let buttonClasses =
     'bg-cta-dark text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
 
   const disabled =
-    disabledCategories.some(c => c === category) ||
-    !category ||
+    disabledCategories.some(c => c === categoryId) ||
+    !categoryId ||
     (isNameUsed && !name)
 
   if (disabled) {
@@ -60,14 +60,14 @@ export function CategoryPicker({
       {data && (
         <>
           <CategorySelect
-            onChange={category => {
+            onChange={categoryId => {
               if (onChange) {
-                onChange(category)
+                onChange(categoryId)
               }
-              setCategory(category)
+              setCategoryId(categoryId)
             }}
             categories={data.categories}
-            selected={category}
+            selected={categoryId}
           />
           <button
             disabled={disabled}

@@ -9,34 +9,9 @@ import Question from '../../question'
 import styles from './MultiplayerGame.module.scss'
 
 export const ANSWER = gql`
-  mutation($questionId: ID!, $id: ID!) {
-    answerQuestionMultiplayer(questionId: $questionId, answerId: $id) {
-      id
-      categoryBackground
-      players {
-        id
-        score
-        name
-        won
-        hasLeft
-      }
-      currentQuestion {
-        id
-        type
-        text
-        src
-        answerId
-        alternatives {
-          id
-          type
-          text
-          src
-        }
-      }
-      lastQuestion {
-        id
-        answerId
-      }
+  mutation($answer: AnswerQuestionMultiplayerInput!) {
+    answerQuestionMultiplayer(answer: $answer) {
+      success
     }
   }
 `
@@ -75,14 +50,16 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
     }
   }, [correctAnswerId, game, playerId])
 
-  const alternativeSelected = id => {
+  const alternativeSelected = answerId => {
     answer({
       variables: {
-        id,
-        questionId: game.currentQuestion.id,
+        answer: {
+          answerId,
+          questionId: game.currentQuestion.id,
+        },
       },
     })
-    setSelectedAnswerId(id)
+    setSelectedAnswerId(answerId)
   }
   const winner = game ? game.players.find(({ won }) => won) : null
   const leaveGameCallback = useCallback(() => leaveGame(), [leaveGame])

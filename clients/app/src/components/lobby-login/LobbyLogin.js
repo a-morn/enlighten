@@ -12,17 +12,15 @@ export const LOBBY = gql`
       players {
         name
         id
-        category
+        categoryId
       }
     }
   }
 `
 const JOIN_LOBBY = gql`
-  mutation($player: PlayerInput!) {
+  mutation($player: JoinLobbyInput!) {
     joinLobby(player: $player) {
-      name
-      id
-      category
+      success
     }
   }
 `
@@ -47,8 +45,8 @@ export const GAME_SUBSCRIPTION = gql`
 `
 
 export function LobbyLogin({ history, playerId }) {
-  const [category, setCategory] = useState()
-  const { category: categoryFromParams } = useParams()
+  const [categoryId, setCategoryId] = useState()
+  const { categoryId: categoryFromParams } = useParams()
 
   const [joinLobby] = useMutation(JOIN_LOBBY)
 
@@ -85,15 +83,15 @@ export function LobbyLogin({ history, playerId }) {
     startPolling(1000)
   }, [startPolling])
 
-  if (!category && categoryFromParams) {
-    setCategory(categoryFromParams)
+  if (!categoryId && categoryFromParams) {
+    setCategoryId(categoryFromParams)
   }
 
   const joinLobbyCallback = useCallback(
     name => {
-      joinLobby({ variables: { player: { id: playerId, category, name } } })
+      joinLobby({ variables: { player: { id: playerId, categoryId, name } } })
     },
-    [category, playerId, joinLobby],
+    [categoryId, playerId, joinLobby],
   )
 
   useEffect(() => {
@@ -103,14 +101,14 @@ export function LobbyLogin({ history, playerId }) {
   }, [gameData, history, playerId])
 
   useEffect(() => {
-    if (category) {
-      history.push(`/lobby/${category}`)
+    if (categoryId) {
+      history.push(`/lobby/${categoryId}`)
     }
-  }, [category, history])
+  }, [categoryId, history])
   const disabledCategories = []
   const joinedCurrentCategory = false
 
-  const memoSetCategory = useCallback(c => setCategory(c), [])
+  const memoSetCategoryId = useCallback(c => setCategoryId(c), [])
 
   const leave = useCallback(async () => {
     //setPlayers(players => players.filter(p => p.playerId !== playerId))
@@ -131,8 +129,8 @@ export function LobbyLogin({ history, playerId }) {
           onClick={joinLobbyCallback}
           buttonLabel={'Join lobby'}
           disabledCategories={disabledCategories}
-          category={category}
-          setCategory={memoSetCategory}
+          categoryId={categoryId}
+          setCategoryId={memoSetCategoryId}
           isNameUsed={true}
           autoPick
         />
@@ -146,9 +144,9 @@ export function LobbyLogin({ history, playerId }) {
         ) && (
           <LobbyComponent
             playerId={playerId}
-            category={category}
+            categoryId={categoryId}
             players={R.pathOr([], ['lobby', 'players'], lobbyData).filter(
-              p => p.category === category,
+              p => p.categoryId === categoryId,
             )}
           />
         )}

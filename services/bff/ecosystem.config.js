@@ -1,7 +1,8 @@
 module.exports = {
-  apps : [{
-    name: 'bff',
-    script: 'dist/index.js',
-    autorestart: true,
+	apps: [{
+		name: 'bff',
+		script: 'production-start.js',
+		instances: 0,
+		exec_mode: 'cluster'
 	}]
 };

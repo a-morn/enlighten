@@ -39,6 +39,22 @@ const GAME = gql`
   }
 `
 
+const REMOVE_PLAYER_FROM_GAME = gql`
+  mutation($player: RemovePlayerFromGameMultiplayerInput!) {
+    removePlayerFromGameMultiplayer(player: $player) {
+      success
+    }
+  }
+`
+
+const PING_MULTIPLAYER = gql`
+  mutation {
+    pingMultiplayer {
+      success
+    }
+  }
+`
+
 const GAME_UPDATED = gql`
   subscription {
     gameMultiplayerSubscription {
@@ -75,20 +91,22 @@ const GAME_UPDATED = gql`
   }
 `
 
-const REMOVE_PLAYER_FROM_GAME = gql`
-  mutation($id: ID!) {
-    removePlayerFromGameMultiplayer(id: $id) {
-      id
-    }
-  }
-`
-
 function Multiplayer({ history, playerId }) {
   const { data, startPolling, subscribeToMore } = useQuery(GAME)
 
   useEffect(() => {
     startPolling(2000)
   }, [startPolling])
+
+  const [pingMultipalyer] = useMutation(PING_MULTIPLAYER)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      pingMultipalyer()
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [pingMultipalyer])
 
   const globalState = useContext(store)
   const { dispatch } = globalState
@@ -132,7 +150,9 @@ function Multiplayer({ history, playerId }) {
     if (data && data.gameMultiplayer) {
       removePlayerFromGame({
         variables: {
-          id: data.gameMultiplayer.id,
+          player: {
+            id: data.gameMultiplayer.id,
+          },
         },
       })
     }

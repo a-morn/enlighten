@@ -30,7 +30,7 @@
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "npm run build:style && react-scripts start --no-cache",
+    "start": "NODE_ENV=development npm run build:style && react-scripts start --no-cache",
     "build": "npm run build:style && react-scripts build",
     "test": "react-scripts test --env=jest-environment-jsdom-sixteen",
     "eject": "react-scripts eject",

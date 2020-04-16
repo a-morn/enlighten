@@ -1,7 +1,7 @@
 import uuidv1 from 'uuid/v4';
 import shuffle from 'shuffle-array';
-import { notUndefined } from '../../models/utils'
-import { Question, QuestionType, QuestionEntityType, QuestionObject, QuestionDirection } from '../../models/question'
+import { notUndefined } from '../src/models/utils'
+import { Question, QuestionType, QuestionEntityType, QuestionObject, QuestionDirection } from '../src/models/question'
 
 type GoTHouse = {
   name: string

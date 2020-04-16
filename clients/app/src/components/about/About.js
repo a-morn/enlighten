@@ -9,12 +9,14 @@ function About() {
       <div className={styles.about__textWrapper}>
         <h2 className={`pb-10 text-2xl text-brand`}>About</h2>
         <p className={`text-brand`}>
-          Portfolio project for Albin Sebastian Mörner. Need a web developer?
-          Contact albin[dot]morner[at]gmail[dot]com. Corona pandemic special
-          sale!
+          Portfolio project for Albin Sebastian Mörner. Need a full stack web
+          developer? Contact albin[dot]morner[at]gmail[dot]com. Corona pandemic
+          special sale!
         </p>
         <p className={`text-brand mt-8`}>
-          Built with: React, CRA, Tailwind CSS, Node.js, express, Apollo GraphQL
+          Built with: React (CRA), Tailwind CSS, Node.js, Express.js, Apollo
+          GraphQL, TypeScript, Redis, AWS (S3, CloudFront, EC2, ElastiCache,
+          CodeDeploy), GitHub Actions
         </p>
       </div>
       <video

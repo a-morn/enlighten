@@ -11,10 +11,15 @@ files:
     destination: /srv/dist
   - source: .env.production
     destination: /srv
+  - source: production-start.js
+    destination: /srv
 hooks:
   AfterInstall:
+    - location: prod-scripts/remove-node_modules.sh
+      runas: ubuntu
+      timeout: 300
     - location: prod-scripts/npm-install.sh
-      runas: root
+      runas: ubuntu
       timeout: 300
   ApplicationStart:
     - location: prod-scripts/start.sh

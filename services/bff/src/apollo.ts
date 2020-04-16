@@ -1,13 +1,19 @@
-import typeDefs from './schema'
-import resolvers from './resolvers'
+import typeDefs from './typeDefs'
+import resolvers from './resolvers/'
 import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
+import { makeExecutableSchema } from 'apollo-server'
 import * as http from 'http'
 import { Express } from 'express'
 
+const schema = makeExecutableSchema({
+	typeDefs,
+	resolvers,
+	resolverValidationOptions: { requireResolversForResolveType: false },
+});
+
 export default (app: Express, httpServer: http.Server) => {
 	const apolloServer = new ApolloServer({
-		typeDefs,
-		resolvers,
+		schema,
 		context: ({ req, connection }: { req: { headers: { authorization: string } }, connection: { context: unknown } }) => {
 			if (req) {
 				const playerId = req.headers.authorization

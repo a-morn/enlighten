@@ -6,14 +6,6 @@ import { store } from '../../hooks/context/store.js'
 import { CategoryPicker } from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
 
-const ANSWER = gql`
-  mutation($questionId: ID!, $id: ID!) {
-    answerQuestionSingleplayer(questionId: $questionId, answerId: $id) {
-      id
-    }
-  }
-`
-
 const GAME = gql`
   query {
     gameSingleplayer {
@@ -36,6 +28,30 @@ const GAME = gql`
           src
         }
       }
+    }
+  }
+`
+
+const ANSWER = gql`
+  mutation($answer: AnswerQuestionSingleplayerInput!) {
+    answerQuestionSingleplayer(answer: $answer) {
+      success
+    }
+  }
+`
+
+const CREATE_GAME_SINGLEPLAYER = gql`
+  mutation($game: CreateGameSingleplayerInput!) {
+    createGameSingleplayer(game: $game) {
+      success
+    }
+  }
+`
+
+const DELETE_SINGLEPLAYER_GAME = gql`
+  mutation {
+    deleteGameSingleplayer {
+      success
     }
   }
 `
@@ -69,27 +85,9 @@ const GAME_UPDATED = gql`
   }
 `
 
-const CREATE_SINGLEPLAYER_GAME = gql`
-  mutation($playerId: ID!, $category: String!) {
-    createGameSingleplayer(playerId: $playerId, category: $category) {
-      id
-      playerId
-      category
-    }
-  }
-`
-
-const DELETE_SINGLEPLAYER_GAME = gql`
-  mutation($id: ID!) {
-    deleteGameSingleplayer(id: $id) {
-      id
-    }
-  }
-`
-
 function Singleplayer({ playerId }) {
   const [isStartingGame, setIsStartingGame] = useState()
-  const [category, setCategory] = useState()
+  const [categoryId, setCategoryId] = useState()
   const globalState = useContext(store)
   const { dispatch } = globalState
 
@@ -131,7 +129,7 @@ function Singleplayer({ playerId }) {
     })
   }, [gameSubscribeToMore])
 
-  const [createGame] = useMutation(CREATE_SINGLEPLAYER_GAME, {
+  const [createGame] = useMutation(CREATE_GAME_SINGLEPLAYER, {
     refetchQueries: [
       {
         query: GAME,
@@ -152,12 +150,14 @@ function Singleplayer({ playerId }) {
       setIsStartingGame(true)
       createGame({
         variables: {
-          playerId,
-          category,
+          game: {
+            playerId,
+            categoryId,
+          },
         },
       })
     }
-  }, [category, createGame, isStartingGame, playerId])
+  }, [categoryId, createGame, isStartingGame, playerId])
 
   const deleteGameCallback = useCallback(() => {
     if (!gameData) {
@@ -175,11 +175,13 @@ function Singleplayer({ playerId }) {
   }, [deleteGame, gameData])
 
   const answerCallback = useCallback(
-    id => {
+    answerId => {
       answer({
         variables: {
-          id,
-          questionId: gameData.gameSingleplayer.currentQuestion.id,
+          answer: {
+            answerId,
+            questionId: gameData.gameSingleplayer.currentQuestion.id,
+          },
         },
       })
     },
@@ -191,8 +193,8 @@ function Singleplayer({ playerId }) {
       {!R.path(['gameSingleplayer', 'id'], gameData) && (
         <CategoryPicker
           onClick={startGameRequest}
-          setCategory={setCategory}
-          category={category}
+          setCategoryId={setCategoryId}
+          categoryId={categoryId}
           buttonLabel="Start"
           className="p-10"
         />

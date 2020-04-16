@@ -4,14 +4,27 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "BFF",
+            "name": "Launch BFFs",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/bff/develop-start.js",
+            "autoAttachChildProcesses": true,
+            "env": {
+                "NODE_ENV": "development"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch BFF",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/services/bff/dist/index",
             "env": {
                 "NODE_ENV": "development"
-            },
-        }
-    ]
+            }
+        },
+    ],
 }

@@ -1,13 +1,15 @@
 {
-  "name": "services",
+  "name": "enlighten-bff",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build:dev": "NODE_ENV=development npm run tsc",
-    "build:prod": "NODE_ENV=production npm run tsc",
+    "build:dev": "NODE_ENV=development npm run build",
+    "build:prod": "NODE_ENV=production npm run build",
+    "build": "rm -rf dist && npm run tsc",
     "tsc": "tsc",
-    "start:dev": "NODE_ENV=development node ./dist/index",
-    "start:prod": "./prod-scripts/start.sh",
+    "generate-questions": "ts-node question-generation-scripts",
+    "start:prod": "pm2 stop bff && NODE_ENV=production pm2 start ecosystem.config.js",
+    "start:dev": "NODE_ENV=development node develop-start.js",
     "lint": "eslint --fix . && echo 'Lint complete.'"
   },
   "dependencies": {
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
+    "@types/dotenv-flow": "^3.0.0",
     "@types/ioredis": "^4.14.9",
     "@types/morgan": "^1.9.0",
     "@types/node": "^13.11.1",
@@ -50,6 +53,7 @@
     "pm2": "^4.2.3",
     "prettier": "^1.18.2",
     "svg-country-flags": "^1.2.7",
+    "ts-node": "^8.8.2",
     "typescript": "^3.8.3"
   },
   "husky": {

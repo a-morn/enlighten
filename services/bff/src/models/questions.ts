@@ -1,6 +1,6 @@
-import got from '../data/questions/game-of-thrones';
-import countries from '../data/questions/countries'
-import { Question } from './question';
+import got from '../generated-data/game-of-thrones.json';
+import countries from '../generated-data/countries.json'
+import { Question, GameQuestion } from './question';
 const allQuestions = {
   'game-of-thrones': got,
   countries
@@ -16,7 +16,7 @@ const allQuestionsArray = Object.values(allQuestions).reduce(
     ), [])
   .filter(q => q);
 
-const getQuestionById = (questionId: string) => {
+const getQuestionById = (questionId: string): GameQuestion => {
   const question = allQuestionsArray.find(
     ({ id }) => id === questionId
   );
@@ -28,6 +28,8 @@ const getQuestionById = (questionId: string) => {
   const { alternatives, ...rest } = question
 
   return {
+    answered: false,
+    record: 0,
     ...rest,
     alternatives
   };

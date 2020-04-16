@@ -10,7 +10,7 @@ const GAME_REQUEST = gql`
   query {
     gameRequest {
       id
-      category
+      categoryId
       playerRequestId
       playerOfferedId
       playerRequestName
@@ -21,30 +21,32 @@ const GAME_REQUEST = gql`
 `
 
 const REQUEST_GAME = gql`
-  mutation($gameRequest: GameRequestInput!) {
+  mutation($gameRequest: RequestGameInput!) {
     requestGame(gameRequest: $gameRequest) {
-      playerOfferedId
-      playerRequestId
-      category
-      playerRequestName
-      id
-      accepted
+      success
     }
   }
 `
 const ANSWER_GAME_REQUEST = gql`
-  mutation($gameRequestId: ID!, $accepted: Boolean!) {
-    answerGameRequest(id: $gameRequestId, accepted: $accepted) {
-      id
-      accepted
+  mutation($answer: AnswerGameRequestInput!) {
+    answerGameRequest(answer: $answer) {
+      success
     }
   }
 `
 
 const DELETE_GAME_REQUEST = gql`
-  mutation($gameRequestId: ID!) {
-    deleteGameRequest(id: $gameRequestId) {
-      id
+  mutation($gameRequest: DeleteGameRequestInput!) {
+    deleteGameRequest(gameRequest: $gameRequest) {
+      success
+    }
+  }
+`
+
+const PING_LOBBY = gql`
+  mutation {
+    pingLobby {
+      success
     }
   }
 `
@@ -58,7 +60,7 @@ export const GAME_REQUEST_SUBSCRIPTION = gql`
         playerOfferedName
         playerRequestId
         playerOfferedId
-        category
+        categoryId
         accepted
       }
       mutation
@@ -66,7 +68,7 @@ export const GAME_REQUEST_SUBSCRIPTION = gql`
   }
 `
 
-export function Lobby({ playerId, category, players }) {
+export function Lobby({ playerId, categoryId, players }) {
   const [requestGame] = useMutation(REQUEST_GAME, {
     refetchQueries: [
       {
@@ -74,8 +76,24 @@ export function Lobby({ playerId, category, players }) {
       },
     ],
   })
-  const [answerGameRequest] = useMutation(ANSWER_GAME_REQUEST)
+
+  const [answerGameRequest] = useMutation(ANSWER_GAME_REQUEST, {
+    refetchQueries: [
+      {
+        query: GAME_REQUEST,
+      },
+    ],
+  })
   const [deleteGameRequest] = useMutation(DELETE_GAME_REQUEST)
+  const [pingLobby] = useMutation(PING_LOBBY)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      pingLobby()
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [pingLobby])
 
   const {
     data: gameRequestData,
@@ -104,7 +122,7 @@ export function Lobby({ playerId, category, players }) {
     requestGame({
       variables: {
         gameRequest: {
-          category,
+          categoryId,
           playerRequestId: playerId,
           playerOfferedId,
         },
@@ -115,8 +133,10 @@ export function Lobby({ playerId, category, players }) {
   const acceptGameRequest = useCallback(() => {
     answerGameRequest({
       variables: {
-        gameRequestId: gameRequestData.gameRequest.id,
-        accepted: true,
+        answer: {
+          gameRequestId: gameRequestData.gameRequest.id,
+          accepted: true,
+        },
       },
     })
   }, [answerGameRequest, gameRequestData])
@@ -124,8 +144,10 @@ export function Lobby({ playerId, category, players }) {
   const declineGameRequest = useCallback(() => {
     answerGameRequest({
       variables: {
-        gameRequestId: gameRequestData.gameRequest.id,
-        accepted: false,
+        answer: {
+          gameRequestId: gameRequestData.gameRequest.id,
+          accepted: false,
+        },
       },
     })
   }, [answerGameRequest, gameRequestData])
@@ -134,7 +156,9 @@ export function Lobby({ playerId, category, players }) {
     _ => {
       deleteGameRequest({
         variables: {
-          gameRequestId: gameRequestData.gameRequest.id,
+          gameRequest: {
+            gameRequestId: gameRequestData.gameRequest.id,
+          },
         },
       })
     },
