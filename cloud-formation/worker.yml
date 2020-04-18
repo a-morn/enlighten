@@ -5,18 +5,50 @@ Description: 'Based on AWS CloudFormation Sample Template EC2InstanceWithSecurit
 Parameters:
   KeyName: 
     Type: String
+  EC2TagKey:
+    Type: String
+    Default: service-name
+  EC2TagValue:
+    Type: String
+    Default: worker
+  CodeDeployServiceRoleArn:
+    Type: String
 Resources:
-  EC2Instance:
+  ReadS3Profile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+      - S3-read
+  WorkerEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
+      IamInstanceProfile:
+        Ref: ReadS3Profile
       InstanceType: t2.micro
       SecurityGroups:
       - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyName
       ImageId: ami-07ebfd5b3428b6f4d
       Tags:
-      - Key: service-name
-        Value: worker
+      - Key: !Ref EC2TagKey
+        Value: !Ref EC2TagValue
+      UserData: !Base64 
+        "Fn::Base64": | 
+          sudo apt-get update -y
+          sudo apt-get install ruby wget -y
+          cd /home/ubuntu
+          wget https://aws-codedeploy-eu-central-1.s3.amazonaws.com/latest/install
+          sudo chmod +x ./install
+          sudo ./install auto
+          sudo service codedeploy-agent start
+          sudo apt update
+          sudo apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
+          curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          mkdir /srv/www
+          sudo chown ubuntu: /srv/www
+          sudo chmod u+w /srv/www
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -29,36 +61,38 @@ Resources:
   CodeDeployApplication:
     Type: AWS::CodeDeploy::Application
     Properties: 
-      ApplicationName: Enlighten-worker
+      ApplicationName: enlighten-worker
       ComputePlatform: Server
   CodeDeployDeploymentGroup:
     Type: AWS::CodeDeploy::DeploymentGroup
     Properties:
-      ApplicationName: Enlighten-worker
-      Ec2TagFilters: 
-        - Key: service-name
-          Value: worker
-      ServiceRoleArn: arn:aws:iam::408421206487:role/code-deploy-service-role
+      ApplicationName: !Ref CodeDeployApplication
+      Ec2TagFilters:
+      - Key: !Ref EC2TagKey
+        Value: !Ref EC2TagValue
+        Type: KEY_AND_VALUE
+      ServiceRoleArn: !Ref CodeDeployServiceRoleArn
+      DeploymentGroupName: enlighten-worker-deployment-group
 Outputs:
   InstanceId:
     Description: InstanceId of the newly created EC2 instance
     Value:
-      Ref: EC2Instance
+      Ref: WorkerEC2Instance
   AZ:
     Description: Availability Zone of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - EC2Instance
+      - WorkerEC2Instance
       - AvailabilityZone
   PublicDNS:
     Description: Public DNSName of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - EC2Instance
+      - WorkerEC2Instance
       - PublicDnsName
   PublicIP:
     Description: Public IP address of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - EC2Instance
+      - WorkerEC2Instance
       - PublicIp

@@ -1,11 +1,12 @@
 {
-  "name": "worker",
+  "name": "enlighten-worker",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "NODE_ENV=development node ./index.js"
+    "start:dev": "NODE_ENV=development node ./index.js",
+    "start:prod": "NODE_ENV=production node ./index.js"
   },
   "keywords": [],
   "author": "",

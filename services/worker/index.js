@@ -1,5 +1,4 @@
 const Redis = require('ioredis');
-const promisify = require('util').promisify;
 const dotenv = require('dotenv-flow')
 const moment = require('moment')
 
