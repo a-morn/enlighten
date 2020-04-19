@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /srv/www
-npm run start:prod
+cd /srv
+npm run start:prod&

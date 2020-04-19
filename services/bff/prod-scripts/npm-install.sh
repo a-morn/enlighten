@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /srv
-npm install
+npm install --production

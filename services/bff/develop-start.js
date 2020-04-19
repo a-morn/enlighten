@@ -1,4 +1,4 @@
-const cluster = require('cluster')
+const cluster = require('cluster') // eslint-disable-line @typescript-eslint/no-var-requires
 const NUMBER_OF_INSTACES = 2
 
 if (cluster.isMaster) {

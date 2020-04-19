@@ -1,13 +1,14 @@
+import { resolve } from 'path' // eslint-disable-line import/order
+import dotenv from 'dotenv-flow' // eslint-disable-line import/order
+dotenv.config({ path: resolve(__dirname, '..') })
+
 import http from 'http'
-import { resolve } from 'path'
 
 import { createTerminus } from '@godaddy/terminus'
 import d from 'debug'
-import dotenv from 'dotenv-flow'
+
 import apollo from './apollo'
 import app from './app'
-
-dotenv.config({ path: resolve(__dirname, '..') })
 
 export function startApp(): void {
   const debug = d('services:server')

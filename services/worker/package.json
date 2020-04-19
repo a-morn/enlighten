@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "NODE_ENV=development node ./index.js",
-    "start:prod": "NODE_ENV=production node ./index.js"
+    "start:prod": "NODE_ENV=production pm2 start ecosystem.config.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
   "dependencies": {
     "dotenv-flow": "^3.1.0",
     "ioredis": "^4.16.2",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "pm2": "^4.3.0"
   }
 }

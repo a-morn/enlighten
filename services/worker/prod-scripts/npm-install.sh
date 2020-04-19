@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /srv/www
+cd /srv
 rm -rf node_modules
-npm install
+npm install --production

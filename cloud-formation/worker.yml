@@ -1,9 +1,9 @@
 # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/sample-templates-services-us-west-2.html#w1ab2c21c45c15c15
 # Amazon EC2 instance in a security group Creates an Amazon EC2 instance in an Amazon EC2 security group.
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Based on AWS CloudFormation Sample Template EC2InstanceWithSecurityGroupSample. Generate EC2 instance and security group for Enlighten Worker service'
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Based on AWS CloudFormation Sample Template EC2InstanceWithSecurityGroupSample. Generate EC2 instance and security group for Enlighten Worker service"
 Parameters:
-  KeyName: 
+  KeyName:
     Type: String
   EC2TagKey:
     Type: String
@@ -19,7 +19,7 @@ Resources:
     Properties:
       Path: /
       Roles:
-      - S3-read
+        - S3-read
   WorkerEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -27,14 +27,14 @@ Resources:
         Ref: ReadS3Profile
       InstanceType: t2.micro
       SecurityGroups:
-      - Ref: InstanceSecurityGroup
+        - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyName
       ImageId: ami-07ebfd5b3428b6f4d
       Tags:
-      - Key: !Ref EC2TagKey
-        Value: !Ref EC2TagValue
-      UserData: !Base64 
-        "Fn::Base64": | 
+        - Key: !Ref EC2TagKey
+          Value: !Ref EC2TagValue
+      UserData: !Base64
+        "Fn::Base64": |
           sudo apt-get update -y
           sudo apt-get install ruby wget -y
           cd /home/ubuntu
@@ -47,20 +47,20 @@ Resources:
           curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
           sudo apt-get install -y nodejs
           mkdir /srv/www
-          sudo chown ubuntu: /srv/www
-          sudo chmod u+w /srv/www
+          sudo chown -r ubuntu: /srv/www
+          sudo chmod -r u+w /srv/www
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable SSH access via port 22
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: '22'
-        ToPort: '22'
-        CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: "22"
+          ToPort: "22"
+          CidrIp: 0.0.0.0/0
   CodeDeployApplication:
     Type: AWS::CodeDeploy::Application
-    Properties: 
+    Properties:
       ApplicationName: enlighten-worker
       ComputePlatform: Server
   CodeDeployDeploymentGroup:
@@ -68,9 +68,9 @@ Resources:
     Properties:
       ApplicationName: !Ref CodeDeployApplication
       Ec2TagFilters:
-      - Key: !Ref EC2TagKey
-        Value: !Ref EC2TagValue
-        Type: KEY_AND_VALUE
+        - Key: !Ref EC2TagKey
+          Value: !Ref EC2TagValue
+          Type: KEY_AND_VALUE
       ServiceRoleArn: !Ref CodeDeployServiceRoleArn
       DeploymentGroupName: enlighten-worker-deployment-group
 Outputs:
@@ -82,17 +82,17 @@ Outputs:
     Description: Availability Zone of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - WorkerEC2Instance
-      - AvailabilityZone
+        - WorkerEC2Instance
+        - AvailabilityZone
   PublicDNS:
     Description: Public DNSName of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - WorkerEC2Instance
-      - PublicDnsName
+        - WorkerEC2Instance
+        - PublicDnsName
   PublicIP:
     Description: Public IP address of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - WorkerEC2Instance
-      - PublicIp
+        - WorkerEC2Instance
+        - PublicIp
