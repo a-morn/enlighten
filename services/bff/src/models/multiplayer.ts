@@ -1,26 +1,26 @@
 import { UserInputError } from 'apollo-server'
-import { RedisPubSub } from 'graphql-redis-subscriptions';
-import { Redis } from 'ioredis';
-import { GAME_MULTIPLAYER } from '../triggers';
-import shuffle from 'shuffle-array';
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { Redis } from 'ioredis'
+import { GAME_MULTIPLAYER } from '../triggers'
+import shuffle from 'shuffle-array'
 //import periodicTable from '../data/questions/periodic-table';
-import got from '../generated-data/game-of-thrones.json';
-import countries from '../generated-data/countries.json';
+import got from '../generated-data/game-of-thrones.json'
+import countries from '../generated-data/countries.json'
 import { GameMultiplayer, isGameMultiplayer } from './game'
-import { PlayerLobby, PlayerMultiplayer, isPlayerGameId } from './player';
-import { CategoryId } from './category';
+import { PlayerLobby, PlayerMultiplayer, isPlayerGameId } from './player'
+import { CategoryId } from './category'
 import { Question } from './question'
-import { isUndefined } from 'util';
+import { isUndefined } from 'util'
 const allQuestions = {
   'game-of-thrones': got,
   //'periodic-table': periodicTable,
-  countries
-};
+  countries,
+}
 
 const backgrounds = {
   'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
   countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
-};
+}
 
 import { filterGame } from './utils'
 
@@ -37,22 +37,30 @@ const getGame = async (redisClient: Redis, gameId: string) => {
   return game
 }
 
-const updateGame = async (redisClient: Redis, pubSub: RedisPubSub, game: GameMultiplayer, mutation: 'UPDATE' | 'CREATE'): Promise<void> => {
-  const gameString = JSON.stringify(game);
-  const setMode = mutation === 'CREATE'
-    ? 'NX'
-    : 'XX'
-  await redisClient.set(`multiplayer:games:${game.id}`, gameString, setMode);
+const updateGame = async (
+  redisClient: Redis,
+  pubSub: RedisPubSub,
+  game: GameMultiplayer,
+  mutation: 'UPDATE' | 'CREATE',
+): Promise<void> => {
+  const gameString = JSON.stringify(game)
+  const setMode = mutation === 'CREATE' ? 'NX' : 'XX'
+  await redisClient.set(`multiplayer:games:${game.id}`, gameString, setMode)
   pubSub.publish(GAME_MULTIPLAYER, {
     gameMultiplayerSubscription: {
       gameMultiplayer: filterGame(game),
-      mutation
-    }
+      mutation,
+    },
   })
 }
 
-const getGameIdByPlayerId = async (redisClient: Redis, playerId: string): Promise<string | null> => {
-  const playerGameIdString = await redisClient.get(`multiplayer:player-game-id:${playerId}`)
+const getGameIdByPlayerId = async (
+  redisClient: Redis,
+  playerId: string,
+): Promise<string | null> => {
+  const playerGameIdString = await redisClient.get(
+    `multiplayer:player-game-id:${playerId}`,
+  )
   if (!playerGameIdString) {
     return null
   }
@@ -64,7 +72,10 @@ const getGameIdByPlayerId = async (redisClient: Redis, playerId: string): Promis
   return playerGameIdString
 }
 
-const getGameByPlayerId = async (redisClient: Redis, playerId: string): Promise<GameMultiplayer | null> => {
+const getGameByPlayerId = async (
+  redisClient: Redis,
+  playerId: string,
+): Promise<GameMultiplayer | null> => {
   const gameId = await getGameIdByPlayerId(redisClient, playerId)
   if (gameId === null) {
     return null
@@ -72,53 +83,73 @@ const getGameByPlayerId = async (redisClient: Redis, playerId: string): Promise<
   return getGame(redisClient, gameId)
 }
 
-const setGameIdForPlayer = async (redisClient: Redis, playerId: string, gameId: string): Promise<unknown> => {
+const setGameIdForPlayer = async (
+  redisClient: Redis,
+  playerId: string,
+  gameId: string,
+): Promise<unknown> => {
   return redisClient.set(`multiplayer:player-game-id:${playerId}`, gameId)
 }
 
-const removePlayer = async (redisClient: Redis, playerId: string): Promise<unknown> => {
-  return redisClient.del(`multiplayer:player-game-id:${playerId}`);
+const removePlayer = async (
+  redisClient: Redis,
+  playerId: string,
+): Promise<unknown> => {
+  return redisClient.del(`multiplayer:player-game-id:${playerId}`)
 }
 
-const deleteGameByGameId = async (redisClient: Redis, pubsub: RedisPubSub, gameId: string): Promise<void> => {
+const deleteGameByGameId = async (
+  redisClient: Redis,
+  pubsub: RedisPubSub,
+  gameId: string,
+): Promise<void> => {
   const game = await getGame(redisClient, gameId)
   await redisClient.del(`multiplayer:games:${gameId}`)
   pubsub.publish(GAME_MULTIPLAYER, {
     gameMultiplayerSubscription: {
       gameMultiplayer: filterGame(game),
-      mutation: 'DELETE'
-    }
+      mutation: 'DELETE',
+    },
   })
 }
 
-const createGame = async (redisClient: Redis, pubSub: RedisPubSub, players: PlayerLobby[], categoryId: CategoryId) => {
+const createGame = async (
+  redisClient: Redis,
+  pubSub: RedisPubSub,
+  players: PlayerLobby[],
+  categoryId: CategoryId,
+) => {
   const game = {
     categoryId,
     categoryBackground: backgrounds[categoryId],
     id: '' + Math.random(),
-    players: players.map((player) => ({
-      ...player,
-      score: 0,
-      won: false,
-      hasLeft: false,
-      timestamp: new Date().toISOString()
-    } as PlayerMultiplayer)),
+    players: players.map(
+      player =>
+        ({
+          ...player,
+          score: 0,
+          won: false,
+          hasLeft: false,
+          timestamp: new Date().toISOString(),
+        } as PlayerMultiplayer),
+    ),
     questions: shuffle(
       Object.values(allQuestions[categoryId])
-        .reduce((acc: Question[], { questions }) => (
-          acc.concat(questions)
-        ), [])
+        .reduce((acc: Question[], { questions }) => acc.concat(questions), [])
         .map(q => ({
           answered: false,
           record: 0,
-          ...q
-        }))
+          ...q,
+        })),
     ),
-    questionIndex: 0
+    questionIndex: 0,
   }
 
-  await updateGame(redisClient, pubSub, game, 'CREATE')
-    .then(() => Promise.all(players.map(p => setGameIdForPlayer(redisClient, p.id, game.id))))
+  await updateGame(redisClient, pubSub, game, 'CREATE').then(() =>
+    Promise.all(
+      players.map(p => setGameIdForPlayer(redisClient, p.id, game.id)),
+    ),
+  )
 
   // Delay game start
   setTimeout(async () => {
@@ -134,7 +165,7 @@ const createGame = async (redisClient: Redis, pubSub: RedisPubSub, players: Play
 const updateQuestionByPlayerId = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
-  playerId: string
+  playerId: string,
 ): Promise<void> => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (game === null) {
@@ -146,7 +177,10 @@ const updateQuestionByPlayerId = async (
   return updateGame(redisClient, pubSub, game, 'UPDATE')
 }
 
-const getLastAnswerByPlayerId = async (redisClient: Redis, playerId: string) => {
+const getLastAnswerByPlayerId = async (
+  redisClient: Redis,
+  playerId: string,
+) => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (game !== null && game.lastQuestion) {
     const question = game.lastQuestion
@@ -164,31 +198,31 @@ const answerQuestion = async (
   pubSub: RedisPubSub,
   playerId: string,
   questionId: string,
-  answerId: string
+  answerId: string,
 ) => {
-  const game = await getGameByPlayerId(redisClient, playerId);
+  const game = await getGameByPlayerId(redisClient, playerId)
   if (game === null) {
     throw new UserInputError(`No game for player ${playerId}`)
   }
   const question = game.currentQuestion
   if (questionId === question?.id) {
     game.players
-    const player = game
-      .players
-      .find(({ id }) => id === playerId)
+    const player = game.players.find(({ id }) => id === playerId)
 
     if (!player) {
-      throw new UserInputError(`Player ${playerId} is not a part of game ${game.id}`)
+      throw new UserInputError(
+        `Player ${playerId} is not a part of game ${game.id}`,
+      )
     }
-    const correct = answerId === question.answerId;
-    player.score = Math.max(0, player.score + (correct ? 1 : -1));
+    const correct = answerId === question.answerId
+    player.score = Math.max(0, player.score + (correct ? 1 : -1))
     if (player.score >= 10) {
-      player.won = true;
+      player.won = true
     }
     question.answered = true
     await updateGame(redisClient, pubSub, game, 'UPDATE')
   } else {
-    throw new UserInputError(`Tried to answer invalid question`);
+    throw new UserInputError(`Tried to answer invalid question`)
   }
 
   setTimeout(async () => {
@@ -199,26 +233,25 @@ const answerQuestion = async (
     pubSub.publish(GAME_MULTIPLAYER, {
       gameMultiplayerSubscription: {
         gameMultiplayer: filteredGameWithNewQuestion,
-        mutation: 'UPDATE'
-      }
+        mutation: 'UPDATE',
+      },
     })
   }, 800)
 
   return question
-};
+}
 
 const removePlayerFromGame = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   playerId: string,
-  gameId: string
+  gameId: string,
 ): Promise<GameMultiplayer> => {
   const game = await getGame(redisClient, gameId)
   if (game === null) {
     throw new UserInputError(`No game ${gameId}`)
   }
-  const player = game.players
-    .find(({ id }) => id === playerId);
+  const player = game.players.find(({ id }) => id === playerId)
   if (isUndefined(player)) {
     throw new UserInputError(`No player ${playerId} in game ${gameId}`)
   }
@@ -236,14 +269,16 @@ const removePlayerFromGame = async (
   return game
 }
 
-const updateTimestampForPlayer = async (redisClient: Redis, pubSub: RedisPubSub, playerId: string) => {
+const updateTimestampForPlayer = async (
+  redisClient: Redis,
+  pubSub: RedisPubSub,
+  playerId: string,
+) => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (game === null) {
     return null
   }
-  const player = game
-    .players
-    .find(({ id }) => id === playerId)
+  const player = game.players.find(({ id }) => id === playerId)
   if (!player) {
     return null
   }
@@ -259,5 +294,5 @@ export {
   answerQuestion,
   updateQuestionByPlayerId,
   removePlayerFromGame,
-  updateTimestampForPlayer
-};
+  updateTimestampForPlayer,
+}

@@ -1,12 +1,12 @@
 export type Context = {
-    currentUser: {
-        playerId: string
-    }
+  currentUser: {
+    playerId: string
+  }
 }
 
 export type AnswerQuestionInput = {
-    answer: {
-        questionId: string
-        answerId: string
-    }
+  answer: {
+    questionId: string
+    answerId: string
+  }
 }

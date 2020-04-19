@@ -1,8 +1,10 @@
 module.exports = {
-	apps: [{
-		name: 'bff',
-		script: 'production-start.js',
-		instances: 0,
-		exec_mode: 'cluster'
-	}]
-};
+  apps: [
+    {
+      name: 'bff',
+      script: 'production-start.js',
+      instances: 0,
+      exec_mode: 'cluster',
+    },
+  ],
+}

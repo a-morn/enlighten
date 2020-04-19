@@ -1,28 +1,29 @@
-import got from '../generated-data/game-of-thrones.json';
+import got from '../generated-data/game-of-thrones.json'
 import countries from '../generated-data/countries.json'
-import { Question, GameQuestion } from './question';
+import { Question, GameQuestion } from './question'
 const allQuestions = {
   'game-of-thrones': got,
-  countries
-};
+  countries,
+}
 
-const allQuestionsArray = Object.values(allQuestions).reduce(
-  (acc: Question[], { ...levels }) =>
-    acc.concat(
-      Object.values(levels).reduce(
-        (acc2, { questions }) => acc2.concat(questions),
-        []
-      )
-    ), [])
-  .filter(q => q);
+const allQuestionsArray = Object.values(allQuestions)
+  .reduce(
+    (acc: Question[], { ...levels }) =>
+      acc.concat(
+        Object.values(levels).reduce(
+          (acc2, { questions }) => acc2.concat(questions),
+          [],
+        ),
+      ),
+    [],
+  )
+  .filter(q => q)
 
 const getQuestionById = (questionId: string): GameQuestion => {
-  const question = allQuestionsArray.find(
-    ({ id }) => id === questionId
-  );
+  const question = allQuestionsArray.find(({ id }) => id === questionId)
 
   if (!question) {
-    throw new Error('Can\'t find question')
+    throw new Error("Can't find question")
   }
 
   const { alternatives, ...rest } = question
@@ -31,10 +32,8 @@ const getQuestionById = (questionId: string): GameQuestion => {
     answered: false,
     record: 0,
     ...rest,
-    alternatives
-  };
-};
+    alternatives,
+  }
+}
 
-export {
-  getQuestionById
-};
+export { getQuestionById }

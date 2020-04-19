@@ -6,7 +6,10 @@ import { multiplayerSubscriptionResolvers } from 'src/resolvers/multiplayer'
 import { Question } from './question'
 import { PlayerMultiplayer } from './player'
 
-const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (currentQuestionAnswered: boolean) => ({
+const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
+  currentQuestionAnswered: boolean,
+) =>
+  ({
     questions: [],
     categoryBackground: faker.image.imageUrl(),
     categoryId: faker.random.uuid(),
@@ -14,46 +17,46 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (currentQ
     players: [],
     questionIndex: faker.random.number(),
     currentQuestion: {
-        answered: currentQuestionAnswered,
-        answerId: faker.random.uuid(),
-        alternatives: [],
-        category: faker.random.uuid(),
-        id: faker.random.uuid(),
-        record: faker.random.number(),
-        type: 'text',
-        text: faker.lorem.text()
+      answered: currentQuestionAnswered,
+      answerId: faker.random.uuid(),
+      alternatives: [],
+      category: faker.random.uuid(),
+      id: faker.random.uuid(),
+      record: faker.random.number(),
+      type: 'text',
+      text: faker.lorem.text(),
     } as GameQuestion,
     currentQuestionId: faker.random.uuid(),
-} as GameMultiplayer)
+  } as GameMultiplayer)
 
 describe('filterGame', () => {
-    test('should return null if input is null', () => {
-        const game = null
+  test('should return null if input is null', () => {
+    const game = null
 
-        const filteredGame = filterGame(game)
+    const filteredGame = filterGame(game)
 
-        expect(filteredGame).toBe(null)
-    })
+    expect(filteredGame).toBe(null)
+  })
 
-    test('should return answerId if current question is answered', () => {
-        const game = getGame(true)
+  test('should return answerId if current question is answered', () => {
+    const game = getGame(true)
 
-        const filteredGame = filterGame(game)
+    const filteredGame = filterGame(game)
 
-        expect(filteredGame)
-            .toEqual(expect.objectContaining({
-                currentQuestion: expect.objectContaining({
-                    answerId: game.currentQuestion?.answerId
-                })
-            }))
-    })
+    expect(filteredGame).toEqual(
+      expect.objectContaining({
+        currentQuestion: expect.objectContaining({
+          answerId: game.currentQuestion?.answerId,
+        }),
+      }),
+    )
+  })
 
-    test('should not return answerId if current question is not answered', () => {
-        const game = getGame(false)
+  test('should not return answerId if current question is not answered', () => {
+    const game = getGame(false)
 
-        const filteredGame = filterGame(game)
+    const filteredGame = filterGame(game)
 
-        expect(filteredGame?.currentQuestion?.answerId)
-            .toBeUndefined()
-    })
+    expect(filteredGame?.currentQuestion?.answerId).toBeUndefined()
+  })
 })
