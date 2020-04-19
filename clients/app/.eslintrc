@@ -1,18 +1,15 @@
 {
-	"extends": [
-		"react-app",
-		"plugin:prettier/recommended"
-	],
-	"rules": {
-		"import/order": [
-			"error",
-			{
-				"alphabetize": {
-					"order": "asc",
-					"caseInsensitive": false
-				}
-			}
-		],
-		"no-console": 1
-	}
+  "extends": ["react-app", "plugin:prettier/recommended"],
+  "rules": {
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": false
+        }
+      }
+    ],
+    "no-console": 1
+  }
 }

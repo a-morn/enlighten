@@ -3,7 +3,7 @@ import React, { memo } from 'react'
 const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
   return (
     <div className={className}>
-      <h3 className="p-6 md:p-4 text-lg text-gray-dark border-b border-gray-light border-solid">
+      <h3 className="p-6 md:p-4 text-lg text-brand-light border-b border-gray-light border-solid">
         Player list
       </h3>
       <ul className="">

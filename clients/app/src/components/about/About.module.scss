@@ -1,11 +1,17 @@
 @import 'src/styles/style.scss';
 
 .about {
-  height: calc(100vh - 77px);
-  overflow: hidden;
+  max-height: calc(
+    100vh - #{$header-height} - #{$footer-height} - #{2 * $body-padding}
+  );
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 300px;
+  @media (min-width: 640px) {
+    overflow: hidden;
+    margin: -1.5rem;
+  }
 }
 
 @media (min-width: 640px) {
@@ -13,7 +19,6 @@
     content: '';
     position: absolute;
     background: $gray-darkest;
-    border-radius: 5px;
     top: 0;
     right: 0;
     bottom: 0;
@@ -28,16 +33,14 @@
   max-width: 500px;
   background: $white;
   z-index: 2;
-  padding: 16px 0;
 
   @media (min-width: 640px) {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 100px;
     margin: auto;
-  }  
+  }
 }
 
 .about__video {
@@ -45,13 +48,9 @@
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  pointer-events: none;
 
-  @media (max-width: 640px) { 
-    position: static;
-    transform: rotate(90deg);
-    top: inherit;
-    margin-top: auto;
-    margin-bottom: auto;
+  @media (max-width: 640px) {
+    display: none;
   }
 }
-

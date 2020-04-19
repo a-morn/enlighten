@@ -122,7 +122,7 @@ export function LobbyLogin({ history, playerId }) {
   }
 
   return (
-    <div className="flex flex-col my-auto">
+    <div className="flex flex-col justify-center">
       <div className="flex flex-col">
         <CategoryPicker
           className=""

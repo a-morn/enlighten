@@ -7,16 +7,11 @@ function LandingPage() {
   return (
     <div className="">
       <div className="w-100 inline-block">
-        {/* This is to prevent reflow */}
-        <div
-          className="min-w-full h-full relative"
-          style={{ paddingBottom: '55%' }}
-        >
+        <div className={`${styles['landing-page__video-wrapper']}`}>
           <video
             className={`inline-block min-w-full absolute ${
               styles['landing-page__video']
             }`}
-            style={{ clipPath: 'url(#clipPath)', minHeight: '184px' }}
             autoPlay
             loop
             muted
@@ -38,9 +33,11 @@ function LandingPage() {
         </svg>
         <article
           style={{ backgroundImage: `url(${quizTutorialBg})` }}
-          className="bg-cover bg-center flex flex-col items-center font-mono"
+          className="bg-cover bg-center flex flex-col items-center font-mono rounded"
         >
-          <h2 className="text-brand-dark text-4xl mb-16">Omg such quiz app!</h2>
+          <h2 className="text-brand-dark text-4xl m-16 text-center">
+            Omg such quiz app!
+          </h2>
           <div
             className={`${
               styles['tutorial-text-wrapper']
@@ -60,7 +57,7 @@ function LandingPage() {
               role="img"
               aria-label="arm"
             >
-              💪
+              💪{/* This is not displaying on iOS Safari */}
             </span>
             <span
               className={`${styles['thinking-face']} absolute text-6xl top-1/2`}

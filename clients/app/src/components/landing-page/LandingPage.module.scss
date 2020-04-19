@@ -5,7 +5,7 @@
 }
 
 .tutorial-text-wrapper {
-  background-color: rgba(211,209,208, 0.5);
+  background-color: rgba(211, 209, 208, 0.5);
 }
 
 .thinking-face {
@@ -19,6 +19,13 @@
   transform: rotate(45deg);
 }
 
+.landing-page__video-wrapper {
+  clip-path: url(#clipPath);
+  -webkit-clip-path: url(#clipPath);
+  min-height: 184px;
+}
 .landing-page__video {
   animation: fadein 3s;
+  min-height: 184px;
+  background-color: $brand;
 }

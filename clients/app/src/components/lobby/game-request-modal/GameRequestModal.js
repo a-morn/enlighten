@@ -15,13 +15,15 @@ const GameRequestModal = memo(
     return (
       <div
         data-testid={testid}
-        className="border border-solid border-gray-500 bg-gray-dark fixed z-50 top-0 right-0 bottom-0 left-0 w-full h-full overflow-auto bg-smoke-dark flex"
+        className="border border-solid border-gray-500 bg-gray-dark fixed z-50 top-0 right-0 bottom-0 left-0 w-full h-full overflow-auto bg-smoke-dark flex justify-center items-center"
       >
-        <div className="fixed shadow-inner max-w-md md:relative right-0 left-0 top-0 bottom-0 h-64  align-top m-auto justify-end md:justify-center p-8 bg-white md:rounded w-full md:h-auto md:shadow flex flex-col">
-          <h2 className="text-4xl text-center font-hairline md:leading-loose text-grey md:mt-8 mb-4">
+        <div className="shadow-inner max-w-md md:relative align-top justify-end md:justify-center p-8 bg-white md:rounded w-full md:h-auto md:shadow flex flex-col">
+          <h2 className="text-2xl md:text-4xl text-center font-hairline md:leading-loose text-grey md:mt-8 mb-4">
             {title}
           </h2>
-          <p className="text-xl leading-normal mb-8 text-center">{body}</p>
+          <p className="text-md md:text-xl leading-normal mb-8 text-center">
+            {body}
+          </p>
           <div className="inline-flex justify-center">
             {acceptText && (
               <button

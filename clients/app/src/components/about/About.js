@@ -5,8 +5,8 @@ import styles from './About.module.scss'
 
 function About() {
   return (
-    <div className={styles.about}>
-      <div className={styles.about__textWrapper}>
+    <div className={`${styles.about}`}>
+      <div className={`${styles.about__textWrapper} rounded p-4`}>
         <h2 className={`pb-10 text-2xl text-brand`}>About</h2>
         <p className={`text-brand`}>
           Portfolio project for Albin Sebastian Mörner. Need a full stack web

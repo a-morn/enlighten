@@ -11,7 +11,7 @@ function Body({ children }) {
     : {}
 
   return (
-    <div className="p-6 max-w-full flex-grow" style={backgroundStyle}>
+    <div className="p-6 max-w-full flex-grow bg-brand" style={backgroundStyle}>
       {children}
     </div>
   )
