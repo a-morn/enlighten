@@ -1,32 +1,33 @@
-#!/usr/bin/env node
-
-/**
- * Module dependencies.
- */
-
+import http from 'http'
 import { resolve } from 'path'
 
-const dotenv = require('dotenv-flow')
-dotenv.config({ path: resolve(__dirname, '..') })
-import app from './app'
-import apollo from './apollo'
-
-import d from 'debug'
-import http from 'http'
 import { createTerminus } from '@godaddy/terminus'
+import d from 'debug'
+import dotenv from 'dotenv-flow'
+import apollo from './apollo'
+import app from './app'
 
-export function startApp() {
+dotenv.config({ path: resolve(__dirname, '..') })
+
+export function startApp(): void {
   const debug = d('services:server')
-  /**
-   * Get port from environment and store in Express.
-   */
+
+  function normalizePort(val: string): string | number | boolean {
+    const port = parseInt(val, 10)
+
+    if (isNaN(port)) {
+      return val
+    }
+
+    if (port >= 0) {
+      return port
+    }
+
+    return false
+  }
 
   const port = normalizePort(process.env.PORT || '3000')
   app.set('port', port)
-
-  /**
-   * Create HTTP server.
-   */
 
   const server = http.createServer(app)
 
@@ -35,12 +36,12 @@ export function startApp() {
   /**
    * Health check
    */
-  async function onHealthCheck() {
+  async function onHealthCheck(): Promise<boolean> {
     // Add health check here
     return Promise.resolve(true)
   }
 
-  function onSignal() {
+  function onSignal(): Promise<void> {
     // Graceful shutdown goes here
     return Promise.resolve()
   }
@@ -51,39 +52,7 @@ export function startApp() {
     onSignal,
   })
 
-  /**
-   * Listen on provided port, on all network interfaces.
-   */
-
-  server.listen(port)
-  server.on('error', onError)
-  server.on('listening', onListening)
-
-  /**
-   * Normalize a port into a number, string, or false.
-   */
-
-  function normalizePort(val: string) {
-    const port = parseInt(val, 10)
-
-    if (isNaN(port)) {
-      // named pipe
-      return val
-    }
-
-    if (port >= 0) {
-      // port number
-      return port
-    }
-
-    return false
-  }
-
-  /**
-   * Event listener for HTTP server "error" event.
-   */
-
-  function onError(error: Error & { syscall?: string; code?: string }) {
+  function onError(error: Error & { syscall?: string; code?: string }): void {
     if (error.syscall !== 'listen') {
       throw error
     }
@@ -105,11 +74,7 @@ export function startApp() {
     }
   }
 
-  /**
-   * Event listener for HTTP server "listening" event.
-   */
-
-  function onListening() {
+  function onListening(): void {
     const addr = server.address()
     if (addr === null) {
       throw new Error('No address')
@@ -117,4 +82,8 @@ export function startApp() {
     const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
     debug('Listening on ' + bind)
   }
+
+  server.listen(port)
+  server.on('error', onError)
+  server.on('listening', onListening)
 }

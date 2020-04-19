@@ -1,6 +1,6 @@
-import { GameQuestion } from './question'
-import { PlayerMultiplayer } from './player'
-import { isCategoryId } from './category'
+import { isCategoryId } from './category-types'
+import { PlayerMultiplayer } from './player-types'
+import { GameQuestion } from './question-types'
 
 export type Game = {
   categoryId: string
@@ -30,12 +30,12 @@ export type Levels = {
 
 // todo: implement
 function isLevels(x: unknown): x is Levels {
-  return true
+  return x !== undefined
 }
 
 // todo: implement
 function isUserLevel(x: unknown, levels: Levels): x is keyof Levels {
-  return true
+  return x && levels !== undefined
 }
 
 export function isGame(x: unknown): x is Game {

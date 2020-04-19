@@ -1,3 +1,9 @@
+export type MutationResponse = {
+  code: number
+  success: boolean
+  message: string
+}
+
 export type Context = {
   currentUser: {
     playerId: string

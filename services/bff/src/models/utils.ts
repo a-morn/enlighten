@@ -1,25 +1,10 @@
-import R, { filter } from 'ramda'
+import R from 'ramda'
 import {
   Game,
-  GameSingeplayer,
-  isGameSingleplayer,
-  isGameMultiplayer,
   GameMultiplayer,
-} from './game'
-
-function filterGame(game: null): null
-function filterGame(game: GameSingeplayer): GameSingeplayer
-function filterGame(game: GameMultiplayer): GameMultiplayer
-function filterGame(
-  game: GameSingeplayer | GameMultiplayer | null,
-): GameSingeplayer | GameMultiplayer | null {
-  if (game === null) {
-    return null
-  } else if (isGameMultiplayer(game)) {
-    game.questions = []
-  }
-  return censorAnswerIfNotAnswered(game)
-}
+  GameSingeplayer,
+  isGameMultiplayer,
+} from '../types/game-types'
 
 function censorAnswerIfNotAnswered<T extends Game>(game: T): T {
   if (!R.pathEq(['currentQuestion', 'answered'], true)(game)) {
@@ -33,6 +18,21 @@ function censorAnswerIfNotAnswered<T extends Game>(game: T): T {
   } else {
     return game
   }
+}
+
+function filterGame(game: GameSingeplayer | null): GameSingeplayer | null
+function filterGame(game: GameMultiplayer | null): GameMultiplayer | null
+function filterGame(game: GameSingeplayer): GameSingeplayer
+function filterGame(game: GameMultiplayer): GameMultiplayer
+function filterGame(
+  game: GameSingeplayer | GameMultiplayer | null,
+): GameSingeplayer | GameMultiplayer | null {
+  if (game === null) {
+    return null
+  } else if (isGameMultiplayer(game)) {
+    game.questions = []
+  }
+  return censorAnswerIfNotAnswered(game)
 }
 
 function notUndefined<T>(x: T | undefined): x is T {

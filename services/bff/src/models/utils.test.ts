@@ -1,10 +1,7 @@
-import { filterGame } from './utils'
-import { GameMultiplayer } from './game'
-import { GameQuestion } from './question'
 import faker from 'faker'
-import { multiplayerSubscriptionResolvers } from 'src/resolvers/multiplayer'
-import { Question } from './question'
-import { PlayerMultiplayer } from './player'
+import { GameMultiplayer } from '../types/game-types'
+import { GameQuestion } from '../types/question-types'
+import { filterGame } from './utils'
 
 const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
   currentQuestionAnswered: boolean,

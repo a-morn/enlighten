@@ -1,30 +1,29 @@
+import { isUndefined } from 'util'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import Redis from 'ioredis'
 import { categoriesQueryResolver } from './category'
 import {
-  singleplayerQueryResolvers,
-  singleplayerMutationResolvers,
-  singleplayerSubscriptionResolvers,
-} from './singleplayer'
-import {
-  lobbyQueryResolvers,
   lobbyMutationResolvers,
+  lobbyQueryResolvers,
   lobbySubscriptionResolvers,
 } from './lobby'
 import {
-  multiplayerQueryResolvers,
   multiplayerMutationResolvers,
+  multiplayerQueryResolvers,
   multiplayerSubscriptionResolvers,
 } from './multiplayer'
-
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { isUndefined } from 'util'
-import Redis from 'ioredis'
+import {
+  singleplayerMutationResolvers,
+  singleplayerQueryResolvers,
+  singleplayerSubscriptionResolvers,
+} from './singleplayer'
 
 if (isUndefined(process.env.REDIS_PORT_NUMBER)) {
   throw new Error()
 }
 
 const options = {
-  retryStrategy: (times: number) => {
+  retryStrategy: (times: number): number => {
     // reconnect after
     return Math.min(times * 50, 2000)
   },

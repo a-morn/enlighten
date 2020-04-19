@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /srv
+cd /srv/www
 rm -rf node_modules
 npm install

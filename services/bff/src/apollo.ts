@@ -1,9 +1,10 @@
-import typeDefs from './typeDefs'
-import resolvers from './resolvers/'
-import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
-import { makeExecutableSchema } from 'apollo-server'
 import * as http from 'http'
+import { makeExecutableSchema } from 'apollo-server'
+import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
 import { Express } from 'express'
+import resolvers from './resolvers/'
+import typeDefs from './typeDefs'
+import { Context } from './types'
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -11,7 +12,7 @@ const schema = makeExecutableSchema({
   resolverValidationOptions: { requireResolversForResolveType: false },
 })
 
-export default (app: Express, httpServer: http.Server) => {
+export default (app: Express, httpServer: http.Server): void => {
   const apolloServer = new ApolloServer({
     schema,
     context: ({
@@ -31,14 +32,13 @@ export default (app: Express, httpServer: http.Server) => {
       }
     },
     subscriptions: {
-      onConnect: ({ playerId }: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onConnect: ({ playerId }: any): Context => {
         return { currentUser: { playerId } }
       },
     },
   } as ApolloServerExpressConfig)
 
   apolloServer.applyMiddleware({ app, path: '/graphql' })
-
-  // I wonder what went wrong here 🤔
-  ;(apolloServer as any).installSubscriptionHandlers(httpServer)
+  apolloServer.installSubscriptionHandlers(httpServer)
 }

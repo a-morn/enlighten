@@ -1,5 +1,5 @@
-import { Redis } from 'ioredis'
 import { isString } from 'util'
+import { Redis } from 'ioredis'
 
 export async function getAllByPattern(
   redisClient: Redis,

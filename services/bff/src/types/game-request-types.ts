@@ -1,4 +1,4 @@
-import { CategoryId, isCategoryId } from './category'
+import { CategoryId, isCategoryId } from './category-types'
 
 export type GameRequest = {
   id: string

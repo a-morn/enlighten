@@ -1,16 +1,21 @@
+import { isUndefined } from 'util'
 import { UserInputError } from 'apollo-server'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
-import { GAME_MULTIPLAYER } from '../triggers'
 import shuffle from 'shuffle-array'
 //import periodicTable from '../data/questions/periodic-table';
-import got from '../generated-data/game-of-thrones.json'
 import countries from '../generated-data/countries.json'
-import { GameMultiplayer, isGameMultiplayer } from './game'
-import { PlayerLobby, PlayerMultiplayer, isPlayerGameId } from './player'
-import { CategoryId } from './category'
-import { Question } from './question'
-import { isUndefined } from 'util'
+import got from '../generated-data/game-of-thrones.json'
+import { GAME_MULTIPLAYER } from '../triggers'
+import {
+  CategoryId,
+  GameMultiplayer,
+  GameQuestion,
+  PlayerLobby,
+  PlayerMultiplayer,
+  Question,
+  isGameMultiplayer,
+} from '../types'
 const allQuestions = {
   'game-of-thrones': got,
   //'periodic-table': periodicTable,
@@ -24,7 +29,10 @@ const backgrounds = {
 
 import { filterGame } from './utils'
 
-const getGame = async (redisClient: Redis, gameId: string) => {
+const getGame = async (
+  redisClient: Redis,
+  gameId: string,
+): Promise<GameMultiplayer | null> => {
   const gameString = await redisClient.get(`multiplayer:games:${gameId}`)
   if (!gameString) {
     return null
@@ -118,7 +126,7 @@ const createGame = async (
   pubSub: RedisPubSub,
   players: PlayerLobby[],
   categoryId: CategoryId,
-) => {
+): Promise<GameMultiplayer> => {
   const game = {
     categoryId,
     categoryBackground: backgrounds[categoryId],
@@ -160,6 +168,8 @@ const createGame = async (
     futureGame.currentQuestion = futureGame.questions[0]
     await updateGame(redisClient, pubSub, futureGame, 'UPDATE')
   }, 4000)
+
+  return game
 }
 
 const updateQuestionByPlayerId = async (
@@ -177,29 +187,13 @@ const updateQuestionByPlayerId = async (
   return updateGame(redisClient, pubSub, game, 'UPDATE')
 }
 
-const getLastAnswerByPlayerId = async (
-  redisClient: Redis,
-  playerId: string,
-) => {
-  const game = await getGameByPlayerId(redisClient, playerId)
-  if (game !== null && game.lastQuestion) {
-    const question = game.lastQuestion
-    return {
-      id: question.answerId,
-      questionId: question.id,
-    }
-  } else {
-    return null
-  }
-}
-
 const answerQuestion = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   playerId: string,
   questionId: string,
   answerId: string,
-) => {
+): Promise<GameQuestion> => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (game === null) {
     throw new UserInputError(`No game for player ${playerId}`)
@@ -273,7 +267,7 @@ const updateTimestampForPlayer = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   playerId: string,
-) => {
+): Promise<PlayerMultiplayer | null> => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (game === null) {
     return null
@@ -290,7 +284,6 @@ const updateTimestampForPlayer = async (
 export {
   getGameByPlayerId,
   createGame,
-  getLastAnswerByPlayerId,
   answerQuestion,
   updateQuestionByPlayerId,
   removePlayerFromGame,

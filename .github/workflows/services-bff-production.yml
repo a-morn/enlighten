@@ -11,41 +11,43 @@ jobs:
   deploy-bff:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '12.x'
-    - name: Install npm dependencies
-      run: npm install
-      working-directory: services/bff
-    - name: Build
-      run: npm run build:prod
-      working-directory: services/bff
-    - name: Test
-      run: npm run test
-      working-directory: services/bff
-    - name: AWS Deploy Push
-      run: 
-        aws deploy push
+      - uses: actions/checkout@v1
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: Install npm dependencies
+        run: npm install
+        working-directory: services/bff
+      - name: Build
+        run: npm run build:prod
+        working-directory: services/bff
+      - name: Test
+        run: npm run test
+        working-directory: services/bff
+      - name: Fix files with incorrect creation date
+        run: find ./node_modules/* -mtime +10950 -exec touch {} \;
+        working-directory: services/bff
+      - name: AWS Deploy Push
+        run: aws deploy push
           --application-name enlighten-bff
           --description "This is a revision for the enlighten-bff"
           --s3-location s3://artefacts.enlighten/enlighten-bff-prod.zip
           --source services/bff
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    - name: AWS Create Deploy
-      id: aws_create_deploy
-      run: |
-        echo ::set-output name=deployment_id::$(aws deploy create-deployment --application-name enlighten-bff --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name prod --file-exists-behavior OVERWRITE --s3-location bucket=artefacts.enlighten,key=enlighten-bff-prod.zip,bundleType=zip)
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    - name: Parse JSON
-      run: |
-        echo $deployment_id
-      env:
-        deployment_id: ${{ steps.aws_create_deploy.deployment_id }}      
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: AWS Create Deploy
+        id: aws_create_deploy
+        run: |
+          echo ::set-output name=deployment_id::$(aws deploy create-deployment --application-name enlighten-bff --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name prod --file-exists-behavior OVERWRITE --s3-location bucket=artefacts.enlighten,key=enlighten-bff-prod.zip,bundleType=zip)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Parse JSON
+        run: |
+          echo $deployment_id
+        env:
+          deployment_id: ${{ steps.aws_create_deploy.deployment_id }}

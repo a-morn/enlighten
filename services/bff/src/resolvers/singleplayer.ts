@@ -1,19 +1,21 @@
-import { Context, AnswerQuestionInput } from './types'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { ResolverFn, withFilter } from 'graphql-subscriptions'
+import { Redis } from 'ioredis'
 import {
-  getGameByPlayerId,
+  answerQuestion,
   createGame,
   deleteGameByPlayerId,
-  answerQuestion,
+  getGameByPlayerId,
 } from '../models/singleplayer'
-
-import { GAME_SINGLEPLAYER } from '../triggers'
-import { CategoryId } from '../models/category'
-
 import { filterGame } from '../models/utils'
-import { Redis } from 'ioredis'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { withFilter } from 'graphql-subscriptions'
-import { filter } from 'ramda'
+import { GAME_SINGLEPLAYER } from '../triggers'
+import {
+  AnswerQuestionInput,
+  CategoryId,
+  Context,
+  GameSingeplayer,
+  MutationResponse,
+} from '../types'
 
 type CreateGameSingleplayerInput = {
   game: {
@@ -22,43 +24,77 @@ type CreateGameSingleplayerInput = {
   }
 }
 
+type GameSingleplayeMutationrResponse = MutationResponse & {
+  game: GameSingeplayer | null
+}
+
 type DeleteGameSingleplayerInput = {
   id: string
 }
 
-export const singleplayerQueryResolvers = (redisClient: Redis) => ({
-  gameSingleplayer: async (_: unknown, __: unknown, context: Context) => {
-    const {
-      currentUser: { playerId },
-    } = context
-    const game = await getGameByPlayerId(redisClient, playerId)
-    const filteredGame = filterGame(game)
-    return filteredGame
-  },
-})
+export function singleplayerQueryResolvers(
+  redisClient: Redis,
+): {
+  gameSingleplayer: (
+    _: unknown,
+    __: unknown,
+    context: Context,
+  ) => Promise<GameSingeplayer | null>
+} {
+  return {
+    gameSingleplayer: async (
+      _,
+      __,
+      context,
+    ): Promise<GameSingeplayer | null> => {
+      const {
+        currentUser: { playerId },
+      } = context
+      const game = await getGameByPlayerId(redisClient, playerId)
+      const filteredGame = filterGame(game)
+      return filteredGame
+    },
+  }
+}
 
 export const singleplayerMutationResolvers = (
   redisClient: Redis,
   pubSub: RedisPubSub,
-) => ({
-  createGameSingleplayer: async (
+): {
+  createGameSingleplayer: (
     _: unknown,
-    { game: { playerId, categoryId } }: CreateGameSingleplayerInput,
-  ) => {
+    input: CreateGameSingleplayerInput,
+  ) => Promise<GameSingleplayeMutationrResponse>
+  deleteGameSingleplayer: (
+    _: unknown,
+    input: DeleteGameSingleplayerInput,
+    context: Context,
+  ) => Promise<GameSingleplayeMutationrResponse>
+  answerQuestionSingleplayer: (
+    _: unknown,
+    input: AnswerQuestionInput,
+    context: Context,
+  ) => Promise<GameSingleplayeMutationrResponse>
+} => ({
+  createGameSingleplayer: async (
+    _,
+    { game: { playerId, categoryId } },
+  ): Promise<GameSingleplayeMutationrResponse> => {
     const game = await createGame(redisClient, playerId, categoryId)
     const filteredGame = filterGame(game)
+
     return {
       game: filteredGame,
-      code: 201,
-      success: true,
-      message: 'Singleplayer game created',
+      code: game ? 201 : 500,
+      success: game !== null,
+      message: game ? 'Singleplayer game created' : '',
     }
   },
   deleteGameSingleplayer: async (
-    _: unknown,
-    {}: DeleteGameSingleplayerInput,
-    context: Context,
-  ) => {
+    _,
+    __,
+    context,
+  ): Promise<GameSingleplayeMutationrResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -72,10 +108,10 @@ export const singleplayerMutationResolvers = (
     }
   },
   answerQuestionSingleplayer: async (
-    _: unknown,
-    { answer: { answerId, questionId } }: AnswerQuestionInput,
-    context: Context,
-  ) => {
+    _,
+    { answer: { answerId, questionId } },
+    context,
+  ): Promise<GameSingleplayeMutationrResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -97,7 +133,11 @@ export const singleplayerMutationResolvers = (
   },
 })
 
-export const singleplayerSubscriptionResolvers = (pubSub: RedisPubSub) => ({
+export const singleplayerSubscriptionResolvers = (
+  pubSub: RedisPubSub,
+): {
+  gameSingleplayerSubscription: { subscribe: ResolverFn }
+} => ({
   gameSingleplayerSubscription: {
     subscribe: withFilter(
       () => pubSub.asyncIterator(GAME_SINGLEPLAYER),

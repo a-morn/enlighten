@@ -1,13 +1,21 @@
+import { ForbiddenError, UserInputError } from 'apollo-server'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
-import { getAllByPattern } from './redis-utils'
 import { GAME_REQUEST, LOBBY_PLAYERS_SUBSCRIPTION } from '../triggers'
-import { PlayerLobby, isPlayerLobby } from './player'
-import { GameRequest, isGameRequest } from './gameRequest'
-import { CategoryId } from './category'
-import { ForbiddenError, UserInputError } from 'apollo-server'
+import {
+  CategoryId,
+  GameRequest,
+  PlayerLobby,
+  isGameRequest,
+  isPlayerLobby,
+} from '../types'
 
-const getGameRequest = async (redisClient: Redis, gameRequestId: string) => {
+import { getAllByPattern } from './redis-utils'
+
+const getGameRequest = async (
+  redisClient: Redis,
+  gameRequestId: string,
+): Promise<GameRequest | null> => {
   const gameRequestString = await redisClient.get(
     `lobby:game-requests:${gameRequestId}`,
   )
@@ -27,7 +35,7 @@ const getGameRequest = async (redisClient: Redis, gameRequestId: string) => {
 const getGameRequestIdByPlayerId = async (
   redisClient: Redis,
   playerId: string,
-) => {
+): Promise<GameRequest | null> => {
   const gameRequestIdString = await redisClient.get(
     `lobby:player-game-request-id:${playerId}`,
   )
@@ -125,8 +133,11 @@ const removePlayer = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   playerId: string,
-) => {
-  await redisClient.del(`lobby:players:${playerId}`)
+): Promise<void> => {
+  const result = await redisClient.del(`lobby:players:${playerId}`)
+  if (result !== 0) {
+    // todo: log this
+  }
   const players = await getPlayers(redisClient)
   pubSub.publish(LOBBY_PLAYERS_SUBSCRIPTION, {
     players,
@@ -139,7 +150,7 @@ const addGameRequest = async (
   playerRequestId: string,
   playerOfferedId: string,
   categoryId: CategoryId,
-) => {
+): Promise<GameRequest> => {
   const playerRequest = await getPlayer(redisClient, playerRequestId)
   const playerOffered = await getPlayer(redisClient, playerOfferedId)
 
@@ -185,18 +196,40 @@ const addGameRequest = async (
   return gameRequest
 }
 
-const deleteGameRequest = async (
+async function deleteGameRequest(
   redisClient: Redis,
   pubsub: RedisPubSub,
   playerId: string,
+  gameRequest: GameRequest,
+): Promise<GameRequest>
+async function deleteGameRequest(
+  redisClient: Redis,
+  pubsub: RedisPubSub,
+  playerId: string,
+  gameRequest: null,
   gameRequestId: string,
-) => {
-  const gameRequest = await getGameRequest(redisClient, gameRequestId)
-  if (!gameRequest) {
-    throw new UserInputError(`No game request with id ${gameRequestId}`)
+): Promise<GameRequest>
+async function deleteGameRequest(
+  redisClient: Redis,
+  pubsub: RedisPubSub,
+  playerId: string,
+  gameRequest: GameRequest | null,
+  gameRequestId?: string,
+): Promise<GameRequest> {
+  let _gameRequest: GameRequest
+  if (!gameRequest && gameRequestId) {
+    const gr = await getGameRequest(redisClient, gameRequestId)
+    if (!gr) {
+      throw new UserInputError(`No game request with id ${gameRequestId}`)
+    }
+    _gameRequest = gr
+  } else if (gameRequest) {
+    _gameRequest = gameRequest
+  } else {
+    throw new Error('This will never happen')
   }
   if (
-    ![gameRequest.playerRequestId, gameRequest.playerOfferedId].includes(
+    ![_gameRequest.playerRequestId, _gameRequest.playerOfferedId].includes(
       playerId,
     )
   ) {
@@ -204,16 +237,20 @@ const deleteGameRequest = async (
   }
 
   const result = await Promise.all([
-    redisClient.del(`lobby:game-requests:${gameRequestId}`),
+    redisClient.del(`lobby:game-requests:${_gameRequest.id}`),
     redisClient.set(
-      `lobby:player-game-request-id:${gameRequest.playerOfferedId}`,
-      gameRequest.id,
+      `lobby:player-game-request-id:${_gameRequest.playerOfferedId}`,
+      _gameRequest.id,
     ),
     redisClient.set(
-      `lobby:player-game-request-id:${gameRequest.playerRequestId}`,
-      gameRequest.id,
+      `lobby:player-game-request-id:${_gameRequest.playerRequestId}`,
+      _gameRequest.id,
     ),
   ])
+
+  if (result[0] !== 1) {
+    // todo: Should log this
+  }
 
   if (result.some(r => r !== 1)) {
     // todo: this should be logged
@@ -226,7 +263,7 @@ const deleteGameRequest = async (
     },
   })
 
-  return gameRequestId
+  return _gameRequest
 }
 
 const updatePlayerTimestamp = async (
@@ -249,7 +286,7 @@ const join = async (
   id: string,
   categoryId: CategoryId,
   name: string,
-) => {
+): Promise<PlayerLobby> => {
   const player = { id, categoryId, name, timestamp: new Date().toISOString() }
   return addPlayer(redisClient, pubSub, player)
 }
@@ -267,7 +304,7 @@ const answerGameRequest = async (
     players: PlayerLobby[],
     categoryId: CategoryId,
   ) => Promise<unknown>,
-) => {
+): Promise<GameRequest> => {
   const gameRequestAnswered = await getGameRequest(redisClient, id)
 
   if (!gameRequestAnswered) {
@@ -286,7 +323,7 @@ const answerGameRequest = async (
     },
   })
 
-  const gameRequest = await deleteGameRequest(redisClient, pubSub, playerId, id)
+  await deleteGameRequest(redisClient, pubSub, playerId, gameRequestAnswered)
 
   if (accepted) {
     const players = [
@@ -307,7 +344,7 @@ const answerGameRequest = async (
     )
   }
 
-  return gameRequest
+  return gameRequestAnswered
 }
 
 export {

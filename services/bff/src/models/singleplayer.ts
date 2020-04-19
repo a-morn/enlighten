@@ -1,15 +1,20 @@
-import shuffle from 'shuffle-array'
-import { Redis } from 'ioredis'
-
-import got from '../generated-data/game-of-thrones.json'
-import countries from '../generated-data/countries.json'
-import { GameSingeplayer, isGameSingleplayer } from './game'
-import { QuestionObject } from './question'
 import { isUndefined } from 'util'
-import { CategoryId } from './category'
-import { filterGame } from './utils'
+import { UserInputError } from 'apollo-server'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { Redis } from 'ioredis'
+import shuffle from 'shuffle-array'
 
+import countries from '../generated-data/countries.json'
+import got from '../generated-data/game-of-thrones.json'
 import { GAME_SINGLEPLAYER } from '../triggers'
+import {
+  CategoryId,
+  GameSingeplayer,
+  QuestionObject,
+  isGameSingleplayer,
+} from '../types'
+import { getQuestionById } from './questions'
+import { filterGame } from './utils'
 
 const allQuestions: {
   [key in CategoryId]: QuestionObject
@@ -23,11 +28,7 @@ const backgrounds: { [key: string]: string } = {
   countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
 }
 
-import { getQuestionById } from './questions'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { UserInputError } from 'apollo-server'
-
-const getGameByPlayerIdInternal = async (
+const getGameByPlayerId = async (
   redisClient: Redis,
   playerId: string,
 ): Promise<GameSingeplayer | null> => {
@@ -65,11 +66,40 @@ const deleteGameByPlayerId = async (
   return redisClient.del(`singleplayer:games:${playerId}`).then(() => game)
 }
 
+const updateQuestionByPlayerId = async (
+  redisClient: Redis,
+  playerId: string,
+  game?: GameSingeplayer,
+): Promise<GameSingeplayer> => {
+  if (isUndefined(game)) {
+    const fetchedGame = await getGameByPlayerId(redisClient, playerId)
+    if (!fetchedGame) {
+      throw new UserInputError(`Player ${playerId} is not in a game`)
+    }
+    game = fetchedGame
+  }
+
+  const lastQuestionId = game.lastQuestionId
+  game.currentQuestionId = shuffle(
+    game.levels[game.userLevel].filter(
+      ({ id, record }) => id !== lastQuestionId && record < 2,
+    ),
+  )[0].id
+
+  game.lastQuestionId = game.currentQuestionId
+  game.currentQuestion = getQuestionById(game.currentQuestionId)
+  game.currentQuestion.alternatives = shuffle(game.currentQuestion.alternatives)
+  game.currentQuestion.answered = false
+
+  updateGameByPlayerId(redisClient, playerId, game)
+  return game
+}
+
 const createGame = async (
   redisClient: Redis,
   playerId: string,
   categoryId: CategoryId,
-) => {
+): Promise<GameSingeplayer> => {
   const id = '' + Math.random()
   const game = {
     playerId,
@@ -96,63 +126,14 @@ const createGame = async (
   return updatedGame
 }
 
-const getLastAnswerByPlayerId = async (
-  redisClient: Redis,
-  playerId: string,
-) => {
-  const game = await getGameByPlayerIdInternal(redisClient, playerId)
-  if (!game) {
-    throw new UserInputError(`Player ${playerId} is not in a game`)
-  }
-  if (game.lastQuestionId) {
-    const question = getQuestionById(game.lastQuestionId)
-    return {
-      id: question.answerId,
-      questionId: game.lastQuestionId,
-      playerId,
-    }
-  } else {
-    return null
-  }
-}
-
-const updateQuestionByPlayerId = async (
-  redisClient: Redis,
-  playerId: string,
-  game?: GameSingeplayer,
-) => {
-  if (isUndefined(game)) {
-    const fetchedGame = await getGameByPlayerIdInternal(redisClient, playerId)
-    if (!fetchedGame) {
-      throw new UserInputError(`Player ${playerId} is not in a game`)
-    }
-    game = fetchedGame
-  }
-
-  const lastQuestionId = game.lastQuestionId
-  game.currentQuestionId = shuffle(
-    game.levels[game.userLevel].filter(
-      ({ id, record }) => id !== lastQuestionId && record < 2,
-    ),
-  )[0].id
-
-  game.lastQuestionId = game.currentQuestionId
-  game.currentQuestion = getQuestionById(game.currentQuestionId)
-  game.currentQuestion.alternatives = shuffle(game.currentQuestion.alternatives)
-  game.currentQuestion.answered = false
-
-  updateGameByPlayerId(redisClient, playerId, game)
-  return game
-}
-
 const answerQuestion = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   playerId: string,
   questionId: string,
   answerId: string,
-) => {
-  const game = await getGameByPlayerIdInternal(redisClient, playerId)
+): Promise<GameSingeplayer> => {
+  const game = await getGameByPlayerId(redisClient, playerId)
   if (!game) {
     throw new UserInputError(`Player ${playerId} is not in a game`)
   }
@@ -204,15 +185,10 @@ const answerQuestion = async (
   return game
 }
 
-const getGameByPlayerId = (redisClient: Redis, playerId: string) => {
-  return getGameByPlayerIdInternal(redisClient, playerId)
-}
-
 export {
   getGameByPlayerId,
   createGame,
   answerQuestion,
-  getLastAnswerByPlayerId,
   updateQuestionByPlayerId,
   deleteGameByPlayerId,
 }

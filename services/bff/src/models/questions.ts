@@ -1,6 +1,6 @@
-import got from '../generated-data/game-of-thrones.json'
 import countries from '../generated-data/countries.json'
-import { Question, GameQuestion } from './question'
+import got from '../generated-data/game-of-thrones.json'
+import { GameQuestion, Question } from '../types/question-types'
 const allQuestions = {
   'game-of-thrones': got,
   countries,

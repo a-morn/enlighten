@@ -1,27 +1,30 @@
-import { Context } from './types'
-
 import { ForbiddenError, UserInputError } from 'apollo-server'
 
-import {
-  getPlayers,
-  addGameRequest,
-  getGameRequestIdByPlayerId,
-  deleteGameRequest,
-  updatePlayerTimestamp,
-  join,
-  answerGameRequest,
-} from '../models/lobby'
-import { LOBBY_PLAYERS_SUBSCRIPTION, GAME_REQUEST } from '../triggers'
-
-import { PlayerLobby } from '../models/player'
-
-import { createGame } from '../models/multiplayer'
-
-import { CategoryId, isCategoryId } from '../models/category'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { ResolverFn, withFilter } from 'graphql-subscriptions'
 
 import { Redis } from 'ioredis'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { withFilter } from 'graphql-subscriptions'
+import {
+  addGameRequest,
+  answerGameRequest,
+  deleteGameRequest,
+  getGameRequestIdByPlayerId,
+  getPlayers,
+  join,
+  updatePlayerTimestamp,
+} from '../models/lobby'
+import { createGame } from '../models/multiplayer'
+import { GAME_REQUEST, LOBBY_PLAYERS_SUBSCRIPTION } from '../triggers'
+
+import {
+  Context,
+  GameRequest,
+  MutationResponse,
+  PlayerLobby,
+  isCategoryId,
+} from '../types'
+
+type QueryLobbyResponse = { players: PlayerLobby[] }
 
 type JoinLobbyInput = {
   player: {
@@ -29,6 +32,14 @@ type JoinLobbyInput = {
     categoryId: string
     name: string
   }
+}
+
+type PlayerLobbyMutationResponse = MutationResponse & {
+  player: PlayerLobby | null
+}
+
+type GameRequestMutationResponse = MutationResponse & {
+  gameRequest: GameRequest | null
 }
 
 type RequestGameInput = {
@@ -52,14 +63,23 @@ type DeleteGameRequestInput = {
   }
 }
 
-export const lobbyQueryResolvers = (redisClient: Redis) => ({
-  lobby: async (_: unknown, __: unknown, context: Context) => {
-    const players = getPlayers(redisClient)
+export const lobbyQueryResolvers = (
+  redisClient: Redis,
+): {
+  lobby(): Promise<QueryLobbyResponse>
+  gameRequest(
+    _: unknown,
+    __: unknown,
+    context: Context,
+  ): Promise<GameRequest | null>
+} => ({
+  lobby: async (): Promise<QueryLobbyResponse> => {
+    const players = await getPlayers(redisClient)
     return {
       players,
     }
   },
-  gameRequest: (_: unknown, __: unknown, context: Context) => {
+  gameRequest: (_, __, context): Promise<GameRequest | null> => {
     const {
       currentUser: { playerId },
     } = context
@@ -71,15 +91,40 @@ export const lobbyQueryResolvers = (redisClient: Redis) => ({
 export const lobbyMutationResolvers = (
   redisClient: Redis,
   pubSub: RedisPubSub,
-) => ({
-  joinLobby: (
+): {
+  joinLobby(
     _: unknown,
-    { player: { id, categoryId, name } }: JoinLobbyInput,
-  ) => {
+    input: JoinLobbyInput,
+  ): Promise<PlayerLobbyMutationResponse>
+  pingLobby(
+    _: unknown,
+    __: unknown,
+    context: Context,
+  ): Promise<PlayerLobbyMutationResponse>
+  requestGame(
+    _: unknown,
+    input: RequestGameInput,
+    context: Context,
+  ): Promise<GameRequestMutationResponse>
+  answerGameRequest(
+    _: unknown,
+    input: AnswerGameRequestInput,
+    context: Context,
+  ): Promise<GameRequestMutationResponse>
+  deleteGameRequest(
+    _: unknown,
+    input: DeleteGameRequestInput,
+    context: Context,
+  ): Promise<GameRequestMutationResponse>
+} => ({
+  joinLobby: async (
+    _,
+    { player: { id, categoryId, name } },
+  ): Promise<PlayerLobbyMutationResponse> => {
     if (!isCategoryId(categoryId)) {
       throw new UserInputError('Incorrect category')
     }
-    const player = join(redisClient, pubSub, id, categoryId, name)
+    const player = await join(redisClient, pubSub, id, categoryId, name)
 
     return {
       player,
@@ -88,7 +133,7 @@ export const lobbyMutationResolvers = (
       message: 'Player joined lobby',
     }
   },
-  pingLobby: async (_: unknown, __: unknown, context: Context) => {
+  pingLobby: async (_, __, context): Promise<PlayerLobbyMutationResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -96,18 +141,16 @@ export const lobbyMutationResolvers = (
 
     return {
       player,
-      code: 200,
+      code: player !== null ? 200 : 404,
       success: player !== null,
-      message: 'Pong',
+      message: player !== null ? 'Pong' : 'No pong :(',
     }
   },
   requestGame: async (
-    _: unknown,
-    {
-      gameRequest: { playerRequestId, playerOfferedId, categoryId },
-    }: RequestGameInput,
-    context: Context,
-  ) => {
+    _,
+    { gameRequest: { playerRequestId, playerOfferedId, categoryId } },
+    context,
+  ): Promise<GameRequestMutationResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -136,7 +179,7 @@ export const lobbyMutationResolvers = (
     _: unknown,
     { answer: { gameRequestId, accepted } }: AnswerGameRequestInput,
     { currentUser: { playerId } }: Context,
-  ) => {
+  ): Promise<GameRequestMutationResponse> => {
     const gameRequest = await answerGameRequest(
       redisClient,
       pubSub,
@@ -157,11 +200,12 @@ export const lobbyMutationResolvers = (
     _: unknown,
     { gameRequest: { gameRequestId } }: DeleteGameRequestInput,
     { currentUser: { playerId } }: Context,
-  ) => {
+  ): Promise<GameRequestMutationResponse> => {
     const gameRequest = await deleteGameRequest(
       redisClient,
       pubSub,
       playerId,
+      null,
       gameRequestId,
     )
 
@@ -174,9 +218,15 @@ export const lobbyMutationResolvers = (
   },
 })
 
-export const lobbySubscriptionResolvers = (pubSub: RedisPubSub) => ({
+export const lobbySubscriptionResolvers = (
+  pubSub: RedisPubSub,
+): {
+  lobbyPlayerSubscription: { subscribe: ResolverFn }
+  gameRequestSubscription: { subscribe: ResolverFn }
+} => ({
   lobbyPlayerSubscription: {
-    subscribe: () => pubSub.asyncIterator(LOBBY_PLAYERS_SUBSCRIPTION),
+    subscribe: (): AsyncIterator<unknown, unknown, undefined> =>
+      pubSub.asyncIterator(LOBBY_PLAYERS_SUBSCRIPTION),
   },
   gameRequestSubscription: {
     subscribe: withFilter(
@@ -191,9 +241,6 @@ export const lobbySubscriptionResolvers = (pubSub: RedisPubSub) => ({
             mutation,
           },
         } = payload
-        if (!payload.gameRequestSubscription.gameRequest) {
-          debugger
-        }
         return (
           [playerOfferedId, playerRequestId].includes(playerId) &&
           (!variables.mutation || variables.mutation === mutation)

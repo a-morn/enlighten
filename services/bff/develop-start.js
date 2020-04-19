@@ -1,5 +1,3 @@
-// Can't debug multiple instances when started from pm2. Use this script instead for debugging
-
 const cluster = require('cluster')
 const NUMBER_OF_INSTACES = 2
 

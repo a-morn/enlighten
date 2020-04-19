@@ -1,18 +1,23 @@
-import { Context, AnswerQuestionInput } from './types'
-
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { ResolverFn, withFilter } from 'graphql-subscriptions'
+import { Redis } from 'ioredis'
 import {
-  getGameByPlayerId,
   answerQuestion,
+  getGameByPlayerId,
   removePlayerFromGame,
   updateTimestampForPlayer,
 } from '../models/multiplayer'
-import { GAME_MULTIPLAYER } from '../triggers'
-import { GameMultiplayer } from '../models/game'
-
 import { filterGame } from '../models/utils'
-import { Redis } from 'ioredis'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { withFilter } from 'graphql-subscriptions'
+import { GAME_MULTIPLAYER } from '../triggers'
+
+import {
+  AnswerQuestionInput,
+  Context,
+  GameMultiplayer,
+  MutationResponse,
+  PlayerMultiplayer,
+  Question,
+} from '../types'
 
 type RemovePlayerInput = {
   player: {
@@ -25,8 +30,28 @@ type GameMultiPlayerSubscription = {
   gameMultiplayer: GameMultiplayer
 }
 
-export const multiplayerQueryResolvers = (redisClient: Redis) => ({
-  gameMultiplayer: async (_: unknown, __: unknown, context: Context) => {
+type GameQuestionMutationResponse = MutationResponse & {
+  question: Question
+}
+
+type GameMultiplayerMutationResponse = MutationResponse & {
+  game: GameMultiplayer | null
+}
+
+type PlayerMultiplayerMutationResponse = MutationResponse & {
+  player: PlayerMultiplayer | null
+}
+
+export const multiplayerQueryResolvers = (
+  redisClient: Redis,
+): {
+  gameMultiplayer(
+    _: unknown,
+    __: unknown,
+    context: Context,
+  ): Promise<GameMultiplayer | null>
+} => ({
+  gameMultiplayer: async (_, __, context): Promise<GameMultiplayer | null> => {
     const {
       currentUser: { playerId },
     } = context
@@ -39,12 +64,28 @@ export const multiplayerQueryResolvers = (redisClient: Redis) => ({
 export const multiplayerMutationResolvers = (
   redisClient: Redis,
   pubSub: RedisPubSub,
-) => ({
-  answerQuestionMultiplayer: async (
+): {
+  answerQuestionMultiplayer(
     _: unknown,
-    { answer: { answerId, questionId } }: AnswerQuestionInput,
+    input: AnswerQuestionInput,
     context: Context,
-  ) => {
+  ): Promise<GameQuestionMutationResponse>
+  removePlayerFromGameMultiplayer(
+    _: unknown,
+    input: RemovePlayerInput,
+    context: Context,
+  ): Promise<GameMultiplayerMutationResponse>
+  pingMultiplayer(
+    _: unknown,
+    __: unknown,
+    context: Context,
+  ): Promise<PlayerMultiplayerMutationResponse>
+} => ({
+  answerQuestionMultiplayer: async (
+    _,
+    { answer: { answerId, questionId } },
+    context,
+  ): Promise<GameQuestionMutationResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -60,14 +101,14 @@ export const multiplayerMutationResolvers = (
       question,
       code: 201,
       success: true,
-      message: 'Singleplayer game created',
+      message: 'Multiplayer game created',
     }
   },
   removePlayerFromGameMultiplayer: async (
-    _: unknown,
-    { player: { id } }: RemovePlayerInput,
-    { currentUser: { playerId } }: Context,
-  ) => {
+    _,
+    { player: { id } },
+    { currentUser: { playerId } },
+  ): Promise<GameMultiplayerMutationResponse> => {
     const game = await removePlayerFromGame(redisClient, pubSub, playerId, id)
     const filteredGame = filterGame(game)
     return {
@@ -77,7 +118,11 @@ export const multiplayerMutationResolvers = (
       message: 'Player left game created',
     }
   },
-  pingMultiplayer: async (_: unknown, __: unknown, context: Context) => {
+  pingMultiplayer: async (
+    _: unknown,
+    __: unknown,
+    context: Context,
+  ): Promise<PlayerMultiplayerMutationResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -98,7 +143,11 @@ export const multiplayerMutationResolvers = (
   },
 })
 
-export const multiplayerSubscriptionResolvers = (pubSub: RedisPubSub) => ({
+export const multiplayerSubscriptionResolvers = (
+  pubSub: RedisPubSub,
+): {
+  gameMultiplayerSubscription: { subscribe: ResolverFn }
+} => ({
   gameMultiplayerSubscription: {
     subscribe: withFilter(
       () => pubSub.asyncIterator(GAME_MULTIPLAYER),

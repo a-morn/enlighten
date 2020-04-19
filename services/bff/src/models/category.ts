@@ -1,17 +1,8 @@
-type CategoryId = 'game-of-thrones' | 'countries'
+import { Category } from '../types'
+const categories = (): Promise<Category[]> =>
+  Promise.resolve([
+    { id: 'game-of-thrones', label: 'Game of Thrones' },
+    { id: 'countries', label: 'Countries' },
+  ])
 
-type Category = {
-  id: CategoryId
-  label: string
-}
-
-const categories: Category[] = [
-  { id: 'game-of-thrones', label: 'Game of Thrones' },
-  { id: 'countries', label: 'Countries' },
-]
-
-function isCategoryId(x: string | CategoryId): x is CategoryId {
-  return x === 'game-of-thrones' || x === 'countries'
-}
-
-export { CategoryId, categories, isCategoryId }
+export { categories }
