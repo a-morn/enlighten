@@ -58,7 +58,7 @@ const getQuestionProperties = (
     case 'flag':
       return {
         type: 'image',
-        text: `What is the __${toType.label}__ of the house with the flag pictured?`,
+        text: `What is the __${toType.label}__ of the country with the flag pictured?`,
         src: el[fromType.id],
       }
   }
