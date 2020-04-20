@@ -24,6 +24,8 @@ function About() {
         src={bookcase}
         autoPlay
         muted
+        controlsList="nofullscreen"
+        playsinline
       ></video>
     </div>
   )
