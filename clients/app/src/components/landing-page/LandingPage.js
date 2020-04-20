@@ -9,9 +9,7 @@ function LandingPage() {
       <div className="w-100 inline-block">
         <div className={`${styles['landing-page__video-wrapper']}`}>
           <video
-            className={`inline-block min-w-full absolute ${
-              styles['landing-page__video']
-            }`}
+            className={`inline-block absolute ${styles['landing-page__video']}`}
             autoPlay
             loop
             muted

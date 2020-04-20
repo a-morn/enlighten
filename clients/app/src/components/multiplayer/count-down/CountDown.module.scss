@@ -2,72 +2,81 @@
 @import 'src/styles/style.scss';
 
 .countdown {
-	display: block;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	
-	font-family: 'Oswald', sans-serif;
-	font-weight: 400;
-    font-size: 50px;
+  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  font-size: 50px;
+  width: 100%;
+  height: 100%;
+
+  font-size: 50vmin;
+
+  border-radius: 0;
+
+  overflow: hidden;
+
+  transition: width, height, border-radius, font-size;
+  transition-duration: 0.2s;
+
+  &__background,
+  &__progress {
+    display: block;
     width: 100%;
     height: 100%;
-		
-    font-size: 50vmin;
-		
-    border-radius: 0;
-	
-	overflow: hidden;
-		
-	transition: width, height, border-radius, font-size;
-	transition-duration: 0.2s;
-    
-	&__background, &__progress {
-		display: block;
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		left: 0;
-		bottom: 0;
-		background: $danger;
-		opacity: 1;
-    }
-    
-    &__progress {
-		background: $danger-dark;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: $danger;
+  }
+
+  &__progress {
+    background: $danger-dark;
+    opacity: 1;
+  }
+
+  &__background {
+    background: $black;
+    opacity: 0.7;
+  }
+
+  &__digit {
+    width: 100%;
+    color: $white;
+    text-align: center;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    user-select: none;
+    &--ended {
+      animation: buzz 0.5s;
     }
 
-    &__background {
-		background: $black;
+    @keyframes buzz {
+      0% {
+        transform: rotate(0);
+      }
+
+      10%,
+      30%,
+      50%,
+      70%,
+      90% {
+        transform: rotate(6deg);
+      }
+
+      20%,
+      40%,
+      60%,
+      80% {
+        transform: rotate(-6deg);
+      }
+
+      100% {
+        transform: rotate(0);
+      }
     }
-	
-	&__digit {
-		width: 100%;
-		color: $white;
-		text-align: center;
-		mix-blend-mode: difference;
-		pointer-events: none;
-        user-select: none;
-        &--ended {
-            animation: buzz 0.5s;
-        }
-    
-        @keyframes buzz {
-            0% {
-                transform: rotate(0);
-            }
-            
-            10%, 30%, 50%, 70%, 90% {
-                transform: rotate(6deg);
-            }
-            
-            20%, 40%, 60%, 80% {
-                transform: rotate(-6deg);
-            }
-            
-            100% {
-                transform: rotate(0);
-            }
-        }
-	}
+  }
 }

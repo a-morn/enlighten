@@ -9,8 +9,8 @@
   flex-direction: column;
   min-height: 300px;
   @media (min-width: 640px) {
+    margin: 0 -1.5rem;
     overflow: hidden;
-    margin: -1.5rem;
   }
 }
 
@@ -25,7 +25,7 @@
     left: 0;
     z-index: 1;
     vertical-align: top;
-    animation: fadein 12s ease-in;
+    animation: fadein 8s ease-in;
   }
 }
 
@@ -49,8 +49,9 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  display: none;
 
-  @media (max-width: 640px) {
-    display: none;
+  @media (min-width: 640px) {
+    display: block;
   }
 }

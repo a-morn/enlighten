@@ -17,8 +17,10 @@ const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
               <li key={i}>
                 <button
                   onClick={_ => !isCurrentPlayer && onClick(id)}
-                  className={`shadow bg-gray-light hover:bg-cta hover:text-black  px-32 py-6 md:py-4 text-gray-darker block w-full ${
-                    isCurrentPlayer ? 'cursor-not-allowed' : ''
+                  className={`shadow bg-gray-light py-6 md:py-4 text-gray-darker block w-full ${
+                    isCurrentPlayer
+                      ? 'cursor-not-allowed'
+                      : 'hover:bg-cta hover:text-black'
                   }`}
                 >
                   {name} {isCurrentPlayer ? '*' : ''}{' '}

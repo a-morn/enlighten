@@ -28,4 +28,5 @@
   animation: fadein 3s;
   min-height: 184px;
   background-color: $brand;
+  max-width: calc(100% - 3rem);
 }

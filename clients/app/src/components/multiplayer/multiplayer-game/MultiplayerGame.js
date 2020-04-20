@@ -96,12 +96,13 @@ export function MultiplayerGame({ playerId, game, leaveGame }) {
             />
           )}
           <div
-            className={`flex justify-between text-lg bg-gray-lighter p-4 rounded ${
-              styles['multiplayer__scoreboard']
-            }`}
+            className={`flex justify-between text-lg bg-gray-lighter p-4 rounded flex-col sm:flex-row`}
           >
             {game.players.map(({ name, score, id }) => (
-              <div key={id} className="flex items-center text-brand-dark">
+              <div
+                key={id}
+                className="flex items-center text-brand-dark justify-between"
+              >
                 <span
                   className={`font-bold mr-4 ${
                     styles['multiplayer__scoreboard__name']
