@@ -24,6 +24,7 @@ const GAME = gql`
         text
         src
         answerId
+        answered
         alternatives {
           id
           type
@@ -75,6 +76,7 @@ const GAME_UPDATED = gql`
           text
           src
           answerId
+          answered
           alternatives {
             id
             type

@@ -54,17 +54,30 @@ export function MultiplayerGame({ game, leaveGame }) {
     }
   }, [correctAnswerId, game, playerId])
 
-  const alternativeSelected = answerId => {
-    answer({
-      variables: {
-        answer: {
-          answerId,
-          questionId: game.currentQuestion.id,
-        },
-      },
-    })
-    setSelectedAnswerId(answerId)
-  }
+  const alternativeSelected = useCallback(
+    answerId => {
+      const currentQuestionAnswered = R.pathOr(
+        null,
+        ['currentQuestion', 'answered'],
+        game,
+      )
+
+      console.log(currentQuestionAnswered)
+
+      if (!currentQuestionAnswered) {
+        answer({
+          variables: {
+            answer: {
+              answerId,
+              questionId: game.currentQuestion.id,
+            },
+          },
+        })
+        setSelectedAnswerId(answerId)
+      }
+    },
+    [game],
+  )
   const winner = game ? game.players.find(({ won }) => won) : null
   const leaveGameCallback = useCallback(() => leaveGame(), [leaveGame])
   return (

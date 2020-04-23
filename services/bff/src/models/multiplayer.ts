@@ -198,6 +198,10 @@ const answerQuestion = async (
   if (game === null) {
     throw new UserInputError(`No game for player ${playerId}`)
   }
+
+  if (game.currentQuestion?.answered) {
+    return game.currentQuestion
+  }
   const question = game.currentQuestion
   if (questionId === question?.id) {
     game.players

@@ -17,6 +17,7 @@ export default `
 		text: String!
 		src: String	
 		answerId: ID
+		answered: Boolean!
 	} 
 
 	type QuestionAlternative {
