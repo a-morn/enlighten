@@ -7,9 +7,9 @@ import {
 } from 'apollo-server-express'
 import { Express } from 'express'
 import resolvers from './resolvers/'
+import jwt from 'jsonwebtoken'
 import typeDefs from './typeDefs'
 import { Context, isUserToken } from './types'
-import jwt from 'jsonwebtoken'
 import WebSocket from 'ws'
 
 const getJWTPayloadFromAuthorizationHeader = (authHeader: string) => {
@@ -55,9 +55,8 @@ export default (app: Express, httpServer: http.Server): void => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onConnect: (req: object): Context => {
         //authorization
-        let authorization
-        authorization = (req as { headers: { authorization: string } }).headers
-          .authorization
+        const authorization = (req as { headers: { authorization: string } })
+          .headers.authorization
         const { playerId, isTempUser } = getJWTPayloadFromAuthorizationHeader(
           authorization,
         )
