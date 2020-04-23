@@ -9,7 +9,6 @@ import SingleplayerGame from './singleplayer-game'
 const GAME = gql`
   query {
     gameSingleplayer {
-      id
       categoryBackground
       lastQuestion {
         id
@@ -61,7 +60,6 @@ const GAME_UPDATED = gql`
     gameSingleplayerSubscription {
       mutation
       gameSingleplayer {
-        id
         categoryBackground
         lastQuestion {
           id
@@ -193,7 +191,7 @@ function Singleplayer() {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      {!R.path(['gameSingleplayer', 'id'], gameData) && (
+      {!R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (
         <CategoryPicker
           onClick={startGameRequest}
           setCategoryId={setCategoryId}
@@ -202,7 +200,7 @@ function Singleplayer() {
           className="p-10"
         />
       )}
-      {R.path(['gameSingleplayer', 'id'], gameData) && (
+      {R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (
         <SingleplayerGame
           playerId={playerId}
           game={gameData.gameSingleplayer}

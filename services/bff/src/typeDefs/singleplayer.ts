@@ -1,6 +1,5 @@
 export default `
     type GameSingleplayer {
-        id: ID!
         categoryId: String!
         categoryBackground: String!
         playerId: ID!

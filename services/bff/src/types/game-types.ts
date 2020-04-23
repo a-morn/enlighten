@@ -5,11 +5,11 @@ import { GameQuestion } from './question-types'
 export type Game = {
   categoryId: string
   categoryBackground: string
-  id: string
   lastQuestionId?: string
   currentQuestionId?: string
   currentQuestion?: GameQuestion
   lastQuestion?: GameQuestion
+  lastUpdated?: string
 }
 
 export type GameSingeplayer = Game & {
@@ -19,6 +19,7 @@ export type GameSingeplayer = Game & {
 }
 
 export type GameMultiplayer = Game & {
+  id: string
   players: PlayerMultiplayer[]
   questions: GameQuestion[]
   questionIndex: number
@@ -41,8 +42,7 @@ function isUserLevel(x: unknown, levels: Levels): x is keyof Levels {
 export function isGame(x: unknown): x is Game {
   return (
     isCategoryId((x as Game).categoryId) &&
-    typeof (x as Game).categoryBackground === 'string' &&
-    typeof (x as Game).id === 'string'
+    typeof (x as Game).categoryBackground === 'string'
   )
 }
 
@@ -50,7 +50,8 @@ export function isGameMultiplayer(x: unknown): x is GameMultiplayer {
   return (
     isGame(x) &&
     Array.isArray((x as GameMultiplayer).questions) &&
-    typeof (x as GameMultiplayer).questionIndex === 'number'
+    typeof (x as GameMultiplayer).questionIndex === 'number' &&
+    typeof (x as GameMultiplayer).id === 'string'
   )
   // todo add players
 }

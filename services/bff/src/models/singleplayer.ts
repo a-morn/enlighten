@@ -44,13 +44,12 @@ const getGameByPlayerId = async (
   return game
 }
 
-const updateGameByPlayerId = async (
+const updateGame = async (
   redisClient: Redis,
-  playerId: string,
   game: GameSingeplayer,
 ): Promise<string> => {
   const gameString = JSON.stringify(game)
-  return redisClient.set(`singleplayer:games:${playerId}`, gameString)
+  return redisClient.set(`singleplayer:games:${game.playerId}`, gameString)
 }
 
 const deleteGameByPlayerId = async (
@@ -90,8 +89,9 @@ const updateQuestionByPlayerId = async (
   game.currentQuestion = getQuestionById(game.currentQuestionId)
   game.currentQuestion.alternatives = shuffle(game.currentQuestion.alternatives)
   game.currentQuestion.answered = false
+  game.lastUpdated = new Date().toISOString()
 
-  updateGameByPlayerId(redisClient, playerId, game)
+  updateGame(redisClient, game)
   return game
 }
 
@@ -100,12 +100,10 @@ const createGame = async (
   playerId: string,
   categoryId: CategoryId,
 ): Promise<GameSingeplayer> => {
-  const id = '' + Math.random()
   const game = {
     playerId,
     categoryId,
     categoryBackground: backgrounds[categoryId],
-    id,
     levels: Object.entries(allQuestions[categoryId]).reduce(
       (acc, [key, value]) => ({
         ...acc,
@@ -161,7 +159,7 @@ const answerQuestion = async (
   }
 
   getQuestionById(game.currentQuestionId).answered = true
-  updateGameByPlayerId(redisClient, playerId, game)
+  updateGame(redisClient, game)
 
   pubSub.publish(GAME_SINGLEPLAYER, {
     gameSingleplayerSubscription: {
