@@ -80,6 +80,60 @@ export function MultiplayerGame({ game, leaveGame }) {
                   height={height}
                 />
               )}
+              {winner.id !== playerId && (
+                <div className={styles['multiplayer__poop-rain']}>
+                  <span
+                    style={{
+                      fontSize: '32px',
+                      left: '10vw',
+                      animationDelay: '2s',
+                      animationDuration: '8s',
+                    }}
+                  >
+                    💩
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '64px',
+                      left: '22vw',
+                      animationDelay: '1s',
+                      animationDuration: '6s',
+                    }}
+                  >
+                    💩
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '24px',
+                      left: '43vw',
+                      animationDelay: '5s',
+                      animationDuration: '4s',
+                    }}
+                  >
+                    💩
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '32px',
+                      left: '64vw',
+                      animationDelay: '2s',
+                      animationDuration: '5s',
+                    }}
+                  >
+                    💩
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '128px',
+                      left: '80vw',
+                      animationDelay: '3s',
+                      animationDuration: '6s',
+                    }}
+                  >
+                    💩
+                  </span>
+                </div>
+              )}
               <FullscreenModal
                 data-testid="winner-modal"
                 title={`${winner.id === playerId ? 'You' : winner.name} won! ${

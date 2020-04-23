@@ -11,7 +11,7 @@
 .multiplayer__scoreboard__score-wrapper__score {
   position: relative;
   transition: top;
-	transition-duration: 1s;
+  transition-duration: 1s;
 }
 
 .multiplayer__scoreboard__score-wrapper__score:nth-child(1) {
@@ -31,5 +31,23 @@
   }
   100% {
     top: -9em;
+  }
+}
+
+.multiplayer__poop-rain {
+  z-index: 100;
+  span {
+    position: absolute;
+    top: -200px;
+    animation: pop-rain linear infinite;
+  }
+}
+
+@keyframes pop-rain {
+  from {
+    top: -200px;
+  }
+  to {
+    top: 100vh;
   }
 }
