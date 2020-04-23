@@ -1,3 +1,5 @@
+import { UserToken } from './authentication-types'
+
 export type MutationResponse = {
   code: number
   success: boolean
@@ -5,9 +7,7 @@ export type MutationResponse = {
 }
 
 export type Context = {
-  currentUser: {
-    playerId: string
-  }
+  currentUser: UserToken
 }
 
 export type AnswerQuestionInput = {

@@ -25,7 +25,7 @@ function About() {
         autoPlay
         muted
         controlsList="nofullscreen"
-        playsinline
+        playsInline
       ></video>
     </div>
   )

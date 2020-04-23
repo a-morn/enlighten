@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { useParams, withRouter } from 'react-router-dom'
+import { store } from '../../hooks/context/store.js'
 import { CategoryPicker } from '../category-picker'
 import { LobbyComponent } from '../lobby'
 
@@ -44,9 +45,12 @@ export const GAME_SUBSCRIPTION = gql`
   }
 `
 
-export function LobbyLogin({ history, playerId }) {
+export function LobbyLogin({ history }) {
   const [categoryId, setCategoryId] = useState()
   const { categoryId: categoryFromParams } = useParams()
+  const {
+    state: { playerId },
+  } = useContext(store)
 
   const [joinLobby] = useMutation(JOIN_LOBBY)
 

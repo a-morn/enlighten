@@ -1,9 +1,10 @@
 import { useMutation } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import * as R from 'ramda'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
 import Confetti from 'react-confetti'
 import correct from '../../../assets/correct.wav'
+import { store } from '../../../hooks/context/store.js'
 import FullscreenModal from '../../fullscreen-modal'
 import Question from '../../question'
 import styles from './MultiplayerGame.module.scss'
@@ -19,7 +20,10 @@ export const ANSWER = gql`
 const width = window.innerWidth
 const height = window.innerHeight
 
-export function MultiplayerGame({ playerId, game, leaveGame }) {
+export function MultiplayerGame({ game, leaveGame }) {
+  const {
+    state: { playerId },
+  } = useContext(store)
   const [selectedAnswerId, setSelectedAnswerId] = useState()
   const [isLoading] = useState(false)
 

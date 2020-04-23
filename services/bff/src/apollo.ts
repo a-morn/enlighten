@@ -1,10 +1,27 @@
 import * as http from 'http'
 import { makeExecutableSchema } from 'apollo-server'
-import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
+import {
+  ApolloServer,
+  ApolloServerExpressConfig,
+  AuthenticationError,
+} from 'apollo-server-express'
 import { Express } from 'express'
 import resolvers from './resolvers/'
 import typeDefs from './typeDefs'
-import { Context } from './types'
+import { Context, isUserToken } from './types'
+import jwt from 'jsonwebtoken'
+import WebSocket from 'ws'
+
+const getJWTPayloadFromAuthorizationHeader = (authHeader: string) => {
+  const token = authHeader.split('Bearer ')[1]
+
+  const decoded = jwt.verify(token, process.env.SECRET || 's3cr37')
+
+  if (typeof decoded === 'string' || !isUserToken(decoded)) {
+    throw new AuthenticationError('Incorrect token')
+  }
+  return decoded
+}
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -19,12 +36,15 @@ export default (app: Express, httpServer: http.Server): void => {
       req,
       connection,
     }: {
-      req: { headers: { authorization: string } }
+      req?: { headers: { authorization: string } }
       connection: { context: unknown }
     }) => {
       if (req) {
-        const playerId = req.headers.authorization
-        return { currentUser: { playerId } }
+        const { playerId, isTempUser } = getJWTPayloadFromAuthorizationHeader(
+          req.headers.authorization,
+        )
+
+        return { currentUser: { playerId, isTempUser } }
       } else if (connection) {
         return connection.context
       } else {
@@ -33,8 +53,15 @@ export default (app: Express, httpServer: http.Server): void => {
     },
     subscriptions: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onConnect: ({ playerId }: any): Context => {
-        return { currentUser: { playerId } }
+      onConnect: (req: object): Context => {
+        //authorization
+        let authorization
+        authorization = (req as { headers: { authorization: string } }).headers
+          .authorization
+        const { playerId, isTempUser } = getJWTPayloadFromAuthorizationHeader(
+          authorization,
+        )
+        return { currentUser: { playerId, isTempUser } }
       },
     },
   } as ApolloServerExpressConfig)

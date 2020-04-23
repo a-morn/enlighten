@@ -85,11 +85,14 @@ const GAME_UPDATED = gql`
   }
 `
 
-function Singleplayer({ playerId }) {
+function Singleplayer() {
   const [isStartingGame, setIsStartingGame] = useState()
   const [categoryId, setCategoryId] = useState()
   const globalState = useContext(store)
   const { dispatch } = globalState
+  const {
+    state: { playerId },
+  } = useContext(store)
 
   const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
     GAME,

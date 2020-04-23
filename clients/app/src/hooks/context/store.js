@@ -9,8 +9,30 @@ const StateProvider = ({ children }) => {
     switch (action.type) {
       case 'category-background-updated': {
         const newState = {
+          ...state,
           categoryBackground: action.url,
-        } // do something with the action
+        }
+        return newState
+      }
+      case 'player-id-updated': {
+        const newState = {
+          ...state,
+          playerId: action.playerId,
+        }
+        return newState
+      }
+      case 'token-updated': {
+        const newState = {
+          ...state,
+          token: action.token,
+        }
+        return newState
+      }
+      case 'has-client-updated': {
+        const newState = {
+          ...state,
+          hasClient: action.hasClient,
+        }
         return newState
       }
       default:
