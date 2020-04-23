@@ -21,7 +21,7 @@ function App() {
             <SessionProvider>
               <Header />
               <Body>
-                <section className="flex h-full justify-center">
+                <section className="flex h-full justify-center items-center">
                   <Switch>
                     <Route exact path="/(|index.html|landingpage)/">
                       <LandingPage />
