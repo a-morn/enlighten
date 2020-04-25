@@ -3,33 +3,11 @@ import { UserInputError } from 'apollo-server'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
-
-import countries from '../generated-data/countries.json'
-import got from '../generated-data/game-of-thrones.json'
-import musicTheory from '../generated-data/music-theory.json'
 import { GAME_SINGLEPLAYER } from '../triggers'
-import {
-  CategoryId,
-  GameSingeplayer,
-  QuestionObject,
-  isGameSingleplayer,
-} from '../types'
-import { getQuestionById } from './questions'
+import { CategoryId, GameSingeplayer, isGameSingleplayer } from '../types'
+import { getQuestionById, getQuestionsByCategory } from './questions'
 import { filterGame } from './utils'
-
-const allQuestions: {
-  [key in CategoryId]: QuestionObject
-} = {
-  'game-of-thrones': got as QuestionObject,
-  countries: countries as QuestionObject,
-  'music-theory': musicTheory as QuestionObject,
-}
-
-const backgrounds = {
-  'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
-  countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
-  'music-theory': `${process.env.ASSETS_URL}/music-theory/abandoned-art-school.jpg`,
-}
+import { getCategory } from './category'
 
 const getGameByPlayerId = async (
   redisClient: Redis,
@@ -103,11 +81,12 @@ const createGame = async (
   playerId: string,
   categoryId: CategoryId,
 ): Promise<GameSingeplayer> => {
+  const category = await getCategory(categoryId)
   const game = {
     playerId,
     categoryId,
-    categoryBackground: backgrounds[categoryId],
-    levels: Object.entries(allQuestions[categoryId]).reduce(
+    categoryBackground: category.background,
+    levels: Object.entries(getQuestionsByCategory(category.id)).reduce(
       (acc, [key, value]) => ({
         ...acc,
         [key]: value.questions.map(({ id: questionId }) => ({

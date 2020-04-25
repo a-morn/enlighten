@@ -3,10 +3,6 @@ import { UserInputError } from 'apollo-server'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
-//import periodicTable from '../data/questions/periodic-table';
-import countries from '../generated-data/countries.json'
-import got from '../generated-data/game-of-thrones.json'
-import musicTheory from '../generated-data/music-theory.json'
 import { GAME_MULTIPLAYER } from '../triggers'
 import {
   CategoryId,
@@ -17,20 +13,9 @@ import {
   Question,
   isGameMultiplayer,
 } from '../types'
-const allQuestions = {
-  'game-of-thrones': got,
-  //'periodic-table': periodicTable,
-  countries,
-  'music-theory': musicTheory,
-}
-
-const backgrounds = {
-  'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
-  countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
-  'music-theory': `${process.env.ASSETS_URL}/music-theory/abandoned-art-school.jpg`,
-}
-
+import { getQuestionsByCategory } from './questions'
 import { filterGame } from './utils'
+import { getCategory } from './category'
 
 const getGame = async (
   redisClient: Redis,
@@ -130,9 +115,10 @@ const createGame = async (
   players: PlayerLobby[],
   categoryId: CategoryId,
 ): Promise<GameMultiplayer> => {
+  const category = await getCategory(categoryId)
   const game = {
     categoryId,
-    categoryBackground: backgrounds[categoryId],
+    categoryBackground: category.background,
     id: '' + Math.random(),
     players: players.map(
       player =>
@@ -145,7 +131,7 @@ const createGame = async (
         } as PlayerMultiplayer),
     ),
     questions: shuffle(
-      Object.values(allQuestions[categoryId])
+      Object.values(getQuestionsByCategory(categoryId))
         .reduce((acc: Question[], { questions }) => acc.concat(questions), [])
         .map(q => ({
           answered: false,

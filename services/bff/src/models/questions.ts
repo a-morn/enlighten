@@ -1,11 +1,12 @@
 import countries from '../generated-data/countries.json'
 import got from '../generated-data/game-of-thrones.json'
 import musicTheory from '../generated-data/music-theory.json'
-import { GameQuestion, Question } from '../types/question-types'
-const allQuestions = {
-  'game-of-thrones': got,
+import { GameQuestion, Question, CategoryId, QuestionObject } from '../types'
+
+const allQuestions: { [key in CategoryId]: QuestionObject } = {
+  'game-of-thrones': got as QuestionObject,
   countries,
-  'music-theory': musicTheory,
+  'music-theory': musicTheory as QuestionObject,
 }
 
 const allQuestionsArray = Object.values(allQuestions)
@@ -14,7 +15,7 @@ const allQuestionsArray = Object.values(allQuestions)
       acc.concat(
         Object.values(levels).reduce(
           (acc2, { questions }) => acc2.concat(questions),
-          [],
+          [] as Question[],
         ),
       ),
     [],
@@ -38,4 +39,7 @@ const getQuestionById = (questionId: string): GameQuestion => {
   }
 }
 
-export { getQuestionById }
+const getQuestionsByCategory = (categoryId: CategoryId): QuestionObject =>
+  allQuestions[categoryId]
+
+export { getQuestionById, getQuestionsByCategory }
