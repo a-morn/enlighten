@@ -63,6 +63,8 @@ export function WinScreen({ playerWon, winnerName, leaveGameCallback }) {
             💩
           </span>
           <span
+            role="img"
+            aria-label="poop"
             style={{
               fontSize: '54px',
               left: '80vw',
