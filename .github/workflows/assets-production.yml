@@ -1,50 +1,34 @@
-name: clients/app Production Build
+name: clients/assets Production Build
 on:
   pull_request:
   push:
     branches:
       - master
     paths:
-      - "clients/app/**"
-      - ".github/workflows/clients-app-production.yml"
+      - "assets/**"
+      - ".github/workflows/clients-assets-production.yml"
 jobs:
   deploy-client:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [12.x]
 
     steps:
-      - uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: NPM Install (Client)
-        run: |
-          npm install
-        working-directory: clients/app
-      - name: Cypress run
-        uses: cypress-io/github-action@v1
-        with:
-          build: npm run build
-          start: npm start
-          wait-on: http://localhost:8000
-          working-directory: clients/app
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
           args: --acl public-read --delete
         env:
-          AWS_S3_BUCKET: "enlighten.rip"
+          AWS_S3_BUCKET: assets.enlighten.rip
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          SOURCE_DIR: "clients/app/build"
+          SOURCE_DIR: "clients/assets/public"
       - name: Invalidate cache
         uses: awact/cloudfront-action@0.1.2
         env:
-          DISTRIBUTION_ID: ELHX0YJVBLA1S
+          DISTRIBUTION_UD: E3VHFUB65O18V2
           PATHS: "/*"
           AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
