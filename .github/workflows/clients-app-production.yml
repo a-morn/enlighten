@@ -9,7 +9,7 @@ on:
       - ".github/workflows/clients-app-production.yml"
 jobs:
   deploy-client:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     strategy:
       matrix:
         node-version: [12.x]
@@ -24,10 +24,13 @@ jobs:
         run: |
           npm install
         working-directory: clients/app
-      - name: Production Build
-        run: |
-          npm run build
-        working-directory: clients/app
+      - name: Cypress run
+        uses: cypress-io/github-action@v1
+        with:
+          build: npm run build
+          start: npm start
+          wait-on: http://localhost:8000
+          working-directory: clients/app
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         with:

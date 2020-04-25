@@ -1,0 +1,45 @@
+{
+  "categoryBackground": "http://localhost:8080/game-of-thrones/got-tapestry.jpg",
+  "lastQuestion": null,
+  "currentQuestion": {
+    "id": "204332ec-9277-41ed-a430-c0fbcc3ec2b9",
+    "type": "text",
+    "text": "Who is the __lord (298 AC, start of ASoIaF)__ of the house with the name _Arryn_? ",
+    "src": null,
+    "tones": null,
+    "answerId": "4bb67f74-dccf-4037-83a1-35c0bdc0f074",
+    "answered": true,
+    "alternatives": [
+      {
+        "id": "4bb67f74-dccf-4037-83a1-35c0bdc0f074",
+        "type": "text",
+        "text": "Eddard Stark",
+        "src": null,
+        "__typename": "QuestionAlternative"
+      },
+      {
+        "id": "aca96cc3-0faf-4b59-8f07-bf1ee570e0ae",
+        "type": "text",
+        "text": "Hoster Tully",
+        "src": null,
+        "__typename": "QuestionAlternative"
+      },
+      {
+        "id": "b2d6db59-398e-4d2c-8210-8ab7afe39199",
+        "type": "text",
+        "text": "Robert Arryn",
+        "src": null,
+        "__typename": "QuestionAlternative"
+      },
+      {
+        "id": "e674a73b-bc75-469e-af38-e6c43ed0f0b5",
+        "type": "text",
+        "text": "Tywin Lannister",
+        "src": null,
+        "__typename": "QuestionAlternative"
+      }
+    ],
+    "__typename": "Question"
+  },
+  "__typename": "GameSingleplayer"
+}

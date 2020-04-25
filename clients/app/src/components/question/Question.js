@@ -63,7 +63,7 @@ const Question = React.memo(
         </div>
         <ul className="question__alternatives shadow-lg">
           {alternatives.map((alt, i) => (
-            <li key={i}>
+            <li key={i} data-testid={`alternative-${i}-wrapper`}>
               <Alternative
                 alternative={alt}
                 onClick={() => onAlternativeSelected(alt.id)}

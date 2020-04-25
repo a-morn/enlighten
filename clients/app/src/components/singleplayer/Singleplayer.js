@@ -7,7 +7,7 @@ import { CategoryPicker } from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
 
 const GAME = gql`
-  query {
+  query GetGame {
     gameSingleplayer {
       categoryBackground
       lastQuestion {
@@ -34,7 +34,7 @@ const GAME = gql`
 `
 
 const ANSWER = gql`
-  mutation($answer: AnswerQuestionSingleplayerInput!) {
+  mutation AnswerQuestion($answer: AnswerQuestionSingleplayerInput!) {
     answerQuestionSingleplayer(answer: $answer) {
       success
     }
@@ -42,7 +42,7 @@ const ANSWER = gql`
 `
 
 const CREATE_GAME_SINGLEPLAYER = gql`
-  mutation($game: CreateGameSingleplayerInput!) {
+  mutation CreateGame($game: CreateGameSingleplayerInput!) {
     createGameSingleplayer(game: $game) {
       success
     }
@@ -50,7 +50,7 @@ const CREATE_GAME_SINGLEPLAYER = gql`
 `
 
 const DELETE_SINGLEPLAYER_GAME = gql`
-  mutation {
+  mutation DeleteGame {
     deleteGameSingleplayer {
       success
     }
@@ -58,7 +58,7 @@ const DELETE_SINGLEPLAYER_GAME = gql`
 `
 
 const GAME_UPDATED = gql`
-  subscription {
+  subscription GameUpdated {
     gameSingleplayerSubscription {
       mutation
       gameSingleplayer {
@@ -112,6 +112,7 @@ function Singleplayer() {
     gameSubscribeToMore({
       document: GAME_UPDATED,
       updateQuery: (prev, { subscriptionData }) => {
+        debugger
         if (!subscriptionData.data) {
           return prev
         } else {

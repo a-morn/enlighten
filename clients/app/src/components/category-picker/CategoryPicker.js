@@ -4,7 +4,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import CategorySelect from './category-select'
 
 export const GET_CATEGORIES = gql`
-  query {
+  query Categories {
     categories {
       id
       label
@@ -70,6 +70,7 @@ export function CategoryPicker({
             selected={categoryId}
           />
           <button
+            data-testid="start-game-button"
             disabled={disabled}
             onClick={() => onClick(name)}
             className={buttonClasses}

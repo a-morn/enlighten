@@ -19,6 +19,7 @@ function Header({ history }) {
         </Link>
         <div className="block lg:hidden">
           <button
+            data-testid="open-menu-button"
             onClick={onClick}
             className="flex items-center px-3 py-2 border rounded text-brand border-brand-light hover:text-brand-light hover:border-white"
           >
@@ -39,12 +40,14 @@ function Header({ history }) {
         >
           <div className="text-sm lg:flex-grow">
             <Link
+              data-testid="singleplayer-menu-option"
               to="/singleplayer"
               className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4"
             >
               Singleplayer
             </Link>
             <Link
+              data-testid="multiplayer-menu-option"
               to="/lobby"
               className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4"
             >
@@ -53,6 +56,7 @@ function Header({ history }) {
           </div>
           <div>
             <Link
+              data-testid="about-menu-option"
               to="/about"
               href="#"
               className="inline-block text-sm px-4 py-2 leading-none border rounded text-brand border-brand hover:border-transparent hover:text-white hover:bg-brand mt-4 lg:mt-0"

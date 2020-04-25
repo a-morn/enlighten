@@ -1,3 +1,4 @@
+import 'whatwg-fetch' // for Cypress
 import 'reset-css'
 import './styles/tailwind.css'
 import React from 'react'
