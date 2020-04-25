@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - "assets/**"
+      - "assets/public/**"
       - ".github/workflows/clients-assets-production.yml"
 jobs:
   deploy-client:
