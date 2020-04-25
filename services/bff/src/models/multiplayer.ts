@@ -6,6 +6,7 @@ import shuffle from 'shuffle-array'
 //import periodicTable from '../data/questions/periodic-table';
 import countries from '../generated-data/countries.json'
 import got from '../generated-data/game-of-thrones.json'
+import musicTheory from '../generated-data/music-theory.json'
 import { GAME_MULTIPLAYER } from '../triggers'
 import {
   CategoryId,
@@ -20,11 +21,13 @@ const allQuestions = {
   'game-of-thrones': got,
   //'periodic-table': periodicTable,
   countries,
+  'music-theory': musicTheory,
 }
 
 const backgrounds = {
   'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
   countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
+  'music-theory': `${process.env.ASSETS_URL}/music-theory/abandoned-art-school.jpg`,
 }
 
 import { filterGame } from './utils'

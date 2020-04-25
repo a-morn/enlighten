@@ -76,7 +76,7 @@ export function MultiplayerGame({ game, leaveGame }) {
         setSelectedAnswerId(answerId)
       }
     },
-    [game],
+    [answer, game],
   )
   const winner = game ? game.players.find(({ won }) => won) : null
   const leaveGameCallback = useCallback(() => leaveGame(), [leaveGame])

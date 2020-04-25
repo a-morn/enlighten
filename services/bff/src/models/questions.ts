@@ -1,9 +1,11 @@
 import countries from '../generated-data/countries.json'
 import got from '../generated-data/game-of-thrones.json'
+import musicTheory from '../generated-data/music-theory.json'
 import { GameQuestion, Question } from '../types/question-types'
 const allQuestions = {
   'game-of-thrones': got,
   countries,
+  'music-theory': musicTheory,
 }
 
 const allQuestionsArray = Object.values(allQuestions)

@@ -26,6 +26,10 @@ export type Question = {
       type: 'image'
       src: string
     }
+  | {
+      type: 'tones'
+      tones: string[]
+    }
 )
 
 export type GameQuestion = Question & {

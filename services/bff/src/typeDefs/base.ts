@@ -16,6 +16,7 @@ export default `
 		alternatives: [QuestionAlternative!]
 		text: String!
 		src: String	
+		tones: [String]
 		answerId: ID
 		answered: Boolean!
 	} 

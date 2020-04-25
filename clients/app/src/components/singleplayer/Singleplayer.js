@@ -19,7 +19,9 @@ const GAME = gql`
         type
         text
         src
+        tones
         answerId
+        answered
         alternatives {
           id
           type
@@ -70,7 +72,9 @@ const GAME_UPDATED = gql`
           type
           text
           src
+          tones
           answerId
+          answered
           alternatives {
             id
             type

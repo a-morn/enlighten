@@ -7,7 +7,7 @@ import {
   QuestionEntityType,
   QuestionObject,
   QuestionDirection,
-} from '../src/models/question'
+} from '../src/types/question-types'
 
 type GoTHouse = {
   name: string

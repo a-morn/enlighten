@@ -28,7 +28,8 @@
     "react-scripts": "^3.4.1",
     "react-use-websocket": "^0.9.8",
     "reset-css": "^4.0.1",
-    "subscriptions-transport-ws": "^0.9.16"
+    "subscriptions-transport-ws": "^0.9.16",
+    "tone": "^13.8.25"
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",

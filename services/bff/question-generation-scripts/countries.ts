@@ -8,7 +8,7 @@ import {
   QuestionEntityType,
   QuestionObject,
   QuestionDirection,
-} from '../src/models/question'
+} from '../src/types/question-types'
 
 const COUNTRIES = Object.entries(countries).map(([key, value]) => ({
   ...value,

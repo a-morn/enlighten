@@ -6,6 +6,7 @@ import shuffle from 'shuffle-array'
 
 import countries from '../generated-data/countries.json'
 import got from '../generated-data/game-of-thrones.json'
+import musicTheory from '../generated-data/music-theory.json'
 import { GAME_SINGLEPLAYER } from '../triggers'
 import {
   CategoryId,
@@ -21,11 +22,13 @@ const allQuestions: {
 } = {
   'game-of-thrones': got as QuestionObject,
   countries: countries as QuestionObject,
+  'music-theory': musicTheory as QuestionObject,
 }
 
-const backgrounds: { [key: string]: string } = {
+const backgrounds = {
   'game-of-thrones': `${process.env.ASSETS_URL}/game-of-thrones/got-tapestry.jpg`,
   countries: `${process.env.ASSETS_URL}/countries/world-map.jfif`,
+  'music-theory': `${process.env.ASSETS_URL}/music-theory/abandoned-art-school.jpg`,
 }
 
 const getGameByPlayerId = async (
