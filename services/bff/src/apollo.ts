@@ -6,13 +6,14 @@ import {
   AuthenticationError,
 } from 'apollo-server-express'
 import { Express } from 'express'
-import resolvers from './resolvers/'
 import jwt from 'jsonwebtoken'
+import resolvers from './resolvers/'
 import typeDefs from './typeDefs'
-import { Context, isUserToken } from './types'
-import WebSocket from 'ws'
+import { Context, isUserToken, UserToken } from './types'
 
-const getJWTPayloadFromAuthorizationHeader = (authHeader: string) => {
+const getJWTPayloadFromAuthorizationHeader = (
+  authHeader: string,
+): UserToken => {
   const token = authHeader.split('Bearer ')[1]
 
   const decoded = jwt.verify(token, process.env.SECRET || 's3cr37')

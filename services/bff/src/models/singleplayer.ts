@@ -5,9 +5,9 @@ import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
 import { GAME_SINGLEPLAYER } from '../triggers'
 import { CategoryId, GameSingeplayer, isGameSingleplayer } from '../types'
+import { getCategory } from './category'
 import { getQuestionById, getQuestionsByCategory } from './questions'
 import { filterGame } from './utils'
-import { getCategory } from './category'
 
 const getGameByPlayerId = async (
   redisClient: Redis,

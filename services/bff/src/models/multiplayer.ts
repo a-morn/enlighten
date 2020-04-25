@@ -13,9 +13,9 @@ import {
   Question,
   isGameMultiplayer,
 } from '../types'
+import { getCategory } from './category'
 import { getQuestionsByCategory } from './questions'
 import { filterGame } from './utils'
-import { getCategory } from './category'
 
 const getGame = async (
   redisClient: Redis,
