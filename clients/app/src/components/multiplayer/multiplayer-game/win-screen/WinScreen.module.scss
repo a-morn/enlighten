@@ -1,0 +1,18 @@
+.win-screen__poop-rain {
+  overflow: hidden;
+  z-index: 100;
+  span {
+    position: absolute;
+    top: -200px;
+    animation: pop-rain linear infinite;
+  }
+}
+
+@keyframes pop-rain {
+  from {
+    top: -200px;
+  }
+  to {
+    top: 100vh;
+  }
+}
