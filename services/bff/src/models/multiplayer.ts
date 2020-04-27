@@ -119,6 +119,7 @@ const createGame = async (
   const game = {
     categoryId,
     categoryBackground: category.background,
+    categoryBackgroundBase64: category.backgroundBase64,
     id: '' + Math.random(),
     players: players.map(
       player =>

@@ -10,7 +10,7 @@ const StateProvider = ({ children }) => {
       case 'category-background-updated': {
         const newState = {
           ...state,
-          categoryBackground: action.url,
+          background: action.background,
         }
         return newState
       }

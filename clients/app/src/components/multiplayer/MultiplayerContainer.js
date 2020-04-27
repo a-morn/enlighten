@@ -104,8 +104,20 @@ function Multiplayer({ history }) {
 
   useEffect(() => {
     const url = R.pathOr(null, ['gameMultiplayer', 'categoryBackground'], data)
-    dispatch({ type: 'category-background-updated', url })
-    return () => dispatch({ type: 'category-background-updated', url: null })
+    const base64 = R.pathOr(
+      null,
+      ['gameMultiplayer', 'categoryBackgroundBase64'],
+      data,
+    )
+    dispatch({
+      type: 'category-background-updated',
+      background: { url, base64 },
+    })
+    return () =>
+      dispatch({
+        type: 'category-background-updated',
+        background: { url: null, base64: null },
+      })
   }, [data, dispatch])
 
   const [correctAnswerId, setCorrectAnswerId] = useState()

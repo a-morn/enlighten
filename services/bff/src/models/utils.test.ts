@@ -9,6 +9,7 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
   ({
     questions: [],
     categoryBackground: faker.image.imageUrl(),
+    categoryBackgroundBase64: faker.random.alphaNumeric(),
     categoryId: faker.random.uuid(),
     id: faker.random.uuid(),
     players: [],

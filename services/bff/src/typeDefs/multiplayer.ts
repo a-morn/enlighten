@@ -11,6 +11,7 @@ export default `
         id: ID!
         categoryId: String!
         categoryBackground: String!
+        categoryBackgroundBase64: String!
         players: [PlayerMultiplayer]
         currentQuestion: Question
         lastQuestion: Question

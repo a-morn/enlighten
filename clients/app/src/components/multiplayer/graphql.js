@@ -5,6 +5,7 @@ const GAME = gql`
     gameMultiplayer {
       id
       categoryBackground
+      categoryBackgroundBase64
       players {
         id
         score
@@ -58,6 +59,7 @@ const GAME_UPDATED = gql`
       gameMultiplayer {
         id
         categoryBackground
+        categoryBackgroundBase64
         players {
           id
           score

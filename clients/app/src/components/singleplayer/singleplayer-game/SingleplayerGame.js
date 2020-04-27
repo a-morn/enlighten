@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import Question from '../../question'
 
 function SingleplayerGame({
@@ -9,6 +9,11 @@ function SingleplayerGame({
   correctAnswerId,
   answer,
 }) {
+  const [endingGame, setEndingGame] = useState(false)
+  const endGameCallback = useCallback(() => {
+    setEndingGame(true)
+    endGame()
+  }, [endGame])
   return (
     <>
       <Question
@@ -21,8 +26,11 @@ function SingleplayerGame({
       />
       <button
         data-testid="end-game-button"
-        className="bg-danger-dark hover:bg-danger text-white rounded px-4 mt-10 shadow-lg p-4"
-        onClick={endGame}
+        className={`bg-danger-dark hover:bg-danger text-white rounded px-4 mt-10 shadow-lg p-4 ${
+          endingGame ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
+        onClick={endGameCallback}
+        disabled={endingGame}
       >
         End game
       </button>

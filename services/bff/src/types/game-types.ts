@@ -5,6 +5,7 @@ import { GameQuestion } from './question-types'
 export type Game = {
   categoryId: string
   categoryBackground: string
+  categoryBackgroundBase64: string
   lastQuestionId?: string
   currentQuestionId?: string
   currentQuestion?: GameQuestion

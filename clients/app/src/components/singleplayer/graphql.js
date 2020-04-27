@@ -4,6 +4,7 @@ const GAME = gql`
   query GetGame {
     gameSingleplayer {
       categoryBackground
+      categoryBackgroundBase64
       lastQuestion {
         id
         answerId
@@ -57,6 +58,7 @@ const GAME_UPDATED = gql`
       mutation
       gameSingleplayer {
         categoryBackground
+        categoryBackgroundBase64
         lastQuestion {
           id
           answerId
