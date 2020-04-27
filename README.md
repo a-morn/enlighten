@@ -26,7 +26,7 @@ This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase
 
 - Start Redis
 - `cd services/bff && npm install && npm run build:dev && npm run start:develop`
-- `cd services/worker && npm install &`
+- `cd services/worker && npm install && npm start:dev`
 - `cd clients/assets && npm install && npm start`
 - `cd clients/app && npm install && npm start`
 - Direct you browser to localhost:8000
