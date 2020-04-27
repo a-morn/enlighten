@@ -125,14 +125,14 @@ const answerQuestion = async (
     throw new UserInputError('No question to be answered')
   }
 
-  const currentQuestion = game.levels[game.userLevel].find(
+  const question = game.levels[game.userLevel].find(
     ({ id }) => id === game.currentQuestionId,
   )
 
-  if (isUndefined(currentQuestion)) {
+  if (isUndefined(question)) {
     throw new UserInputError('Current question did not exist')
   }
-  currentQuestion.record += answerId === currentQuestion.answerId ? 1 : -1
+  question.record += answerId === question.answerId ? 1 : -1
 
   if (game.levels[game.userLevel].every(q => q.record >= 2)) {
     game.userLevel++
@@ -140,7 +140,12 @@ const answerQuestion = async (
     game.userLevel--
   }
 
-  getQuestionById(game.currentQuestionId).answered = true
+  // todo: bad code smell
+  if (game.currentQuestion) {
+    game.currentQuestion.answered = true
+  } else {
+    throw new Error("Current question didn't exist... 🤔")
+  }
   updateGame(redisClient, game)
 
   pubSub.publish(GAME_SINGLEPLAYER, {

@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useEffect } from 'react'
+import React, { Fragment, useRef, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { DuoSynth } from 'tone'
 import Alternative from './alternative'
@@ -49,7 +49,7 @@ const questionHeading = (type, src, text, tones, synth) => {
 
 const Question = React.memo(
   ({
-    question: { type, alternatives, text, src, tones },
+    question: { id, type, alternatives, text, src, tones, answered },
     onAlternativeSelected,
     selectedAnswerId,
     correctAnswerId,
@@ -61,8 +61,20 @@ const Question = React.memo(
     useEffect(() => {
       synth.current = new DuoSynth().toMaster()
     }, [])
+
+    useEffect(() => {
+      if (answered) {
+      } else {
+      }
+    }, [answered])
     return (
-      <div className={`${className}`}>
+      <div
+        className={`${className} transition-opacity ease-in-out ${
+          answered
+            ? 'opacity-0 delay-300 duration-1000'
+            : 'opacity-100 duration-500'
+        }`}
+      >
         <div className="flex flex-col items-center bg-gray-lighter text-black my-4 p-4 rounded">
           {questionHeading(type, src, text, tones, synth)}
         </div>
