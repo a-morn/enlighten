@@ -3,14 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "serve": "^11.3.0"
   },
-  "devDependencies": {
-    "server": "^1.0.27"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx serve public -l 8080"
   },
   "keywords": [],
