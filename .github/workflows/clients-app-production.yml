@@ -36,7 +36,7 @@ jobs:
         working-directory: clients/app
       - name: Build
         run: |
-          npm build
+          npm run build
         working-directory: clients/app
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1

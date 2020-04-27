@@ -1,4 +1,4 @@
-name: clients/assets Production Build
+name: assets Production Build
 on:
   pull_request:
   push:
@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - "assets/public/**"
-      - ".github/workflows/clients-assets-production.yml"
+      - ".github/workflows/assets-production.yml"
 jobs:
   deploy-client:
     runs-on: ubuntu-latest
@@ -15,6 +15,7 @@ jobs:
         node-version: [12.x]
 
     steps:
+      - uses: actions/checkout@v1
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
@@ -24,11 +25,11 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          SOURCE_DIR: "clients/assets/public"
+          SOURCE_DIR: "assets/public"
       - name: Invalidate cache
         uses: awact/cloudfront-action@0.1.2
         env:
-          DISTRIBUTION_UD: E3VHFUB65O18V2
+          DISTRIBUTION_ID: E3VHFUB65O18V2
           PATHS: "/*"
           AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

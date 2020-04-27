@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useEffect, useState } from 'react'
+import React, { Fragment, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { DuoSynth } from 'tone'
 import Alternative from './alternative'
@@ -49,7 +49,7 @@ const questionHeading = (type, src, text, tones, synth) => {
 
 const Question = React.memo(
   ({
-    question: { id, type, alternatives, text, src, tones, answered },
+    question: { type, alternatives, text, src, tones, answered },
     onAlternativeSelected,
     selectedAnswerId,
     correctAnswerId,
