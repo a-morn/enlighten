@@ -138,7 +138,6 @@ function Multiplayer({ history }) {
         ? data.gameMultiplayer.players.find(({ won }) => won)
         : null
       setPlayerWon(winner && winner.id === playerId)
-      console.log(winner, playerId)
       setOtherPlayerWon(winner && winner.id !== playerId)
       setOtherPlayerName(
         data.gameMultiplayer.players.find(({ id }) => id !== playerId).name,

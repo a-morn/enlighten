@@ -1,3 +1,5 @@
+@import 'src/styles/style.scss';
+
 .scoreboard__score-wrapper {
   width: 2em;
   height: 2em;
@@ -6,6 +8,10 @@
   display: flex;
   flex-direction: row;
   font-size: 2em;
+}
+
+.scoreboard__score-wrapper--scored {
+  animation: disco 2s infinite;
 }
 
 .scoreboard__score-wrapper__score {
@@ -31,5 +37,26 @@
   }
   100% {
     top: -9em;
+  }
+}
+
+@keyframes disco {
+  0% {
+    background-color: $brand;
+  }
+  20% {
+    background-color: $info;
+  }
+  40% {
+    background-color: $cta;
+  }
+  60% {
+    background-color: $warning;
+  }
+  80% {
+    background-color: $success;
+  }
+  100% {
+    background-color: $danger;
   }
 }

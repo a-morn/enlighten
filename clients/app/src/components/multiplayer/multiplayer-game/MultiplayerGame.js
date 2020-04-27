@@ -1,7 +1,7 @@
 import React from 'react'
 import FullscreenModal from '../../fullscreen-modal'
 import Question from '../../question'
-import { Scoreboard } from './scoreboard'
+import { Scoreboards } from './scoreboards'
 import { WinScreen } from './win-screen'
 
 export function MultiplayerGame({
@@ -39,7 +39,7 @@ export function MultiplayerGame({
   } else {
     return (
       <>
-        <Scoreboard players={players} />
+        <Scoreboards players={players} />
         <Question
           disabled={isLoading}
           question={currentQuestion}

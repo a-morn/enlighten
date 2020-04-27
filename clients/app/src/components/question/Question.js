@@ -62,11 +62,6 @@ const Question = React.memo(
       synth.current = new DuoSynth().toMaster()
     }, [])
 
-    useEffect(() => {
-      if (answered) {
-      } else {
-      }
-    }, [answered])
     return (
       <div
         className={`${className} transition-opacity ease-in-out ${
