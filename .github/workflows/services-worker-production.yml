@@ -1,6 +1,5 @@
 name: services/worker Production Build
 on:
-  pull_request:
   push:
     branches:
       - master
@@ -11,35 +10,34 @@ jobs:
   deploy-worker:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '12.x'
-    - name: Install npm dependencies
-      run: npm install
-      working-directory: services/worker
-    - name: AWS Deploy Push
-      run: 
-        aws deploy push
+      - uses: actions/checkout@v1
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: Install npm dependencies
+        run: npm install
+        working-directory: services/worker
+      - name: AWS Deploy Push
+        run: aws deploy push
           --application-name enlighten-worker
           --description "This is a revision for the enlighten-worker"
           --s3-location s3://artefacts.enlighten/enlighten-worker-prod.zip
           --source services/worker
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    - name: AWS Create Deploy
-      id: aws_create_deploy
-      run: |
-        echo ::set-output name=deployment_id::$(aws deploy create-deployment --application-name enlighten-worker --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name enlighten-worker-deployment-group --file-exists-behavior OVERWRITE --s3-location bucket=artefacts.enlighten,key=enlighten-worker-prod.zip,bundleType=zip)
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    - name: Parse JSON
-      run: |
-        echo $deployment_id
-      env:
-        deployment_id: ${{ steps.aws_create_deploy.deployment_id }}      
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: AWS Create Deploy
+        id: aws_create_deploy
+        run: |
+          echo ::set-output name=deployment_id::$(aws deploy create-deployment --application-name enlighten-worker --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name enlighten-worker-deployment-group --file-exists-behavior OVERWRITE --s3-location bucket=artefacts.enlighten,key=enlighten-worker-prod.zip,bundleType=zip)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Parse JSON
+        run: |
+          echo $deployment_id
+        env:
+          deployment_id: ${{ steps.aws_create_deploy.deployment_id }}
