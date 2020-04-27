@@ -16,7 +16,7 @@ const getPayloadFromJwt = jwt => {
   return JSON.parse(atob(base64))
 }
 
-function WSRoute({ children }) {
+function ApolloRoute({ children }) {
   const {
     state: { token, playerId },
     dispatch,
@@ -133,4 +133,4 @@ function WSRoute({ children }) {
   )
 }
 
-export default WSRoute
+export default ApolloRoute

@@ -1,29 +1,25 @@
 import React from 'react'
-import { create } from 'react-test-renderer'
+import { render } from '@testing-library/react'
 import Question from './Question'
 
-describe('Question component', () => {
-  it('matches the snapshot', () => {
-    const questionProp = { type: 'text', text: 'Test', alternatives: [] }
-    const question = create(<Question question={questionProp} />)
-    expect(question.toJSON()).toMatchSnapshot()
-  })
-  it('renders text', () => {
-    const questionProp = { type: 'text', text: 'Test', alternatives: [] }
-    const component = create(<Question question={questionProp} />)
-    const instance = component.root
-    const h3 = instance.findByType('h3')
-    expect(h3.props.children).toBe(questionProp.text)
-  })
-  it('renders image', () => {
-    const questionProp = {
-      type: 'image',
-      src: 'domain/image.jpg',
-      alternatives: [],
-    }
-    const component = create(<Question question={questionProp} />)
-    const instance = component.root
-    const img = instance.findByType('img')
-    expect(img.props.src).toBe(questionProp.src)
-  })
+test('renders text', () => {
+  const questionProp = { type: 'text', text: 'Test', alternatives: [] }
+
+  const { getByText } = render(<Question question={questionProp} />)
+
+  expect(getByText(questionProp.text)).toBeInTheDocument()
+})
+
+test('renders image', () => {
+  const questionProp = {
+    type: 'image',
+    src: 'domain/image.jpg',
+    alternatives: [],
+  }
+
+  const { getByTestId } = render(<Question question={questionProp} />)
+
+  expect(getByTestId('question-image').getAttribute('src')).toEqual(
+    questionProp.src,
+  )
 })

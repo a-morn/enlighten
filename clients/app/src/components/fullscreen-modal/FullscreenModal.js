@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react'
 
-const GameRequestModal = memo(
+const FullscreenModal = memo(
   ({ title, body, acceptText, declineText, onAccept, onDecline }) => {
     return (
       <div className="border border-solid border-gray-500 bg-info fixed z-50 top-0 right-0 bottom-0 left-0 w-full h-full overflow-auto flex">
@@ -15,7 +15,7 @@ const GameRequestModal = memo(
             {acceptText && (
               <button
                 onClick={onAccept}
-                className="bg-grey-lighter flex-1 border-b-2 md:flex-none border-green ml-2 hover:bg-green-lightest text-grey-darkest font-bold py-4 px-6 rounded"
+                className="bg-grey-lighter flex-1 border-b-2 md:flex-none border-green ml-2 hover:bg-cta text-grey-darkest font-bold py-4 px-6 rounded"
               >
                 {acceptText}
               </button>
@@ -23,7 +23,7 @@ const GameRequestModal = memo(
             {declineText && (
               <button
                 onClick={onDecline}
-                className="bg-grey-lighter flex-1 md:flex-none border-b-2 border-red ml-2 hover:bg-cta hover:text-white text-grey-darkest font-bold py-4 px-6 rounded"
+                className="bg-grey-lighter flex-1 md:flex-none border-b-2 border-red ml-2 hover:bg-danger hover:text-white text-grey-darkest font-bold py-4 px-6 rounded"
               >
                 {declineText}
               </button>
@@ -49,4 +49,4 @@ const GameRequestModal = memo(
   },
 )
 
-export default GameRequestModal
+export default FullscreenModal

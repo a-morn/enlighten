@@ -1,1 +1,1 @@
-export { default } from './Multiplayer'
+export { default } from './MultiplayerContainer'

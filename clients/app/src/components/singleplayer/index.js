@@ -1,1 +1,1 @@
-export { default } from './Singleplayer'
+export { default } from './SingleplayerContainer'

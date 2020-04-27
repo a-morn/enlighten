@@ -1,108 +1,24 @@
-import Bowser from 'bowser'
-import * as R from 'ramda'
-import React, { useCallback, useEffect, useState } from 'react'
-//import LimitBreak from './limit-break'
-import correct from '../../../assets/correct.wav'
+import React from 'react'
 import Question from '../../question'
-const browser = Bowser.getParser(window.navigator.userAgent)
 
-const correctSound = new Audio(correct)
-correctSound.volume = 0.05
-
-function SingleplayerGame({ game, deleteGame, answer }) {
-  const [correctAnswerId, setCorrectAnswerId] = useState()
-  const [selectedAnswerId, setSelectedAlternativeId] = useState()
-  const [isLoading] = useState(false)
-
-  useEffect(() => {
-    const currentQuestionAnswerId = R.pathOr(
-      null,
-      ['currentQuestion', 'answerId'],
-      game,
-    )
-    setCorrectAnswerId(currentQuestionAnswerId)
-    if (currentQuestionAnswerId === selectedAnswerId) {
-      if (browser.getBrowserName() !== 'Safari') {
-        correctSound.play()
-      }
-    }
-  }, [game, selectedAnswerId])
-
-  /*
-  const [limitBreakLevel, setLimitBreakLevel] = useState(0)
-  const [limitBreakTimerActive, setLimitBreakTimerActive] = useState(false)
-  const [limitBreakStatus, setLimitBreakStatus] = useState('inactive')
-  const [limitBreakCharge, setLimitBreakCharge] = useState(0)
-  const [
-    limitBreakHasAchievedGodlike,
-    setLimitBreakHasAchievedGodlike,
-  ] = useState(false)
-  const [
-    limitBreakHasAchievedDominating,
-    setLimitBreakHasAchievedDominating,
-  ] = useState(false)
-  const [
-    limitBreakHasAchievedRampage,
-    setLimitBreakHasAchievedRampage,
-  ] = useState(false)
-
-  useEffect(() => {
-    if (limitBreakStatus === 'charged') {
-      if (limitBreakLevel > 50 && !limitBreakHasAchievedGodlike) {
-        setLimitBreakHasAchievedGodlike(true)
-        const audio = new Audio('godlike.mp3')
-        audio.volume = 0.005
-        audio.play()
-      } else if (limitBreakLevel > 75 && !limitBreakHasAchievedDominating) {
-        setLimitBreakHasAchievedDominating(true)
-        const audio = new Audio('dominating.mp3')
-        audio.volume = 0.0075
-        audio.play()
-      } else if (limitBreakLevel >= 100 && !limitBreakHasAchievedRampage) {
-        setLimitBreakHasAchievedRampage(true)
-        const audio = new Audio('rampage.mp3')
-        audio.volume = 0.01
-        audio.play()
-      }
-    }
-  }, [
-    limitBreakLevel,
-    limitBreakHasAchievedGodlike,
-    limitBreakHasAchievedDominating,
-    limitBreakHasAchievedRampage,
-    limitBreakStatus,
-  ])
-*/
-
-  const endGame = useCallback(() => {
-    deleteGame()
-  }, [deleteGame])
-
-  const answerCallback = useCallback(
-    id => {
-      answer(id)
-      setSelectedAlternativeId(id)
-    },
-    [answer],
-  )
+function SingleplayerGame({
+  currentQuestion,
+  endGame,
+  isLoading,
+  selectedAnswerId,
+  correctAnswerId,
+  answer,
+}) {
   return (
-    <div>
-      {/* <LimitBreak
-        level={limitBreakLevel}
-        charge={limitBreakCharge}
-        status={limitBreakStatus}
-        max={100}
-      /> */}
-      {game && (
-        <Question
-          className="pt-4"
-          disabled={isLoading /*|| limitBreakStatus === 'decharge' */}
-          question={game.currentQuestion}
-          selectedAnswerId={selectedAnswerId}
-          correctAnswerId={correctAnswerId}
-          onAlternativeSelected={answerCallback}
-        />
-      )}
+    <>
+      <Question
+        className="pt-4"
+        disabled={isLoading}
+        question={currentQuestion}
+        selectedAnswerId={selectedAnswerId}
+        correctAnswerId={correctAnswerId}
+        onAlternativeSelected={answer}
+      />
       <button
         data-testid="end-game-button"
         className="bg-danger-dark hover:bg-danger text-white rounded px-4 mt-10 shadow-lg p-4"
@@ -110,7 +26,7 @@ function SingleplayerGame({ game, deleteGame, answer }) {
       >
         End game
       </button>
-    </div>
+    </>
   )
 }
 

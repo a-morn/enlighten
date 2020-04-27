@@ -6,7 +6,7 @@ import styles from './WinScreen.module.scss'
 const width = window.innerWidth
 const height = window.innerHeight
 
-export function WinScreen({ playerWon, winnerName, leaveGameCallback }) {
+export function WinScreen({ playerWon, winnerName, leaveGame }) {
   return (
     <>
       {playerWon && (
@@ -82,7 +82,7 @@ export function WinScreen({ playerWon, winnerName, leaveGameCallback }) {
           playerWon ? '😃' : '😢'
         }`}
         declineText="Ok"
-        onDecline={leaveGameCallback}
+        onDecline={leaveGame}
       />
     </>
   )

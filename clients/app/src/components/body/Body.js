@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { withRouter } from 'react-router-dom'
 import { store } from '../../hooks/context/store.js'
 
 function Body({ children }) {
@@ -17,4 +16,4 @@ function Body({ children }) {
   )
 }
 
-export default withRouter(Body)
+export default Body

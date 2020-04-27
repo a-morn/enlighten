@@ -6,11 +6,11 @@ import About from '../about'
 import Body from '../body'
 import Header from '../header'
 import LandingPage from '../landing-page'
-import { LobbyLoginComponent } from '../lobby-login'
+import Lobby from '../lobby'
 import Multiplayer from '../multiplayer'
 import Page404 from '../page-404'
 import Singleplayer from '../singleplayer'
-import WSRoute from '../ws-route'
+import ApolloRoute from '../apollo-route'
 
 function App() {
   return (
@@ -30,19 +30,19 @@ function App() {
                       <About />
                     </Route>
                     <Route path="/singleplayer">
-                      <WSRoute>
+                      <ApolloRoute>
                         <Singleplayer />
-                      </WSRoute>
+                      </ApolloRoute>
                     </Route>
                     <Route path="/lobby/:categoryId?">
-                      <WSRoute>
-                        <LobbyLoginComponent />
-                      </WSRoute>
+                      <ApolloRoute>
+                        <Lobby />
+                      </ApolloRoute>
                     </Route>
-                    <Route path="/multiplayer/:gameId/:playerId">
-                      <WSRoute>
+                    <Route path="/multiplayer">
+                      <ApolloRoute>
                         <Multiplayer />
-                      </WSRoute>
+                      </ApolloRoute>
                     </Route>
                     <Route>
                       <Page404 />

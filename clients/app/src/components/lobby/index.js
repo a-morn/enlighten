@@ -1,1 +1,1 @@
-export { LobbyComponent } from './Lobby'
+export { default } from './LobbyContainer'

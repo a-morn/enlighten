@@ -11,7 +11,12 @@ const questionHeading = (type, src, text, tones, synth) => {
       return (
         <Fragment>
           {text && <ReactMarkdown source={text} className=" markdown" />}
-          <img src={src} alt={text} className="h-32 p-4" />
+          <img
+            data-testid="question-image"
+            src={src}
+            alt={text}
+            className="h-32 p-4"
+          />
         </Fragment>
       )
     case 'tones':

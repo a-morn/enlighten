@@ -258,7 +258,7 @@ async function deleteGameRequest(
 
   pubsub.publish(GAME_REQUEST, {
     gameRequestSubscription: {
-      gameRequest,
+      gameRequest: _gameRequest,
       mutation: 'DELETE',
     },
   })

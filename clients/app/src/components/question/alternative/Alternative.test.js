@@ -1,58 +1,40 @@
 import React from 'react'
-import { render, unmountComponentAtNode } from 'react-dom'
-import { act } from 'react-dom/test-utils'
-import { create } from 'react-test-renderer'
+import { render } from '@testing-library/react'
 import Alternative from './Alternative'
 
-describe('Alternative component', () => {
-  describe('snapshot', () => {
-    it('matches the snapshot', () => {
-      const alternative = create(<Alternative alternative={{}} />)
-      expect(alternative.toJSON()).toMatchSnapshot()
-    })
-  })
-  describe('unit tests', () => {
-    let container
+test("doesn't have classes correct, incorrect, or selected by default", () => {
+  const { getByTestId } = render(<Alternative alternative={{ type: 'text' }} />)
 
-    beforeEach(() => {
-      container = document.createElement('div')
-      document.body.appendChild(container)
-    })
+  expect(getByTestId('alternative-button').classList.contains('correct')).toBe(
+    false,
+  )
+  expect(getByTestId('alternative-button').classList.contains('selected')).toBe(
+    false,
+  )
+  expect(
+    getByTestId('alternative-button').classList.contains('incorrect'),
+  ).toBe(false)
+})
 
-    afterEach(() => {
-      unmountComponentAtNode(container)
-      container.remove()
-      container = null
-    })
-    it("doesn't have classes correct, incorrect, or selected by default", () => {
-      act(() => {
-        render(<Alternative alternative={{ type: 'text' }} />, container)
-      })
-      const button = container.querySelector('button')
-      expect(button.className).toEqual(expect.not.stringContaining('correct'))
-      expect(button.className).toEqual(expect.not.stringContaining('selected'))
-      expect(button.className).toEqual(expect.not.stringContaining('incorrect'))
-    })
-    it('has class correct if @correct == true , and class selected if @selected == true', () => {
-      act(() => {
-        render(
-          <Alternative alternative={{ type: 'text' }} selected correct />,
-          container,
-        )
-      })
-      const button = container.querySelector('button')
-      expect(button.className).toEqual(expect.stringContaining('correct'))
-      expect(button.className).toEqual(expect.stringContaining('selected'))
-    })
-    it('has class incorrect if correct === false', () => {
-      act(() => {
-        render(
-          <Alternative alternative={{ type: 'text' }} correct={false} />,
-          container,
-        )
-      })
-      const button = container.querySelector('button')
-      expect(button.className).toEqual(expect.stringContaining('incorrect'))
-    })
-  })
+test('has class correct if @correct == true , and class selected if @selected == true', () => {
+  const { getByTestId } = render(
+    <Alternative alternative={{ type: 'text' }} selected correct />,
+  )
+
+  expect(getByTestId('alternative-button').classList.contains('correct')).toBe(
+    true,
+  )
+  expect(getByTestId('alternative-button').classList.contains('selected')).toBe(
+    true,
+  )
+})
+
+test('has class incorrect if correct === false', () => {
+  const { getByTestId } = render(
+    <Alternative alternative={{ type: 'text' }} correct={false} />,
+  )
+
+  expect(
+    getByTestId('alternative-button').classList.contains('incorrect'),
+  ).toBe(true)
 })

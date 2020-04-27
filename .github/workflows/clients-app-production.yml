@@ -24,12 +24,16 @@ jobs:
         run: |
           npm install
         working-directory: clients/app
-      - name: Cypress run
+      - name: Run Cypress
         uses: cypress-io/github-action@v1
         with:
           start: npm start
           wait-on: http://localhost:8000
           working-directory: clients/app
+      - name: Run Jest
+        run: |
+          npm test -- --watchAll=false
+        working-directory: clients/app
       - name: Build
         run: |
           npm build

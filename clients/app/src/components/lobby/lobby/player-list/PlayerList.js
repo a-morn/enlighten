@@ -13,7 +13,7 @@ const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
               ...p,
               isCurrentPlayer: currentPlayerId === p.id,
             }))
-            .map(({ name, id, isCurrentPlayer, status }, i) => (
+            .map(({ name, id, isCurrentPlayer }, i) => (
               <li key={i}>
                 <button
                   onClick={_ => !isCurrentPlayer && onClick(id)}
@@ -24,7 +24,6 @@ const PlayerList = memo(({ players, onClick, currentPlayerId, className }) => {
                   }`}
                 >
                   {name} {isCurrentPlayer ? '*' : ''}{' '}
-                  {status === 'IN_GAME' ? ' - in game' : ''}
                 </button>
               </li>
             ))}

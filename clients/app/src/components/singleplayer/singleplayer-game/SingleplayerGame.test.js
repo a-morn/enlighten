@@ -1,9 +1,17 @@
+import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import SingleplayerGame from './SingleplayerGame'
 
-it('renders without crashing', () => {
-  const div = document.createElement('div')
-  ReactDOM.render(<SingleplayerGame />, div)
-  ReactDOM.unmountComponentAtNode(div)
+test('ends game', () => {
+  const endGame = jest.fn()
+  const { getByText } = render(
+    <SingleplayerGame
+      endGame={endGame}
+      currentQuestion={{ type: 'text', alternatives: [] }}
+    />,
+  )
+
+  fireEvent.click(getByText(/End Game/i))
+
+  expect(endGame).toHaveBeenCalledTimes(1)
 })

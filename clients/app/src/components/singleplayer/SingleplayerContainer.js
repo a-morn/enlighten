@@ -1,91 +1,22 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
-import gql from 'graphql-tag'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { store } from '../../hooks/context/store.js'
 import { CategoryPicker } from '../category-picker'
 import SingleplayerGame from './singleplayer-game'
+import Bowser from 'bowser'
+import correct from '../../assets/correct.wav'
+import {
+  GAME,
+  ANSWER,
+  CREATE_GAME_SINGLEPLAYER,
+  DELETE_SINGLEPLAYER_GAME,
+  GAME_UPDATED,
+} from './graphql'
 
-const GAME = gql`
-  query GetGame {
-    gameSingleplayer {
-      categoryBackground
-      lastQuestion {
-        id
-        answerId
-      }
-      currentQuestion {
-        id
-        type
-        text
-        src
-        tones
-        answerId
-        answered
-        alternatives {
-          id
-          type
-          text
-          src
-        }
-      }
-    }
-  }
-`
-
-const ANSWER = gql`
-  mutation AnswerQuestion($answer: AnswerQuestionSingleplayerInput!) {
-    answerQuestionSingleplayer(answer: $answer) {
-      success
-    }
-  }
-`
-
-const CREATE_GAME_SINGLEPLAYER = gql`
-  mutation CreateGame($game: CreateGameSingleplayerInput!) {
-    createGameSingleplayer(game: $game) {
-      success
-    }
-  }
-`
-
-const DELETE_SINGLEPLAYER_GAME = gql`
-  mutation DeleteGame {
-    deleteGameSingleplayer {
-      success
-    }
-  }
-`
-
-const GAME_UPDATED = gql`
-  subscription GameUpdated {
-    gameSingleplayerSubscription {
-      mutation
-      gameSingleplayer {
-        categoryBackground
-        lastQuestion {
-          id
-          answerId
-        }
-        currentQuestion {
-          id
-          type
-          text
-          src
-          tones
-          answerId
-          answered
-          alternatives {
-            id
-            type
-            text
-            src
-          }
-        }
-      }
-    }
-  }
-`
+const browser = Bowser.getParser(window.navigator.userAgent)
+const correctSound = new Audio(correct)
+correctSound.volume = 0.05
 
 function Singleplayer() {
   const [isStartingGame, setIsStartingGame] = useState()
@@ -100,10 +31,11 @@ function Singleplayer() {
     GAME,
   )
   useEffect(() => {
-    const url =
-      gameData && gameData.gameSingleplayer
-        ? gameData.gameSingleplayer.categoryBackground
-        : null
+    const url = R.pathOr(
+      null,
+      ['gameSingleplayer', 'categoryBackground'],
+      gameData,
+    )
     dispatch({ type: 'category-background-updated', url })
     return () => dispatch({ type: 'category-background-updated', url: null })
   }, [gameData, dispatch])
@@ -112,7 +44,6 @@ function Singleplayer() {
     gameSubscribeToMore({
       document: GAME_UPDATED,
       updateQuery: (prev, { subscriptionData }) => {
-        debugger
         if (!subscriptionData.data) {
           return prev
         } else {
@@ -190,9 +121,28 @@ function Singleplayer() {
           },
         },
       })
+      setSelectedAlternativeId(answerId)
     },
     [answer, gameData],
   )
+
+  const [correctAnswerId, setCorrectAnswerId] = useState()
+  const [selectedAnswerId, setSelectedAlternativeId] = useState()
+  const [isLoading] = useState(false)
+
+  useEffect(() => {
+    const currentQuestionAnswerId = R.pathOr(
+      null,
+      ['gameSingleplayer', 'currentQuestion', 'answerId'],
+      gameData,
+    )
+    setCorrectAnswerId(currentQuestionAnswerId)
+    if (currentQuestionAnswerId === selectedAnswerId) {
+      if (browser.getBrowserName() !== 'Safari') {
+        correctSound.play()
+      }
+    }
+  }, [gameData, selectedAnswerId])
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -207,10 +157,12 @@ function Singleplayer() {
       )}
       {R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (
         <SingleplayerGame
-          playerId={playerId}
-          game={gameData.gameSingleplayer}
-          deleteGame={deleteGameCallback}
+          currentQuestion={gameData.gameSingleplayer.currentQuestion}
+          endGame={deleteGameCallback}
           answer={answerCallback}
+          isLoading={isLoading}
+          selectedAnswerId={selectedAnswerId}
+          correctAnswerId={correctAnswerId}
         />
       )}
     </div>

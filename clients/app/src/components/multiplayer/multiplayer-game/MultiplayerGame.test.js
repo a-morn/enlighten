@@ -1,50 +1,25 @@
-import { mount } from 'enzyme'
+import { render } from '@testing-library/react'
 import React from 'react'
 import { MultiplayerGame } from './MultiplayerGame'
 
-const baseGame = {
-  currentQuestion: { type: 'text', alternatives: [] },
-}
+test('show when you won', () => {
+  const { getByText } = render(<MultiplayerGame playerWon />)
 
-let container
-
-it('show winner-modal when someone won', () => {
-  const gameWherePlayerWon = {
-    ...baseGame,
-    players: [{ id: 'id', won: true }, { id: 'other-id' }],
-  }
-  container = mount(
-    <MultiplayerGame
-      game={gameWherePlayerWon}
-      playerId={'id'}
-      leaveGame={() => {}}
-    />,
-  )
-
-  expect(
-    container.find({
-      'data-testid': 'winner-modal',
-    }),
-  ).toHaveLength(1)
+  expect(getByText(/You won!/i)).not.toEqual(null)
 })
 
-it('show opponent-left-modal when other player left', () => {
-  // Test first render and effect
-  const gameWhereOtherPlayerLeft = {
-    ...baseGame,
-    players: [{ id: 'id' }, { id: 'other-id', hasLeft: true }],
-  }
-  container = mount(
-    <MultiplayerGame
-      game={gameWhereOtherPlayerLeft}
-      playerId={'id'}
-      leaveGame={() => {}}
-    />,
+test('show when you lost', () => {
+  const { getByText } = render(
+    <MultiplayerGame otherPlayerWon otherPlayerName="Bob" />,
   )
 
-  expect(
-    container.find({
-      'data-testid': 'opponent-left-modal',
-    }),
-  ).toHaveLength(1)
+  expect(getByText(/Bob won!/i)).toBeInTheDocument()
+})
+
+test('show when other player left', () => {
+  const { getByText } = render(
+    <MultiplayerGame otherPlayerLeft otherPlayerName="Bob" />,
+  )
+
+  expect(getByText(/Bob left!/i)).toBeInTheDocument()
 })

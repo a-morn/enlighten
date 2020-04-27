@@ -1,10 +1,22 @@
 import React from 'react'
-import { create } from 'react-test-renderer'
-import CategoryPicker from './CategoryPicker'
+import { render } from '@testing-library/react'
+import CategorySelect from './CategorySelect'
 
-describe('CategoryPicker component', () => {
-  it('matches the snapshot', () => {
-    const categoryPicker = create(<CategoryPicker />)
-    expect(categoryPicker.toJSON()).toMatchSnapshot()
-  })
+test('renders all categories', () => {
+  const categories = [
+    { label: 'Animals', id: 'animals' },
+    { label: 'Plants', id: 'plants' },
+  ]
+
+  const { getByText } = render(
+    <CategorySelect
+      categories={categories}
+      onChange={() => {}}
+      selected="plants"
+    />,
+  )
+
+  for (const { label } of categories) {
+    expect(getByText(label)).toBeInTheDocument()
+  }
 })
