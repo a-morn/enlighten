@@ -16,6 +16,7 @@ function Body({ children }) {
       <div className="absolute overflow-hidden top-0 right-0 left-0 bottom-0">
         {(base64 || url) && (
           <img
+            alt=""
             src={base64}
             data-srcset={url}
             className="lazyload absolute w-100"
