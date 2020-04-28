@@ -14,7 +14,7 @@ const GAME = gql`
         hasLeft
       }
       currentQuestion {
-        id
+        _id
         type
         text
         src
@@ -22,14 +22,14 @@ const GAME = gql`
         answerId
         answered
         alternatives {
-          id
+          _id
           type
           text
           src
         }
       }
       lastQuestion {
-        id
+        _id
         answerId
       }
     }
@@ -68,7 +68,7 @@ const GAME_UPDATED = gql`
           hasLeft
         }
         currentQuestion {
-          id
+          _id
           type
           text
           src
@@ -76,14 +76,14 @@ const GAME_UPDATED = gql`
           answerId
           answered
           alternatives {
-            id
+            _id
             type
             text
             src
           }
         }
         lastQuestion {
-          id
+          _id
           answerId
         }
       }

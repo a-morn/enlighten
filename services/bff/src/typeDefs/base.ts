@@ -11,7 +11,7 @@ export default `
 	}
 
 	type Question {
-		id: ID!
+		_id: ID!
 		type: String!
 		alternatives: [QuestionAlternative!]
 		text: String!
@@ -25,7 +25,7 @@ export default `
 		type: String!
 		text: String
 		src: String
-		id: ID!
+		_id: ID!
 	}
 
 	type Query {

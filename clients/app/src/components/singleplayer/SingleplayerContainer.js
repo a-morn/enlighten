@@ -130,7 +130,7 @@ function Singleplayer() {
         variables: {
           answer: {
             answerId,
-            questionId: gameData.gameSingleplayer.currentQuestion.id,
+            questionId: gameData.gameSingleplayer.currentQuestion._id,
           },
         },
       })

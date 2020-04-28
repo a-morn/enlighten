@@ -20,11 +20,13 @@ This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase
 
 - node@12.x
 - npm@6.x
-- Redis (running on port 6379).
+- Redis
+- MongoDB 4.2
 
 ### Running the app
 
-- Start Redis
+- Start Redis on port 6379
+- Start MongoDB on X
 - `cd services/bff && npm install && npm run build:dev && npm run start:develop`
 - `cd services/worker && npm install && npm start:dev`
 - `cd clients/assets && npm install && npm start`

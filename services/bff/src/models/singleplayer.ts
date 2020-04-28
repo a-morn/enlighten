@@ -61,13 +61,11 @@ const updateQuestionByPlayerId = async (
 
   const lastQuestionId = game.lastQuestionId
   game.currentQuestionId = shuffle(
-    game.levels[game.userLevel].filter(
-      ({ id, record }) => id !== lastQuestionId && record < 2,
-    ),
-  )[0].id
+    game.questions.filter(({ _id }) => _id !== lastQuestionId),
+  )[0]._id
 
   game.lastQuestionId = game.currentQuestionId
-  game.currentQuestion = getQuestionById(game.currentQuestionId)
+  game.currentQuestion = await getQuestionById(game.currentQuestionId)
   game.currentQuestion.alternatives = shuffle(game.currentQuestion.alternatives)
   game.currentQuestion.answered = false
   game.lastUpdated = new Date().toISOString()
@@ -81,23 +79,20 @@ const createGame = async (
   playerId: string,
   categoryId: CategoryId,
 ): Promise<GameSingeplayer> => {
-  const category = await getCategory(categoryId)
+  const [category, questions] = await Promise.all([
+    getCategory(categoryId),
+    getQuestionsByCategory(categoryId),
+  ])
+
   const game = {
     playerId,
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
-    levels: Object.entries(getQuestionsByCategory(category.id)).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [key]: value.questions.map(({ id: questionId }) => ({
-          id: questionId,
-          record: 0,
-        })),
-      }),
-      {},
-    ),
-    userLevel: 1,
+    questions: questions.map(q => ({
+      ...q,
+      record: 0,
+    })),
   } as GameSingeplayer
   const updatedGame = await updateQuestionByPlayerId(
     redisClient,
@@ -126,8 +121,8 @@ const answerQuestion = async (
     throw new UserInputError('No question to be answered')
   }
 
-  const question = game.levels[game.userLevel].find(
-    ({ id }) => id === game.currentQuestionId,
+  const question = game.questions.find(
+    ({ _id }) => _id === game.currentQuestionId,
   )
 
   if (isUndefined(question)) {
@@ -135,18 +130,8 @@ const answerQuestion = async (
   }
   question.record += answerId === question.answerId ? 1 : -1
 
-  if (game.levels[game.userLevel].every(q => q.record >= 2)) {
-    game.userLevel++
-  } else if (game.levels[game.userLevel].every(q => q.record < 0)) {
-    game.userLevel--
-  }
+  question.answered = true
 
-  // todo: bad code smell
-  if (game.currentQuestion) {
-    game.currentQuestion.answered = true
-  } else {
-    throw new Error("Current question didn't exist... 🤔")
-  }
   updateGame(redisClient, game)
 
   pubSub.publish(GAME_SINGLEPLAYER, {

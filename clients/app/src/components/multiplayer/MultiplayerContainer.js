@@ -172,7 +172,7 @@ function Multiplayer({ history }) {
           variables: {
             answer: {
               answerId,
-              questionId: data.gameMultiplayer.currentQuestion.id,
+              questionId: data.gameMultiplayer.currentQuestion._id,
             },
           },
         })

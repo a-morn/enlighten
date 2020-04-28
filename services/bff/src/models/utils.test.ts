@@ -1,6 +1,6 @@
+import { GameQuestion } from 'enlighten-common-types'
 import faker from 'faker'
 import { GameMultiplayer } from '../types/game-types'
-import { GameQuestion } from '../types/question-types'
 import { filterGame } from './utils'
 
 const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
@@ -19,7 +19,7 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
       answerId: faker.random.uuid(),
       alternatives: [],
       category: faker.random.uuid(),
-      id: faker.random.uuid(),
+      _id: faker.random.uuid(),
       record: faker.random.number(),
       type: 'text',
       text: faker.lorem.text(),

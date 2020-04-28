@@ -1,0 +1,28 @@
+{
+  "name": "questions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "reload-questions": "ts-node src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/mongodb": "^3.5.14",
+    "@types/node": "^13.13.4",
+    "ts-node": "^8.9.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/shuffle-array": "0.0.28",
+    "@types/uuid": "^7.0.3",
+    "countries-list": "^2.5.4",
+    "dotenv-flow": "^3.1.0",
+    "enlighten-common-types": "file:../../libraries/enlighten-common-types",
+    "mongodb": "^3.5.6",
+    "shuffle-array": "^1.0.1",
+    "uuid": "^7.0.3"
+  }
+}
