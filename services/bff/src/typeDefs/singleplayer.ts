@@ -2,6 +2,7 @@ export default `
     type GameSingleplayer {
         categoryId: String!
         categoryBackground: String!
+        categoryBackgroundBase64: String!
         playerId: ID!
         currentQuestion: Question
         lastQuestion: Question

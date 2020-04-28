@@ -22,6 +22,7 @@ export function CategoryPicker({
   disabledCategories = [],
   isNameUsed = false,
   autoPick = false,
+  disabled = false,
 }) {
   const { data } = useQuery(GET_CATEGORIES)
 
@@ -33,19 +34,12 @@ export function CategoryPicker({
     }
   }, [autoPick, data, setCategoryId])
 
-  let buttonClasses =
-    'bg-cta-dark text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap'
-
-  const disabled =
+  const isDisabled =
     disabledCategories.some(c => c === categoryId) ||
     !categoryId ||
-    (isNameUsed && !name)
+    (isNameUsed && !name) ||
+    disabled
 
-  if (disabled) {
-    buttonClasses += ' opacity-50 cursor-not-allowed'
-  } else {
-    buttonClasses += ' hover:bg-black'
-  }
   return (
     <div className={`flex flex-col md:flex-row justify-center ${className}`}>
       {isNameUsed && (
@@ -71,9 +65,12 @@ export function CategoryPicker({
           />
           <button
             data-testid="start-game-button"
-            disabled={disabled}
+            disabled={isDisabled}
             onClick={() => onClick(name)}
-            className={buttonClasses}
+            className={`bg-cta-dark text-white font-bold py-6 md:py-4 px-4 rounded whitespace-no-wrap ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black'
+            }
+            }`}
           >
             {buttonLabel}
           </button>

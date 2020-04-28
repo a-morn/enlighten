@@ -86,6 +86,7 @@ const createGame = async (
     playerId,
     categoryId,
     categoryBackground: category.background,
+    categoryBackgroundBase64: category.backgroundBase64,
     levels: Object.entries(getQuestionsByCategory(category.id)).reduce(
       (acc, [key, value]) => ({
         ...acc,

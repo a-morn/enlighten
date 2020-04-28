@@ -5,10 +5,12 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
+    "lqip": "^2.1.0",
     "serve": "^11.3.0"
   },
   "scripts": {
-    "start": "npx serve public -l 8080"
+    "start": "npx serve public -l 8080",
+    "lqip": "node generate-lqip"
   },
   "keywords": [],
   "author": "",

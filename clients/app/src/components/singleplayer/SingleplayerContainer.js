@@ -36,8 +36,20 @@ function Singleplayer() {
       ['gameSingleplayer', 'categoryBackground'],
       gameData,
     )
-    dispatch({ type: 'category-background-updated', url })
-    return () => dispatch({ type: 'category-background-updated', url: null })
+    const base64 = R.pathOr(
+      null,
+      ['gameSingleplayer', 'categoryBackgroundBase64'],
+      gameData,
+    )
+    dispatch({
+      type: 'category-background-updated',
+      background: { url, base64 },
+    })
+    return () =>
+      dispatch({
+        type: 'category-background-updated',
+        background: { url: null, base64: null },
+      })
   }, [gameData, dispatch])
 
   useEffect(() => {
@@ -103,12 +115,13 @@ function Singleplayer() {
     const {
       gameSingleplayer: { id },
     } = gameData
-    deleteGame({
+    setIsStartingGame(false)
+
+    return deleteGame({
       variables: {
         id,
       },
     })
-    setIsStartingGame(false)
   }, [deleteGame, gameData])
 
   const answerCallback = useCallback(
@@ -153,6 +166,7 @@ function Singleplayer() {
           categoryId={categoryId}
           buttonLabel="Start"
           className="p-10"
+          disabled={isStartingGame}
         />
       )}
       {R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (

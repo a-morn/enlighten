@@ -4,6 +4,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './components/app'
 import * as serviceWorker from './serviceWorker'
+import 'lazysizes'
+import 'lazysizes/plugins/attrchange/ls.attrchange'
 
 ReactDOM.render(<App />, document.getElementById('root'))
 
