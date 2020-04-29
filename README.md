@@ -1,6 +1,6 @@
 # Enlighten - a multiplayer quiz app
 
-This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase proficiency in modern full stack web development. The project is live at [enlighten.rip](https://enlighten.rip).
+This is a portfolio project by Albin Sebastian Mörner. The goal is to showcase proficiency in modern full stack web development. The project is live at [enlighten.rip](https://enlighten.rip). Work in progress, alpha, etc.
 
 ## Tech stack
 
@@ -12,8 +12,14 @@ This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase
 
 ### Infrastructure
 
-- Client/Static assets/Build artefacts (enlighten.rip/assets.enlighten.rip/artefacts.enligten.rip) - Route 53/CloudFront/S3 - Deployed to S3 by Github Actions
-- Service (api.enlighten.rip) - Route 53/ELB/EC2 + ElastiCache - Deployed to EC2 by Code Deploy using build artefact from S3
+- **Client and static assets**
+  - Static files: enlighten.rip, assets.enlighten.rip, artefacts.enligten.rip
+  - AWS services: Route 53 -> CloudFront -> S3
+  - Deployment: Deployed to S3 by Github Actions
+- **Services**
+  - Services: BFF (api.enlighten.rip), Worker
+  - AWS services: Route 53 -> ELB -> EC2 -> ElastiCache (and MongoDB Atlas on EC2)
+  - Deployment: Github Action puts build artefact on S3 and creats a Code Deploy deployment
 
 ## Development
 
@@ -48,7 +54,7 @@ Run the service with VS Code and the `Launch BFFs` configuration.
 
 ### Secrets
 
-The workflows defined in `.github/workflows/*-production.yml` deploy to production. There's currently no staging env. The following secrets are stored on Github and are used during CI: `AWS_ACCESS_KEY_ID`, `AWS_DEFAULT_REGION`, `AWS_PRODUCTION_BUCKET_NAME`, `AWS_SECRET_ACCESS_KEY`, `AWS_ASSETS_DISTRIBUTION_ID`, `AWS_APP_DISTRIBUTION_ID`. The following secrets are stored in AWS Secrets Manager and are used by EC2: `enlighten-mongodb-url`, `enlighten-mongodb-username`, `enlighten-mongodb-password`.
+The workflows defined in `.github/workflows/*-production.yml` deploy to production. The workflows defined in `.github/workflows/*pr.yml` are ran on PR to master. There's currently no staging env. The following secrets are stored on Github and are used during CI: `AWS_ACCESS_KEY_ID`, `AWS_DEFAULT_REGION`, `AWS_PRODUCTION_BUCKET_NAME`, `AWS_SECRET_ACCESS_KEY`, `AWS_ASSETS_DISTRIBUTION_ID`, `AWS_APP_DISTRIBUTION_ID`. The following secrets are stored in AWS Secrets Manager and are used by EC2: `enlighten-mongodb-url`, `enlighten-mongodb-username`, `enlighten-mongodb-password`.
 
 ### Cloudformation
 
