@@ -1,7 +1,9 @@
 import React, { useContext } from 'react'
 import { store } from '../../hooks/context/store.js'
-
+import Bowser from 'bowser'
 import * as R from 'ramda'
+
+const browser = Bowser.getParser(window.navigator.userAgent)
 
 function Body({ children }) {
   const { base64, url } = R.pathOr(
@@ -11,7 +13,11 @@ function Body({ children }) {
   )
 
   return (
-    <div className="p-6 max-w-full flex-grow bg-brand relative flex justify-center">
+    <div
+      className={`p-6 max-w-full flex-grow bg-brand relative justify-center ${
+        browser.getBrowserName() !== 'Safari' ? 'flex' : ''
+      }`}
+    >
       <div className="absolute overflow-hidden top-0 right-0 left-0 bottom-0">
         {(base64 || url) && (
           <img
