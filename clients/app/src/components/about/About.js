@@ -14,8 +14,9 @@ function About() {
       </p>
       <p className={`text-brand mt-8`}>
         Built with: React (CRA), Cypress, Jest, React Testing Library, Tailwind
-        CSS, Node.js, Express.js, Apollo GraphQL, TypeScript, Redis, AWS (S3,
-        CloudFront, EC2, ElastiCache, CodeDeploy), GitHub Actions.
+        CSS, SCSS, Node.js, Express.js, Apollo GraphQL, TypeScript, Redis,
+        MongoDB (MongoDB Atlas), AWS (S3, CloudFront, EC2, ElastiCache,
+        CodeDeploy), GitHub (GitHub Actions).
       </p>
     </article>
   )

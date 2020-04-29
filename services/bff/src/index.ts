@@ -11,7 +11,11 @@ import d from 'debug'
 import apollo from './apollo'
 import app from './app'
 
-if (!process.env.MONGO_DB_PASSWORD || !process.env.MONGO_DB_USER) {
+if (
+  !process.env.MONGO_DB_PASSWORD ||
+  !process.env.MONGO_DB_USER ||
+  !process.env.MONGO_DB_URL
+) {
   const region = 'us-east-1'
   const secretName = 'enlighten-mongodb-credentials'
   const client = new AWS.SecretsManager({
@@ -45,9 +49,11 @@ if (!process.env.MONGO_DB_PASSWORD || !process.env.MONGO_DB_USER) {
       // Depending on whether the secret is a string or binary, one of these fields will be populated.
       if (data.SecretString !== undefined) {
         const secret: {
+          'enlighten-mongodb-url': string
           'enlighten-mongodb-username': string
           'enlighten-mongodb-password': string
         } = JSON.parse(data.SecretString)
+        process.env.MONGO_DB_URL = secret['enlighten-mongodb-url']
         process.env.MONGO_DB_USER = secret['enlighten-mongodb-username']
         process.env.MONGO_DB_PASSWORD = secret['enlighten-mongodb-password']
       }

@@ -8,7 +8,7 @@ on:
       - ".github/workflows/assets-production.yml"
 jobs:
   deploy-client:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         node-version: [12.x]
@@ -27,7 +27,7 @@ jobs:
       - name: Invalidate cache
         uses: awact/cloudfront-action@0.1.2
         env:
-          DISTRIBUTION_ID: E3VHFUB65O18V2
+          DISTRIBUTION_ID: ${{ secrets.AWS_ASSETS_DISTRIBUTION_ID }}
           PATHS: "/*"
           AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

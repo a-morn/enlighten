@@ -13,13 +13,13 @@ test('renders text', () => {
 test('renders image', () => {
   const questionProp = {
     type: 'image',
-    src: 'domain/image.jpg',
+    src: '/path/to/image.jpg',
     alternatives: [],
   }
 
   const { getByTestId } = render(<Question question={questionProp} />)
 
   expect(getByTestId('question-image').getAttribute('src')).toEqual(
-    questionProp.src,
+    `${process.env.REACT_APP_ASSETS_URL}${questionProp.src}`,
   )
 })

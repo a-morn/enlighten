@@ -5,9 +5,10 @@ This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase
 ## Tech stack
 
 - React.js (CRA), Tailwind CSS, Apollo GraphQL, Cypress, Jest, React Testing Library
-- Node.js, Typescript, Apollo GraphQL, Express.js, Redis
+- Node.js, Typescript, Apollo GraphQL, Express.js, Redis, MongoDB
 - Github (Github Actions)
 - AWS (S3, CloudFront, Route 53, EC2, ELB, ElastiCache)
+- MongoDB Atlas
 
 ### Infrastructure
 
@@ -26,7 +27,7 @@ This is a portfolio project for Albin Sebastian Mörner. The goal is to showcase
 ### Running the app
 
 - Start Redis on port 6379
-- Start MongoDB on X
+- Start MongoDB, and set environment variables for bff (MONGO_DB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD)
 - `cd services/bff && npm install && npm run build:dev && npm run start:develop`
 - `cd services/worker && npm install && npm start:dev`
 - `cd clients/assets && npm install && npm start`
@@ -45,7 +46,9 @@ Run the service with VS Code and the `Launch BFFs` configuration.
 
 ## Production
 
-The workflows defined in `.github/workflows/*-production.yml` deploy to production. There's currently no staging env. The following secrets are stored on Github: `AWS_ACCESS_KEY_ID`, `AWS_DEFAULT_REGION`, `AWS_PRODUCTION_BUCKET_NAME`, `AWS_SECRET_ACCESS_KEY`.
+### Secrets
+
+The workflows defined in `.github/workflows/*-production.yml` deploy to production. There's currently no staging env. The following secrets are stored on Github and are used during CI: `AWS_ACCESS_KEY_ID`, `AWS_DEFAULT_REGION`, `AWS_PRODUCTION_BUCKET_NAME`, `AWS_SECRET_ACCESS_KEY`, `AWS_ASSETS_DISTRIBUTION_ID`, `AWS_APP_DISTRIBUTION_ID`. The following secrets are stored in AWS Secrets Manager and are used by EC2: `enlighten-mongodb-url`, `enlighten-mongodb-username`, `enlighten-mongodb-password`.
 
 ### Cloudformation
 
