@@ -35,7 +35,6 @@
     "pm2": "^4.3.0",
     "ramda": "^0.26.1",
     "redis": "^2.8.0",
-    "save-dev": "0.0.1-security",
     "shuffle-array": "^1.0.1",
     "subscriptions-transport-ws": "^0.9.16",
     "ts-jest": "^25.4.0",
