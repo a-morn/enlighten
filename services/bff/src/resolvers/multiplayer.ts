@@ -1,3 +1,4 @@
+import { Question } from 'enlighten-common-types'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { ResolverFn, withFilter } from 'graphql-subscriptions'
 import { Redis } from 'ioredis'
@@ -16,7 +17,6 @@ import {
   GameMultiplayer,
   MutationResponse,
   PlayerMultiplayer,
-  Question,
 } from '../types'
 
 type RemovePlayerInput = {

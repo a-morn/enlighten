@@ -1,16 +1,16 @@
 import { isUndefined } from 'util'
 import { UserInputError } from 'apollo-server'
+import { GameQuestion } from 'enlighten-common-types'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
+import { v4 as uuid } from 'uuid'
 import { GAME_MULTIPLAYER } from '../triggers'
 import {
   CategoryId,
   GameMultiplayer,
-  GameQuestion,
   PlayerLobby,
   PlayerMultiplayer,
-  Question,
   isGameMultiplayer,
 } from '../types'
 import { getCategory } from './category'
@@ -59,10 +59,6 @@ const getGameIdByPlayerId = async (
   )
   if (!playerGameIdString) {
     return null
-  }
-  const playerGameId = JSON.parse(playerGameIdString)
-  if (typeof playerGameId !== 'number') {
-    throw new Error('This is not a game id :(')
   }
 
   return playerGameIdString
@@ -115,12 +111,16 @@ const createGame = async (
   players: PlayerLobby[],
   categoryId: CategoryId,
 ): Promise<GameMultiplayer> => {
-  const category = await getCategory(categoryId)
+  const [category, questions] = await Promise.all([
+    getCategory(categoryId),
+    getQuestionsByCategory(categoryId),
+  ])
+
   const game = {
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
-    id: '' + Math.random(),
+    id: uuid(),
     players: players.map(
       player =>
         ({
@@ -131,15 +131,11 @@ const createGame = async (
           timestamp: new Date().toISOString(),
         } as PlayerMultiplayer),
     ),
-    questions: shuffle(
-      Object.values(getQuestionsByCategory(categoryId))
-        .reduce((acc: Question[], { questions }) => acc.concat(questions), [])
-        .map(q => ({
-          answered: false,
-          record: 0,
-          ...q,
-        })),
-    ),
+    questions: shuffle(questions).map(q => ({
+      answered: false,
+      record: 0,
+      ...q,
+    })),
     questionIndex: 0,
   }
 
@@ -193,7 +189,7 @@ const answerQuestion = async (
     return game.currentQuestion
   }
   const question = game.currentQuestion
-  if (questionId === question?.id) {
+  if (questionId === question?._id) {
     game.players
     const player = game.players.find(({ id }) => id === playerId)
 

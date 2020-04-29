@@ -56,17 +56,25 @@ setInterval(async () => {
       .map((gS) => JSON.parse(gS))
       .forEach((game) => {
         let shouldSave;
-        game.players.forEach((player) => {
-          const diff = moment().diff(player.timestamp, "seconds");
-          if (diff > 5) {
-            player.hasLeft = true;
-            shouldSave = true;
-          }
-        });
+        game.players
+          .filter(({ hasLeft }) => !hasLeft)
+          .forEach((player) => {
+            const diff = moment().diff(player.timestamp, "seconds");
+            if (diff > 5) {
+              player.hasLeft = true;
+              shouldSave = true;
+            }
+          });
+        const key = `multiplayer:games:${game.id}`;
+
         if (shouldSave) {
-          const key = `multiplayer:games:${game.id}`;
           console.log("setting: ", key);
           redisClient.set(key, JSON.stringify(game));
+        }
+
+        if (game.players.every(({ hasLeft }) => hasLeft)) {
+          console.log("deleting: ", key);
+          redisClient.del(key);
         }
       });
   }

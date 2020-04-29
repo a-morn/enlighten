@@ -10,7 +10,6 @@ function Body({ children }) {
     useContext(store),
   )
 
-  console.log(url)
   return (
     <div className="p-6 max-w-full flex-grow bg-brand relative flex justify-center">
       <div className="absolute overflow-hidden top-0 right-0 left-0 bottom-0">
@@ -18,7 +17,7 @@ function Body({ children }) {
           <img
             alt=""
             src={base64}
-            data-srcset={url}
+            data-srcset={`${process.env.REACT_APP_ASSETS_URL}${url}`}
             className="lazyload absolute w-100"
             style={{
               top: '50%',

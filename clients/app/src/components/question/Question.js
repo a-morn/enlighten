@@ -13,7 +13,7 @@ const questionHeading = (type, src, text, tones, synth) => {
           {text && <ReactMarkdown source={text} className=" markdown" />}
           <img
             data-testid="question-image"
-            src={src}
+            src={`${process.env.REACT_APP_ASSETS_URL}${src}`}
             alt={text}
             className="h-32 p-4"
           />
@@ -78,10 +78,10 @@ const Question = React.memo(
             <li key={i} data-testid={`alternative-${i}-wrapper`}>
               <Alternative
                 alternative={alt}
-                onClick={() => onAlternativeSelected(alt.id)}
-                selected={alt.id === selectedAnswerId}
+                onClick={() => onAlternativeSelected(alt._id)}
+                selected={alt._id === selectedAnswerId}
                 correct={
-                  correctAnswerId === null ? null : alt.id === correctAnswerId
+                  correctAnswerId === null ? null : alt._id === correctAnswerId
                 }
                 disabled={disabled}
               />

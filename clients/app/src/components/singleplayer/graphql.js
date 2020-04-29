@@ -6,11 +6,11 @@ const GAME = gql`
       categoryBackground
       categoryBackgroundBase64
       lastQuestion {
-        id
+        _id
         answerId
       }
       currentQuestion {
-        id
+        _id
         type
         text
         src
@@ -18,7 +18,7 @@ const GAME = gql`
         answerId
         answered
         alternatives {
-          id
+          _id
           type
           text
           src
@@ -60,11 +60,11 @@ const GAME_UPDATED = gql`
         categoryBackground
         categoryBackgroundBase64
         lastQuestion {
-          id
+          _id
           answerId
         }
         currentQuestion {
-          id
+          _id
           type
           text
           src
@@ -72,7 +72,7 @@ const GAME_UPDATED = gql`
           answerId
           answered
           alternatives {
-            id
+            _id
             type
             text
             src

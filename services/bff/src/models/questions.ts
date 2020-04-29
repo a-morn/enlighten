@@ -1,29 +1,11 @@
-import countries from '../generated-data/countries.json'
-import got from '../generated-data/game-of-thrones.json'
-import musicTheory from '../generated-data/music-theory.json'
-import { GameQuestion, Question, CategoryId, QuestionObject } from '../types'
+import { GameQuestion, Question } from 'enlighten-common-types'
+import { getClient } from '../data/client'
+import { findQuestions, findOneQuestion } from '../data/questions'
+import { CategoryId } from '../types'
 
-const allQuestions: { [key in CategoryId]: QuestionObject } = {
-  'game-of-thrones': got as QuestionObject,
-  countries,
-  'music-theory': musicTheory as QuestionObject,
-}
-
-const allQuestionsArray = Object.values(allQuestions)
-  .reduce(
-    (acc: Question[], { ...levels }) =>
-      acc.concat(
-        Object.values(levels).reduce(
-          (acc2, { questions }) => acc2.concat(questions),
-          [] as Question[],
-        ),
-      ),
-    [],
-  )
-  .filter(q => q)
-
-const getQuestionById = (questionId: string): GameQuestion => {
-  const question = allQuestionsArray.find(({ id }) => id === questionId)
+const getQuestionById = async (questionId: string): Promise<GameQuestion> => {
+  const client = await getClient()
+  const question = await findOneQuestion(client, questionId)
 
   if (!question) {
     throw new Error("Can't find question")
@@ -39,7 +21,11 @@ const getQuestionById = (questionId: string): GameQuestion => {
   }
 }
 
-const getQuestionsByCategory = (categoryId: CategoryId): QuestionObject =>
-  allQuestions[categoryId]
+const getQuestionsByCategory = async (
+  categoryId: CategoryId,
+): Promise<Question[]> => {
+  const client = await getClient()
+  return findQuestions(client, categoryId)
+}
 
 export { getQuestionById, getQuestionsByCategory }

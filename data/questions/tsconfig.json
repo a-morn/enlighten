@@ -2,24 +2,17 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "lib": [
-      "es6"
-    ],
+    "lib": ["es6"],
     "allowJs": true,
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "rootDir": "question-generation-scripts",
+    "rootDir": "src",
     "baseUrl": "./",
     "paths": {
-      "*": [
-        "./node_modules/@types/*",
-        "*"
-      ]
-    },
+      "*": ["./node_modules/@types/*", "*"]
+    }
   },
-  "include": [
-    "question-generation-scripts/**/*"
-  ]
+  "include": ["src/**/*"]
 }
