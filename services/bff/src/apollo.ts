@@ -1,28 +1,11 @@
 import * as http from 'http'
 import { makeExecutableSchema } from 'apollo-server'
-import {
-  ApolloServer,
-  ApolloServerExpressConfig,
-  AuthenticationError,
-} from 'apollo-server-express'
+import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
 import { Express } from 'express'
-import jwt from 'jsonwebtoken'
 import resolvers from './resolvers/'
 import typeDefs from './typeDefs'
-import { Context, isUserToken, UserToken } from './types'
-
-const getJWTPayloadFromAuthorizationHeader = (
-  authHeader: string,
-): UserToken => {
-  const token = authHeader.split('Bearer ')[1]
-
-  const decoded = jwt.verify(token, process.env.SECRET || 's3cr37')
-
-  if (typeof decoded === 'string' || !isUserToken(decoded)) {
-    throw new AuthenticationError('Incorrect token')
-  }
-  return decoded
-}
+import { Context } from 'enlighten-common-types'
+import { getJWTPayloadFromAuthorizationHeader } from './utils'
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -30,10 +13,10 @@ const schema = makeExecutableSchema({
   resolverValidationOptions: { requireResolversForResolveType: false },
 })
 
-export default (app: Express, httpServer: http.Server): void => {
+export default async (app: Express, httpServer: http.Server): Promise<void> => {
   const apolloServer = new ApolloServer({
     schema,
-    context: ({
+    context: async ({
       req,
       connection,
     }: {

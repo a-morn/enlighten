@@ -1,4 +1,4 @@
-import { Category, CategoryId } from '../types'
+import { Category, CategoryId } from 'enlighten-common-types'
 const getCategories = (): Promise<Category[]> =>
   Promise.resolve([
     {

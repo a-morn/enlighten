@@ -1,14 +1,18 @@
 import { ForbiddenError, UserInputError } from 'apollo-server'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
-import { GAME_REQUEST, LOBBY_PLAYERS_SUBSCRIPTION } from '../triggers'
+import {
+  GAME_REQUEST,
+  LOBBY_PLAYERS_SUBSCRIPTION,
+} from 'enlighten-common-graphql'
 import {
   CategoryId,
   GameRequest,
   PlayerLobby,
   isGameRequest,
   isPlayerLobby,
-} from '../types'
+} from 'enlighten-common-types'
+import { v4 as uuid } from 'uuid'
 
 import { getAllByPattern } from './redis-utils'
 
@@ -42,12 +46,6 @@ const getGameRequestIdByPlayerId = async (
 
   if (!gameRequestIdString) {
     return null
-  }
-
-  const gameRequestId = JSON.parse(gameRequestIdString)
-
-  if (typeof gameRequestId !== 'number') {
-    throw new Error(`That's no game request id... ${gameRequestId}`)
   }
 
   const gameRequest = getGameRequest(redisClient, gameRequestIdString)
@@ -103,12 +101,16 @@ const addPlayer = async (
 ): Promise<PlayerLobby> => {
   // todo: (re)add duplicate name check
 
-  await redisClient.set(`lobby:players:${player.id}`, JSON.stringify(player))
-  const players = await getPlayers(redisClient)
-
+  await redisClient.set(
+    `lobby:players:${player.id}`,
+    JSON.stringify(player),
+    'EX',
+    10,
+  )
   pubSub.publish(LOBBY_PLAYERS_SUBSCRIPTION, {
-    lobby: {
-      players,
+    lobbyPlayerMutated: {
+      mutation: 'CREATE',
+      lobbyPlayer: player,
     },
   })
 
@@ -122,6 +124,8 @@ const updatePlayer = async (
   const result = await redisClient.set(
     `lobby:players:${player.id}`,
     JSON.stringify(player),
+    'EX',
+    10,
   )
   if (result !== 'OK') {
     throw new Error('Redis failed updating player')
@@ -160,7 +164,7 @@ const addGameRequest = async (
 
   const { name: playerRequestName } = playerRequest
   const { name: playerOfferedName } = playerOffered
-  const id = '' + Math.random()
+  const id = uuid()
   const created = new Date().toISOString()
   const gameRequest: GameRequest = {
     accepted: null,
@@ -176,14 +180,20 @@ const addGameRequest = async (
   redisClient.set(
     `lobby:game-requests:${gameRequest.id}`,
     JSON.stringify(gameRequest),
+    'EX',
+    600,
   )
   redisClient.set(
     `lobby:player-game-request-id:${playerOfferedId}`,
     gameRequest.id,
+    'EX',
+    300,
   )
   redisClient.set(
     `lobby:player-game-request-id:${playerRequestId}`,
     gameRequest.id,
+    'EX',
+    300,
   )
 
   pubsub.publish(GAME_REQUEST, {
@@ -238,13 +248,11 @@ async function deleteGameRequest(
 
   const result = await Promise.all([
     redisClient.del(`lobby:game-requests:${_gameRequest.id}`),
-    redisClient.set(
+    redisClient.del(
       `lobby:player-game-request-id:${_gameRequest.playerOfferedId}`,
-      _gameRequest.id,
     ),
-    redisClient.set(
+    redisClient.del(
       `lobby:player-game-request-id:${_gameRequest.playerRequestId}`,
-      _gameRequest.id,
     ),
   ])
 

@@ -54,7 +54,7 @@ const Question = React.memo(
     selectedAnswerId,
     correctAnswerId,
     disabled,
-    className,
+    className = '',
   }) => {
     const synth = useRef(null)
 

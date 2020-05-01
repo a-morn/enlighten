@@ -1,27 +1,31 @@
 import { isUndefined } from 'util'
 import { UserInputError } from 'apollo-server'
-import { GameQuestion } from 'enlighten-common-types'
+import {
+  GameMultiplayer,
+  GameQuestion,
+  CategoryId,
+  PlayerLobby,
+  PlayerMultiplayer,
+  isGameMultiplayer,
+} from 'enlighten-common-types'
+import { getClient } from '../data/client'
+import { findOneUser } from '../data/users'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
 import { v4 as uuid } from 'uuid'
-import { GAME_MULTIPLAYER } from '../triggers'
-import {
-  CategoryId,
-  GameMultiplayer,
-  PlayerLobby,
-  PlayerMultiplayer,
-  isGameMultiplayer,
-} from '../types'
 import { getCategory } from './category'
 import { getQuestionsByCategory } from './questions'
-import { filterGame } from './utils'
+import { GAME_MULTIPLAYER, updateGame } from 'enlighten-common-graphql'
+import { filterGame } from 'enlighten-common-utils'
 
 const getGame = async (
   redisClient: Redis,
   gameId: string,
 ): Promise<GameMultiplayer | null> => {
-  const gameString = await redisClient.get(`multiplayer:games:${gameId}`)
+  const key = `multiplayer:games:${gameId}`
+  const gameString = await redisClient.get(key)
+  redisClient.expire(key, 3600)
   if (!gameString) {
     return null
   }
@@ -31,23 +35,6 @@ const getGame = async (
     throw new UserInputError(`That's no game... ${Object.keys(game)}`)
   }
   return game
-}
-
-const updateGame = async (
-  redisClient: Redis,
-  pubSub: RedisPubSub,
-  game: GameMultiplayer,
-  mutation: 'UPDATE' | 'CREATE',
-): Promise<void> => {
-  const gameString = JSON.stringify(game)
-  const setMode = mutation === 'CREATE' ? 'NX' : 'XX'
-  await redisClient.set(`multiplayer:games:${game.id}`, gameString, setMode)
-  pubSub.publish(GAME_MULTIPLAYER, {
-    gameMultiplayerSubscription: {
-      gameMultiplayer: filterGame(game),
-      mutation,
-    },
-  })
 }
 
 const getGameIdByPlayerId = async (
@@ -80,7 +67,12 @@ const setGameIdForPlayer = async (
   playerId: string,
   gameId: string,
 ): Promise<unknown> => {
-  return redisClient.set(`multiplayer:player-game-id:${playerId}`, gameId)
+  return redisClient.set(
+    `multiplayer:player-game-id:${playerId}`,
+    gameId,
+    'EX',
+    3600,
+  )
 }
 
 const removePlayer = async (
@@ -116,20 +108,22 @@ const createGame = async (
     getQuestionsByCategory(categoryId),
   ])
 
+  const client = await getClient()
   const game = {
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
     id: uuid(),
-    players: players.map(
-      player =>
-        ({
-          ...player,
-          score: 0,
-          won: false,
-          hasLeft: false,
-          timestamp: new Date().toISOString(),
-        } as PlayerMultiplayer),
+    players: await Promise.all(
+      players.map(async player => ({
+        ...player,
+        score: 0,
+        won: false,
+        hasLeft: false,
+        timestamp: new Date().toISOString(),
+        profilePictureUrl: (await findOneUser(client, player.id))
+          ?.profilePictureUrl,
+      })),
     ),
     questions: shuffle(questions).map(q => ({
       answered: false,
@@ -139,17 +133,17 @@ const createGame = async (
     questionIndex: 0,
   }
 
-  await updateGame(redisClient, pubSub, game, 'CREATE').then(() =>
-    Promise.all(
-      players.map(p => setGameIdForPlayer(redisClient, p.id, game.id)),
-    ),
+  await updateGame(redisClient, pubSub, game, 'CREATE')
+  await Promise.all(
+    players.map(p => setGameIdForPlayer(redisClient, p.id, game.id)),
   )
 
   // Delay game start
   setTimeout(async () => {
     const futureGame = await getGame(redisClient, game.id)
     if (futureGame === null) {
-      throw new Error('Game was deleted')
+      console.log(`Game ${game.id} was deleted before start`)
+      return
     }
     futureGame.currentQuestion = futureGame.questions[0]
     await updateGame(redisClient, pubSub, futureGame, 'UPDATE')

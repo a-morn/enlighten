@@ -1,6 +1,6 @@
 import React from 'react'
-import bookcase from '../../assets/bookcase-edit-compressed.mp4'
-import quizTutorialBg from '../../assets/quiz-tutorial-bg.png'
+import bookcase from 'assets/bookcase-edit-compressed.mp4'
+import quizTutorialBg from 'assets/quiz-tutorial-bg.png'
 import styles from './LandingPage.module.scss'
 
 function LandingPage() {
@@ -37,9 +37,7 @@ function LandingPage() {
             Omg such quiz app!
           </h2>
           <div
-            className={`${
-              styles['tutorial-text-wrapper']
-            } bg-gray-light relative mb-16`}
+            className={`${styles['tutorial-text-wrapper']} bg-gray-light relative mb-16`}
           >
             <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
               1. Challenge other players
@@ -65,9 +63,7 @@ function LandingPage() {
               🤔
             </span>
             <span
-              className={`${
-                styles['nerd-face']
-              } absolute text-6xl left-1/2 left-1/2`}
+              className={`${styles['nerd-face']} absolute text-6xl left-1/2 left-1/2`}
               role="img"
               aria-label="nerd"
             >

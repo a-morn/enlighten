@@ -1,6 +1,6 @@
 import React from 'react'
-import FullscreenModal from '../../fullscreen-modal'
-import Question from '../../question'
+import FullscreenModal from 'components/fullscreen-modal'
+import Question from 'components/question'
 import { Scoreboards } from './scoreboards'
 import { WinScreen } from './win-screen'
 

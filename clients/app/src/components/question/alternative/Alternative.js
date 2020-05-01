@@ -26,7 +26,11 @@ const Alternative = memo(
           className={`bg-gray-lighter text-black w-full py-8 m:py-6 px-4 rounded bg-origin-content ${classNames}`}
           onClick={onClick}
           disabled={disabled}
-          style={{ backgroundImage: `url(${src})` }}
+          style={{
+            backgroundImage: src
+              ? `url(${process.env.REACT_APP_ASSETS_URL}${src})`
+              : 'inherit',
+          }}
         >
           {type === 'text' && text}
           {type === 'image' && <div>&nbsp;</div>}

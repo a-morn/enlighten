@@ -1,12 +1,18 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useContext } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import EnlightenLogo from '../../assets/enlighten-logo.svg'
+import EnlightenLogo from 'assets/enlighten-logo.svg'
 import styles from './Header.module.scss'
+import Login from './login'
+import { store } from 'hooks/context/store.js'
 
 function Header({ history }) {
   const [open, setOpen] = useState()
+  const {
+    state: { token, isTempUser, profilePictureUrl },
+  } = useContext(store)
   history.listen(() => setOpen(false))
   const onClick = useCallback(() => setOpen(open => !open), [])
+
   return (
     <nav
       className={`${styles.header} block bg-brand-light items-center justify-between flex-wrap brand p-6`}
@@ -14,7 +20,7 @@ function Header({ history }) {
       <div className="flex items-center justify-between flex-wrap ">
         <Link to="/">
           <div className="flex items-center flex-shrink-0 text-brand mr-6">
-            <img className="h-8" src={EnlightenLogo} alt="React Logo" />
+            <img className="h-8" src={EnlightenLogo} alt="Enlighten logo" />
           </div>
         </Link>
         <div className="block lg:hidden">
@@ -53,13 +59,23 @@ function Header({ history }) {
             >
               Multiplayer
             </Link>
+            {(!token || isTempUser) && (
+              <Login className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4" />
+            )}
+            {profilePictureUrl && (
+              <img
+                className="h-8 w-8 rounded-full block mt-4 lg:inline-block lg:mt-0 mr-4"
+                src={profilePictureUrl}
+                alt=""
+              />
+            )}
           </div>
           <div>
             <Link
               data-testid="about-menu-option"
               to="/about"
               href="#"
-              className="inline-block text-sm px-4 py-2 leading-none border rounded text-brand border-brand hover:border-transparent hover:text-white hover:bg-brand mt-4 lg:mt-0"
+              className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4"
             >
               About
             </Link>

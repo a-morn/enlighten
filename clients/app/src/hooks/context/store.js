@@ -8,30 +8,42 @@ const StateProvider = ({ children }) => {
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'category-background-updated': {
+        const { background } = action
         const newState = {
           ...state,
-          background: action.background,
+          background,
         }
         return newState
       }
       case 'player-id-updated': {
+        const { playerId } = action
         const newState = {
           ...state,
-          playerId: action.playerId,
+          playerId,
         }
         return newState
       }
       case 'token-updated': {
+        const { token } = action
         const newState = {
           ...state,
-          token: action.token,
+          token,
         }
         return newState
       }
-      case 'has-client-updated': {
+      case 'is-temp-user-updated': {
+        const { isTempUser } = action
         const newState = {
           ...state,
-          hasClient: action.hasClient,
+          isTempUser,
+        }
+        return newState
+      }
+      case 'profile-picture-url-updated': {
+        const { profilePictureUrl } = action
+        const newState = {
+          ...state,
+          profilePictureUrl,
         }
         return newState
       }

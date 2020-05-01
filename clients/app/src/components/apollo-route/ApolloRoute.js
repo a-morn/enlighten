@@ -8,13 +8,28 @@ import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 import React, { useEffect, useContext, useState } from 'react'
-import { store } from '../../hooks/context/store.js'
+import { store } from 'hooks/context/store.js'
+import { getPayloadFromJwt } from 'utils'
 
-const getPayloadFromJwt = jwt => {
-  const base64Url = jwt.split('.')[1]
-  const base64 = base64Url.replace('-', '+').replace('_', '/')
-  return JSON.parse(atob(base64))
-}
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.map(({ message, locations, path }) =>
+      //eslint-disable-next-line no-console
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    )
+
+  if (networkError)
+    //eslint-disable-next-line no-console
+    console.log(
+      `[Network error]: ${networkError}. Maybe we should display some type of message to the user 🤔`,
+    )
+})
+
+const httpLink = new HttpLink({
+  uri: `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/graphql`,
+})
 
 function ApolloRoute({ children }) {
   const {
@@ -24,27 +39,8 @@ function ApolloRoute({ children }) {
 
   const [client, setClient] = useState(null)
   useEffect(() => {
+    // if we have a token then setup graphql client using the token
     if (token) {
-      const errorLink = onError(({ graphQLErrors, networkError }) => {
-        if (graphQLErrors)
-          graphQLErrors.map(({ message, locations, path }) =>
-            //eslint-disable-next-line no-console
-            console.log(
-              `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-            ),
-          )
-
-        if (networkError)
-          //eslint-disable-next-line no-console
-          console.log(
-            `[Network error]: ${networkError}. Maybe we should display some type of message to the user 🤔`,
-          )
-      })
-
-      const httpLink = new HttpLink({
-        uri: `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/graphql`,
-      })
-
       const wsLink = new WebSocketLink({
         uri: `${process.env.REACT_APP_BFF_WS_PROTOCOL}${process.env.REACT_APP_BFF_URL}/graphql`,
         options: {
@@ -97,29 +93,21 @@ function ApolloRoute({ children }) {
     }
   }, [dispatch, token])
 
+  // if user is not logged in, then log in with temp user
   useEffect(() => {
     async function handleToken() {
-      if (!token) {
-        const storedToken = sessionStorage.getItem('token')
-        if (storedToken) {
-          dispatch({ type: 'token-updated', token: storedToken })
-          dispatch({
-            type: 'player-id-updated',
-            playerId: getPayloadFromJwt(storedToken).playerId,
-          })
-        } else {
-          const response = await fetch(
-            `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/login-temp-user`,
-          )
-          const { playerId, token } = await response.json()
-          sessionStorage.setItem('token', token)
-          dispatch({ type: 'token-updated', token })
-          dispatch({ type: 'player-id-updated', playerId })
-        }
-      } else if (!playerId) {
+      if (token === null) {
+        const response = await fetch(
+          `${process.env.REACT_APP_BFF_PROTOCOL}${process.env.REACT_APP_BFF_URL}/login-temp-user`,
+        )
+        const { token } = await response.json()
+        const { isTempUser, playerId } = getPayloadFromJwt(token)
+        sessionStorage.setItem('token', token)
+        dispatch({ type: 'token-updated', token })
+        dispatch({ type: 'player-id-updated', playerId })
         dispatch({
-          type: 'player-id-updated',
-          playerId: getPayloadFromJwt(token).playerId,
+          type: 'is-temp-user-updated',
+          isTempUser,
         })
       }
     }

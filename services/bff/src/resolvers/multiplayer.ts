@@ -8,8 +8,8 @@ import {
   removePlayerFromGame,
   updateTimestampForPlayer,
 } from '../models/multiplayer'
-import { filterGame } from '../models/utils'
-import { GAME_MULTIPLAYER } from '../triggers'
+import { GAME_MULTIPLAYER } from 'enlighten-common-graphql'
+import { filterGame } from 'enlighten-common-utils'
 
 import {
   AnswerQuestionInput,
@@ -17,7 +17,7 @@ import {
   GameMultiplayer,
   MutationResponse,
   PlayerMultiplayer,
-} from '../types'
+} from 'enlighten-common-types'
 
 type RemovePlayerInput = {
   player: {

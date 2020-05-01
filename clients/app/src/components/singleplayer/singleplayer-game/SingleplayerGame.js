@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import Question from '../../question'
+import Question from 'components/question'
 
 function SingleplayerGame({
   currentQuestion,

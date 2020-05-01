@@ -7,15 +7,15 @@ import {
   deleteGameByPlayerId,
   getGameByPlayerId,
 } from '../models/singleplayer'
-import { filterGame } from '../models/utils'
-import { GAME_SINGLEPLAYER } from '../triggers'
+import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
+import { filterGame } from 'enlighten-common-utils'
 import {
   AnswerQuestionInput,
   CategoryId,
   Context,
   GameSingeplayer,
   MutationResponse,
-} from '../types'
+} from 'enlighten-common-types'
 
 type CreateGameSingleplayerInput = {
   game: {

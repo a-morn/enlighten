@@ -12,6 +12,7 @@ const GAME = gql`
         name
         won
         hasLeft
+        profilePictureUrl
       }
       currentQuestion {
         _id

@@ -74,7 +74,7 @@ const LOBBY = gql`
   }
 `
 const JOIN_LOBBY = gql`
-  mutation($player: JoinLobbyInput!) {
+  mutation JoinLobby($player: JoinLobbyInput!) {
     joinLobby(player: $player) {
       success
     }
@@ -100,8 +100,22 @@ const GAME_SUBSCRIPTION = gql`
   }
 `
 
+const LOBBY_SUBSCRIPTION = gql`
+  subscription onLobbyPlayerMutated {
+    lobbyPlayerMutated {
+      mutation
+      lobbyPlayer {
+        name
+        id
+        categoryId
+      }
+    }
+  }
+`
+
 export {
   GAME_SUBSCRIPTION,
+  LOBBY_SUBSCRIPTION,
   GAME,
   JOIN_LOBBY,
   LOBBY,

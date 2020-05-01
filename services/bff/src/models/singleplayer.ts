@@ -3,17 +3,24 @@ import { UserInputError } from 'apollo-server'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
-import { GAME_SINGLEPLAYER } from '../triggers'
-import { CategoryId, GameSingeplayer, isGameSingleplayer } from '../types'
+import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
+import { filterGame } from 'enlighten-common-utils'
+import {
+  CategoryId,
+  GameSingeplayer,
+  isGameSingleplayer,
+  Question,
+} from 'enlighten-common-types'
 import { getCategory } from './category'
 import { getQuestionById, getQuestionsByCategory } from './questions'
-import { filterGame } from './utils'
 
 const getGameByPlayerId = async (
   redisClient: Redis,
   playerId: string,
 ): Promise<GameSingeplayer | null> => {
-  const gameString = await redisClient.get(`singleplayer:games:${playerId}`)
+  const key = `singleplayer:games:${playerId}`
+  const gameString = await redisClient.get(key)
+  redisClient.expire(key, 300)
   if (!gameString) {
     return null
   }
@@ -30,7 +37,12 @@ const updateGame = async (
   game: GameSingeplayer,
 ): Promise<string> => {
   const gameString = JSON.stringify(game)
-  return redisClient.set(`singleplayer:games:${game.playerId}`, gameString)
+  return redisClient.set(
+    `singleplayer:games:${game.playerId}`,
+    gameString,
+    'EX',
+    300,
+  )
 }
 
 const deleteGameByPlayerId = async (
@@ -89,7 +101,7 @@ const createGame = async (
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
-    questions: questions.map(q => ({
+    questions: questions.map((q: Question) => ({
       ...q,
       record: 0,
     })),

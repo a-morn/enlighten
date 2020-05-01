@@ -1,6 +1,6 @@
 import React from 'react'
 import Confetti from 'react-confetti'
-import FullscreenModal from '../../../fullscreen-modal'
+import FullscreenModal from 'components/fullscreen-modal'
 import styles from './WinScreen.module.scss'
 
 const width = window.innerWidth
@@ -10,7 +10,11 @@ export function WinScreen({ playerWon, winnerName, leaveGame }) {
   return (
     <>
       {playerWon && (
-        <Confetti style={{ zIndex: 100 }} width={width} height={height} />
+        <Confetti
+          style={{ zIndex: 100, position: 'fixed' }}
+          width={width}
+          height={height}
+        />
       )}
       {!playerWon && (
         <div className={styles['win-screen__poop-rain']}>

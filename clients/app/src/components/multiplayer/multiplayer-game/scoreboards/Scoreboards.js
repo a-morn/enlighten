@@ -6,8 +6,13 @@ export function Scoreboards({ players }) {
     <div
       className={`flex justify-between text-lg bg-gray-lighter p-4 rounded flex-col sm:flex-row`}
     >
-      {players.map(({ name, score, id }) => (
-        <Scoreboard name={name} score={score} key={id} />
+      {players.map(({ name, score, id, profilePictureUrl }) => (
+        <Scoreboard
+          name={name}
+          score={score}
+          key={id}
+          profilePictureUrl={profilePictureUrl}
+        />
       ))}
     </div>
   )

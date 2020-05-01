@@ -2,11 +2,12 @@ import { useMutation, useQuery } from '@apollo/react-hooks'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { useParams, withRouter } from 'react-router-dom'
-import { store } from '../../hooks/context/store.js'
-import { CategoryPicker } from '../category-picker'
+import { store } from 'hooks/context/store.js'
+import { CategoryPicker } from 'components/category-picker'
 import { Lobby } from './lobby'
 import {
   GAME_SUBSCRIPTION,
+  LOBBY_SUBSCRIPTION,
   GAME,
   JOIN_LOBBY,
   LOBBY,
@@ -26,7 +27,13 @@ function LobbyContainerComponent({ history }) {
     state: { playerId },
   } = useContext(store)
 
-  const [joinLobby] = useMutation(JOIN_LOBBY)
+  const [joinLobby] = useMutation(JOIN_LOBBY, {
+    refetchQueries: [
+      {
+        query: LOBBY,
+      },
+    ],
+  })
 
   const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
     GAME,
@@ -55,12 +62,59 @@ function LobbyContainerComponent({ history }) {
     })
   }, [gameSubscribeToMore])
 
-  const { data: lobbyData, startPolling } = useQuery(LOBBY)
-  const [pingLobby] = useMutation(PING_LOBBY)
+  const {
+    data: lobbyData,
+    subscribeToMore: lobbySubscribeToMore,
+    startPolling,
+  } = useQuery(LOBBY)
 
   useEffect(() => {
-    startPolling(1000)
+    startPolling(10000)
   }, [startPolling])
+
+  useEffect(() => {
+    lobbySubscribeToMore({
+      document: LOBBY_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev
+        }
+        const {
+          mutation,
+          lobbyPlayer,
+        } = subscriptionData.data.lobbyPlayerMutated
+        switch (mutation) {
+          case 'DELETE': {
+            return {
+              ...prev,
+              lobby: {
+                ...prev.lobby,
+                players: prev.players.filter(({ id }) => id !== lobbyPlayer.id),
+              },
+            }
+          }
+          case 'CREATE': {
+            if (prev.lobby.players.some(({ id }) => id === lobbyPlayer.id)) {
+              return prev
+            }
+            return {
+              ...prev,
+              lobby: {
+                ...prev.lobby,
+                players: [...prev.lobby.players, lobbyPlayer],
+              },
+            }
+          }
+          default: {
+            // todo: log
+            return prev
+          }
+        }
+      },
+    })
+  }, [gameSubscribeToMore, lobbySubscribeToMore])
+
+  const [pingLobby] = useMutation(PING_LOBBY)
 
   if (!categoryId && categoryFromParams) {
     setCategoryId(categoryFromParams)
@@ -205,18 +259,22 @@ function LobbyContainerComponent({ history }) {
             )}
             deleteGameRequest={deleteGameRequestCallback}
             offered={
-              R.pathEq(['gameRequest', 'playerOfferedId'], playerId)(
-                gameRequestData,
-              ) && R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData)
+              R.pathEq(
+                ['gameRequest', 'playerOfferedId'],
+                playerId,
+              )(gameRequestData) &&
+              R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData)
             }
             playerRequestName={R.path(
               ['gameRequest', 'playerRequestName'],
               gameRequestData,
             )}
             pending={
-              R.pathEq(['gameRequest', 'playerRequestId'], playerId)(
-                gameRequestData,
-              ) && R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData)
+              R.pathEq(
+                ['gameRequest', 'playerRequestId'],
+                playerId,
+              )(gameRequestData) &&
+              R.pathEq(['gameRequest', 'accepted'], null)(gameRequestData)
             }
             playerOfferedName={R.path(
               ['gameRequest', 'playerOfferedName'],

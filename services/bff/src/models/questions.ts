@@ -1,7 +1,6 @@
-import { GameQuestion, Question } from 'enlighten-common-types'
+import { GameQuestion, Question, CategoryId } from 'enlighten-common-types'
 import { getClient } from '../data/client'
 import { findQuestions, findOneQuestion } from '../data/questions'
-import { CategoryId } from '../types'
 
 const getQuestionById = async (questionId: string): Promise<GameQuestion> => {
   const client = await getClient()
