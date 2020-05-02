@@ -3,8 +3,6 @@ os: linux
 files:
   - source: package.json
     destination: /srv
-  - source: package-lock.json
-    destination: /srv
   - source: ecosystem.config.js
     destination: /srv
   - source: dist

@@ -3,8 +3,6 @@ os: linux
 files:
   - source: package.json
     destination: /srv
-  - source: package-lock.json
-    destination: /srv
   - source: index.js
     destination: /srv
   - source: .env.production
