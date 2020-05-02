@@ -12,6 +12,7 @@ import Page404 from 'components/page-404'
 import Singleplayer from 'components/singleplayer'
 import ApolloRoute from 'components/apollo-route'
 import Token from 'components/token'
+import Profile from 'components/profile'
 
 function App() {
   return (
@@ -45,6 +46,11 @@ function App() {
                       <Route path="/multiplayer">
                         <ApolloRoute>
                           <Multiplayer />
+                        </ApolloRoute>
+                      </Route>
+                      <Route path="/profile">
+                        <ApolloRoute>
+                          <Profile />
                         </ApolloRoute>
                       </Route>
                       <Route>

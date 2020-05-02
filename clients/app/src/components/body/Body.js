@@ -39,7 +39,7 @@ function Body({ children }) {
           />
         )}
       </div>
-      <div className="relative">{children}</div>
+      <div className="relative m-auto">{children}</div>
     </div>
   )
 }

@@ -34,7 +34,7 @@ function Login({ history, className }) {
           const { token } = await response.json()
           if (token) {
             sessionStorage.setItem('token', token)
-            const { playerId, isTempUser } = getPayloadFromJwt(token)
+            const { playerId, isTempUser, email } = getPayloadFromJwt(token)
             dispatch({
               type: 'player-id-updated',
               playerId,
@@ -43,6 +43,10 @@ function Login({ history, className }) {
             dispatch({
               type: 'is-temp-user-updated',
               isTempUser,
+            })
+            dispatch({
+              type: 'player-email',
+              playerEmail: email,
             })
           }
         }

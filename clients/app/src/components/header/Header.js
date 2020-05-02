@@ -9,9 +9,26 @@ function Header({ history }) {
   const [open, setOpen] = useState()
   const {
     state: { token, isTempUser, profilePictureUrl },
+    dispatch,
   } = useContext(store)
   history.listen(() => setOpen(false))
   const onClick = useCallback(() => setOpen(open => !open), [])
+  const logout = useCallback(() => {
+    sessionStorage.removeItem('token', undefined)
+    dispatch({ type: 'token-updated', token: undefined })
+    dispatch({
+      type: 'player-id-updated',
+      playerId: undefined,
+    })
+    dispatch({
+      type: 'is-temp-user-updated',
+      isTempUser: undefined,
+    })
+    dispatch({
+      type: 'profile-picture-url-updated',
+      profilePictureUrl: undefined,
+    })
+  }, [dispatch])
 
   return (
     <nav
@@ -62,13 +79,23 @@ function Header({ history }) {
             {(!token || isTempUser) && (
               <Login className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4" />
             )}
-            {profilePictureUrl && (
-              <img
-                className="h-8 w-8 rounded-full block mt-4 lg:inline-block lg:mt-0 mr-4"
-                src={profilePictureUrl}
-                alt=""
-              />
+            {token && !isTempUser && (
+              <button
+                className="block mt-4 lg:inline-block lg:mt-0 text-brand hover:text-brand-light mr-4"
+                onClick={logout}
+              >
+                Logout
+              </button>
             )}
+            <Link to="/profile">
+              {profilePictureUrl && (
+                <img
+                  className="h-8 w-8 rounded-full block mt-4 lg:inline-block lg:mt-0 mr-4"
+                  src={profilePictureUrl}
+                  alt=""
+                />
+              )}
+            </Link>
           </div>
           <div>
             <Link

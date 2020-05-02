@@ -12,7 +12,7 @@ function Token({ children }) {
     if (!token) {
       const storedToken = sessionStorage.getItem('token')
       if (storedToken) {
-        const { playerId, isTempUser } = getPayloadFromJwt(storedToken)
+        const { playerId, isTempUser, email } = getPayloadFromJwt(storedToken)
         dispatch({ type: 'token-updated', token: storedToken })
         dispatch({
           type: 'player-id-updated',
@@ -21,6 +21,10 @@ function Token({ children }) {
         dispatch({
           type: 'is-temp-user-updated',
           isTempUser,
+        })
+        dispatch({
+          type: 'player-email',
+          playerEmail: email,
         })
       } else {
         dispatch({ type: 'token-updated', token: null })

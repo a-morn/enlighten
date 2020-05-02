@@ -47,6 +47,14 @@ const StateProvider = ({ children }) => {
         }
         return newState
       }
+      case 'player-email': {
+        const { playerEmail } = action
+        const newState = {
+          ...state,
+          playerEmail,
+        }
+        return newState
+      }
       default:
         throw new Error()
     }
