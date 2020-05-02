@@ -15,8 +15,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-      - name: Install dependencies - libraries
-        run: for d in ./libraries/*/ ; do (cd "$d" && yarn); done
       - name: Install dependencies
         run: yarn
         working-directory: services/bff

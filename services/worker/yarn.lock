@@ -511,22 +511,28 @@ emoji-regex@^7.0.1:
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"
   integrity sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA==
 
-"enlighten-common-graphql@file:../../libraries/enlighten-common-graphql":
+enlighten-common-graphql@enlighten-common-graphql:
   version "1.0.0"
+  resolved "https://registry.yarnpkg.com/enlighten-common-graphql/-/enlighten-common-graphql-1.0.0.tgz#8baf2ce75dc6779c272ae45ba83b298e2868ee55"
+  integrity sha512-A7uVw1op/9wrR86hLi0ONLfVLmdf1NTu9WVMWsdHGgROcmQ5hGkv4XMOG7+tWReqIFSpv+QQvRLNe0yYGmdgLA==
   dependencies:
-    enlighten-common-types "file:../../../../.cache/yarn/v6/npm-enlighten-common-graphql-1.0.0-187d5334-c3fd-4184-bea7-e706be07c929-1588433594531/node_modules/enlighten-common-types"
-    enlighten-common-utils "file:../../../../.cache/yarn/v6/npm-enlighten-common-graphql-1.0.0-187d5334-c3fd-4184-bea7-e706be07c929-1588433594531/node_modules/enlighten-common-utils"
+    enlighten-common-types enlighten-common-types
+    enlighten-common-utils enlighten-common-utils
     graphql-redis-subscriptions "^2.2.1"
     ramda "^0.27.0"
 
-"enlighten-common-types@file:../../libraries/enlighten-common-types":
+enlighten-common-types@enlighten-common-types:
   version "1.0.0"
+  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-1.0.0.tgz#b9c55eba12cf42ba6e678a6f65d0b66661daebe9"
+  integrity sha512-CYwNiW9odqcEH64i1/cDzVZD/o/eiO3BUYD79tfDV7VgaUvo4fbxvJliUefgcbQjiRxpc4kNNBeXmoHXDPau/A==
 
-"enlighten-common-utils@file:../../libraries/enlighten-common-utils":
+enlighten-common-utils@enlighten-common-utils:
   version "1.0.0"
+  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-1.0.0.tgz#ab271d23bd988faa57fe0c6b6b5f7af34bb01d05"
+  integrity sha512-t1pXTw3AwJsYnSXwcL3/XVlratlxWOJOWQJawzjnLo2rJGnibNOjkLkzmQet51PjyqrbxcM0AlGAdKsVioqIkw==
   dependencies:
     "@types/ramda" "^0.27.4"
-    enlighten-common-types "file:../../../../.cache/yarn/v6/npm-enlighten-common-utils-1.0.0-a6c6f317-97f4-4ba7-9b58-29c9c00be860-1588433594539/node_modules/enlighten-common-types"
+    enlighten-common-types enlighten-common-types
     ramda "^0.27.0"
 
 enquirer@2.3.5:
