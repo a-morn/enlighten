@@ -26,18 +26,21 @@ This is a portfolio project by Albin Sebastian Mörner. The goal is to showcase 
 ### Dependencies
 
 - node@12.x
-- npm@6.x
 - Redis
 - MongoDB 4.2
+- yarn
 
 ### Running the app
 
 - Start Redis on port 6379
 - Start MongoDB, and set environment variables for bff (MONGO_DB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD)
-- `cd services/bff && npm install && npm run build:dev && npm run start:develop`
-- `cd services/worker && npm install && npm start:dev`
-- `cd clients/assets && npm install && npm start`
-- `cd clients/app && npm install && npm start`
+- `for d in ./libraries/*/ ; do (cd "$d" && yarn); done`
+- `cd services/bff && yarn && yarn build:dev && yarn run start:develop`
+- `cd services/bff && yarn && yarn build:dev && yarn run start:develop`
+- `cd services/bff && yarn && yarn build:dev && yarn run start:develop`
+- `cd services/worker && yarn && yarn start:dev`
+- `cd clients/assets && yarn && yarn start`
+- `cd clients/app && yarn && yarn start`
 - Direct you browser to localhost:8000
 
 ### Debugging BFF
@@ -64,4 +67,4 @@ The infrastructure is not yet defined with CloudFormation. To create what's done
 
 ### EC2
 
-Runs the Ubuntu Server AMI. Needs CodeDeploy agent installed and running. (https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html)
+Runs the Ubuntu Server AMI. Needs CodeDeploy agent installed and running (https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html).

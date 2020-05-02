@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build:dev": "NODE_ENV=development npm run build",
-    "build:prod": "NODE_ENV=production npm run build",
-    "build": "rm -rf dist && npm run tsc",
+    "build:dev": "NODE_ENV=development yarn build",
+    "build:prod": "NODE_ENV=production yarn build",
+    "build": "rm -rf dist && yarn tsc",
     "tsc": "tsc",
     "start:prod": "pm2 update && pm2 start ecosystem.config.js",
     "start:dev": "NODE_ENV=development node develop-start.js",

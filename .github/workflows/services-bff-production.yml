@@ -15,25 +15,16 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-      - name: Npm update
-        run: npm update
-      - name: Install npm dependencies - enlighten-common-types
-        run: npm i
-        working-directory: libraries/enlighten-common-types
-      - name: Install npm dependencies - enlighten-common-utils
-        run: npm i
-        working-directory: libraries/enlighten-common-utils
-      - name: Install npm dependencies - enlighten-common-graphql
-        run: npm i
-        working-directory: libraries/enlighten-common-graphql
-      - name: Install npm dependencies
-        run: npm i
+      - name: Install dependencies - libraries
+        run: for d in ./libraries/*/ ; do (cd "$d" && yarn); done
+      - name: Install dependencies
+        run: yarn
         working-directory: services/bff
       - name: Build
-        run: npm run build:prod
+        run: yarn build:prod
         working-directory: services/bff
       - name: Test
-        run: npm run test
+        run: yarn test
         working-directory: services/bff
       - name: Fix files with incorrect creation date
         run: find ./node_modules/* -mtime +10950 -exec touch {} \;
