@@ -7,7 +7,7 @@ This is a portfolio project by Albin Sebastian Mörner. The goal is to showcase 
 - React.js (CRA), Tailwind CSS, Apollo GraphQL, Cypress, Jest, React Testing Library
 - Node.js, Typescript, Apollo GraphQL, Express.js, Redis, MongoDB
 - Github (Github Actions)
-- AWS (S3, CloudFront, Route 53, EC2, ELB, ElastiCache)
+- AWS (S3, CloudFront, Route 53, EC2, ELB, ElastiCache, CodeDeploy, Secrets Manager)
 - MongoDB Atlas
 
 ### Infrastructure
