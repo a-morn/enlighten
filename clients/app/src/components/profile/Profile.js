@@ -1,10 +1,18 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { store } from 'hooks/context/store.js'
+import { withRouter } from 'react-router-dom'
 
-export function Profile() {
+function ProfileComponent({ history }) {
   const {
-    state: { profilePictureUrl, playerEmail },
+    state: { profilePictureUrl, playerEmail, token, isTempUser },
   } = useContext(store)
+
+  useEffect(() => {
+    if (!token || isTempUser) {
+      history.push('/')
+    }
+  }, [token, isTempUser, history])
+
   return (
     <section
       className={`rounded p-4 bg-white w-full`}
@@ -14,7 +22,7 @@ export function Profile() {
       {profilePictureUrl && (
         <img
           alt="Profile pic"
-          className="h-32 m-auto pb-10"
+          className="h-32 m-auto pb-10 rounded"
           src={profilePictureUrl}
         />
       )}
@@ -25,3 +33,5 @@ export function Profile() {
     </section>
   )
 }
+
+export const Profile = withRouter(ProfileComponent)
