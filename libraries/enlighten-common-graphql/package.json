@@ -1,6 +1,6 @@
 {
   "name": "enlighten-common-graphql",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "enlighten-common-types": "enlighten-common-types",
-    "enlighten-common-utils": "enlighten-common-utils",
+    "enlighten-common-types": "1.0.0",
+    "enlighten-common-utils": "1.0.1",
     "graphql-redis-subscriptions": "^2.2.1",
     "ramda": "^0.27.0"
   },

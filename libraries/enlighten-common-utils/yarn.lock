@@ -9,7 +9,7 @@
   dependencies:
     ts-toolbelt "^6.3.3"
 
-enlighten-common-types@enlighten-common-types:
+enlighten-common-types@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-1.0.0.tgz#b9c55eba12cf42ba6e678a6f65d0b66661daebe9"
   integrity sha512-CYwNiW9odqcEH64i1/cDzVZD/o/eiO3BUYD79tfDV7VgaUvo4fbxvJliUefgcbQjiRxpc4kNNBeXmoHXDPau/A==
