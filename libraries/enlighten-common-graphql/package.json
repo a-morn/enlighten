@@ -10,9 +10,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "peerDependencies": {
-    "enlighten-common-types": "file:../enlighten-common-types"
-  },
   "dependencies": {
     "enlighten-common-types": "file:../enlighten-common-types",
     "enlighten-common-utils": "file:../enlighten-common-utils",

@@ -15,8 +15,19 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
+      - name: Npm update
+        run: npm update
+      - name: Install npm dependencies - enlighten-common-types
+        run: npm i
+        working-directory: libraries/enlighten-common-types
+      - name: Install npm dependencies - enlighten-common-utils
+        run: npm i
+        working-directory: libraries/enlighten-common-utils
+      - name: Install npm dependencies - enlighten-common-graphql
+        run: npm i
+        working-directory: libraries/enlighten-common-graphql
       - name: Install npm dependencies
-        run: npm install
+        run: npm i
         working-directory: services/bff
       - name: Build
         run: npm run build:prod
