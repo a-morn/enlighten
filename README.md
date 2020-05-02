@@ -59,6 +59,12 @@ Run the service with VS Code and the `Launch BFFs` configuration.
 
 The workflows defined in `.github/workflows/*-production.yml` deploy to production. The workflows defined in `.github/workflows/*pr.yml` are ran on PR to master. There's currently no staging env. The following secrets are stored on Github and are used during CI: `AWS_ACCESS_KEY_ID`, `AWS_DEFAULT_REGION`, `AWS_PRODUCTION_BUCKET_NAME`, `AWS_SECRET_ACCESS_KEY`, `AWS_ASSETS_DISTRIBUTION_ID`, `AWS_APP_DISTRIBUTION_ID`. The following secrets are stored in AWS Secrets Manager and are used by EC2: `enlighten-mongodb-url`, `enlighten-mongodb-username`, `enlighten-mongodb-password`.
 
+### Cloudformation
+
+The infrastructure is not yet defined with CloudFormation. To create what's done thusfar run:
+
+`aws cloudformation create-stack --stack-name enlighten --template-body file://cloud-formation/worker.yml --parameters ParameterKey=KeyName,ParameterValue=MY_KEY.pem ParameterKey=CodeDeployServiceRoleArn,ParameterValue=CODE_DEPLOY_SERVICE_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM`
+
 ### EC2
 
 Runs the Ubuntu Server AMI. Needs CodeDeploy agent installed and running (https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html).
