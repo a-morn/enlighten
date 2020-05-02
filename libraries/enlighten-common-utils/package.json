@@ -1,6 +1,6 @@
 {
   "name": "enlighten-common-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/ramda": "^0.27.4",
-    "enlighten-common-types": "enlighten-common-types",
+    "enlighten-common-types": "1.0.0",
     "ramda": "^0.27.0"
   },
   "devDependencies": {
