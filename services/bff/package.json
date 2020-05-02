@@ -28,6 +28,7 @@
     "enlighten-common-utils": "1.0.1",
     "eslint-plugin-import": "^2.20.2",
     "express": "~4.16.1",
+    "google-auth-library": "^6.0.0",
     "graphql": "^14.5.8",
     "graphql-redis-subscriptions": "^2.2.1",
     "graphql-subscriptions": "^1.1.0",

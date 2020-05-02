@@ -85,6 +85,17 @@ const getSecrets = Promise.all([
       process.env.GITHUB_OAUTH_SECRET = secret['enlighten-github-oauth-secret']
     }
   })(),
+  (async function() {
+    if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
+      const secretName = 'enlighten-google-oauth-credentials'
+      const jsonString = await getSecret(secretName)
+      const secret: {
+        'enlighten-google-oauth-client-id': string
+      } = JSON.parse(jsonString)
+      process.env.GITHUB_OAUTH_CLIENT_ID =
+        secret['enlighten-google-oauth-client-id']
+    }
+  })(),
 ])
 
 export async function startApp(): Promise<void> {

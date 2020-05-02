@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import logger from 'morgan'
-import { me, callbackGithub, loginTempUser, loginGithub } from './routes'
+import { me, callbackGithub, loginTempUser, callbackGoogle } from './routes'
 
 const app = express()
 
@@ -16,8 +16,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.get('/login-temp-user', loginTempUser)
-app.get('/login-github', loginGithub)
 app.post('/callback-github', callbackGithub)
+app.post('/callback-google', callbackGoogle)
 app.get('/me', me)
 
 export default app
