@@ -34,12 +34,8 @@ This is a portfolio project by Albin Sebastian Mörner. The goal is to showcase 
 
 - Start Redis on port 6379
 - Start MongoDB, and set environment variables for bff (MONGO_DB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD)
-- `for d in ./libraries/*/ ; do (cd "$d" && yarn); done`
-- `cd services/bff && yarn && yarn build:dev && yarn run start:develop`
-- `cd services/bff && yarn && yarn build:dev && yarn run start:develop`
 - `cd services/bff && yarn && yarn build:dev && yarn run start:develop`
 - `cd services/worker && yarn && yarn start:dev`
-- `cd clients/assets && yarn && yarn start`
 - `cd clients/app && yarn && yarn start`
 - Direct you browser to localhost:8000
 

@@ -13,8 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv-flow": "^3.1.0",
-    "enlighten-common-graphql": "file:../../libraries/enlighten-common-graphql",
-    "enlighten-common-types": "file:../../libraries/enlighten-common-types",
+    "enlighten-common-graphql": "enlighten-common-graphql",
+    "enlighten-common-types": "enlighten-common-types",
     "graphql": "^15.0.0",
     "graphql-redis-subscriptions": "^2.2.1",
     "graphql-subscriptions": "^1.1.0",

@@ -11,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "enlighten-common-types": "file:../enlighten-common-types",
-    "enlighten-common-utils": "file:../enlighten-common-utils",
+    "enlighten-common-types": "enlighten-common-types",
+    "enlighten-common-utils": "enlighten-common-utils",
     "graphql-redis-subscriptions": "^2.2.1",
     "ramda": "^0.27.0"
   },
