@@ -1,7 +1,6 @@
-import { GameQuestion } from 'enlighten-common-types'
 import faker from 'faker'
-import { GameMultiplayer } from '../types/game-types'
-import { filterGame } from './utils'
+import { GameQuestion, GameMultiplayer } from 'enlighten-common-types'
+import { filterGame } from 'enlighten-common-utils'
 
 const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
   currentQuestionAnswered: boolean,

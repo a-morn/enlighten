@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { store } from '../../hooks/context/store.js'
+import { store } from 'hooks/context/store.js'
 import Bowser from 'bowser'
 import * as R from 'ramda'
 
@@ -39,7 +39,7 @@ function Body({ children }) {
           />
         )}
       </div>
-      <div className="relative">{children}</div>
+      <div className="relative m-auto">{children}</div>
     </div>
   )
 }

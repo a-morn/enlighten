@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /srv
-npm run start:prod&
+yarn start:prod&

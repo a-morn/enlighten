@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb'
-import { CategoryId } from 'src/types'
+import { CategoryId } from 'enlighten-common-types'
 import { Question } from 'enlighten-common-types'
 
 export async function findQuestions(

@@ -14,7 +14,10 @@ import {
   updatePlayerTimestamp,
 } from '../models/lobby'
 import { createGame } from '../models/multiplayer'
-import { GAME_REQUEST, LOBBY_PLAYERS_SUBSCRIPTION } from '../triggers'
+import {
+  GAME_REQUEST,
+  LOBBY_PLAYERS_SUBSCRIPTION,
+} from 'enlighten-common-graphql'
 
 import {
   Context,
@@ -22,7 +25,7 @@ import {
   MutationResponse,
   PlayerLobby,
   isCategoryId,
-} from '../types'
+} from 'enlighten-common-types'
 
 type QueryLobbyResponse = { players: PlayerLobby[] }
 
@@ -221,10 +224,10 @@ export const lobbyMutationResolvers = (
 export const lobbySubscriptionResolvers = (
   pubSub: RedisPubSub,
 ): {
-  lobbyPlayerSubscription: { subscribe: ResolverFn }
+  lobbyPlayerMutated: { subscribe: ResolverFn }
   gameRequestSubscription: { subscribe: ResolverFn }
 } => ({
-  lobbyPlayerSubscription: {
+  lobbyPlayerMutated: {
     subscribe: (): AsyncIterator<unknown, unknown, undefined> =>
       pubSub.asyncIterator(LOBBY_PLAYERS_SUBSCRIPTION),
   },

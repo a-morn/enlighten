@@ -18,21 +18,21 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: NPM Install (Client)
+      - name: Yarn (Client)
         run: |
-          npm install
+          yarn
         working-directory: clients/app
       - name: Run Cypress
         uses: cypress-io/github-action@v1
         with:
-          start: npm start
+          start: yarn start
           wait-on: http://localhost:8000
           working-directory: clients/app
       - name: Run Jest
         run: |
-          npm test -- --watchAll=false
+          yarn test -- --watchAll=false
         working-directory: clients/app
       - name: Build
         run: |
-          npm run build
+          yarn build
         working-directory: clients/app

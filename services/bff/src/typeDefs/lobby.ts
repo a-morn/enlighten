@@ -93,13 +93,13 @@ export default `
         gameRequest: GameRequest!
     }
 
-    type LobbyPlayerSubscription implements SubscriptionPayload {
+    type LobbyPlayerMutation implements SubscriptionPayload {
         mutation: String!
         lobbyPlayer: LobbyPlayer!
     }
 
     extend type Subscription {
-        lobbyPlayerSubscription: LobbyPlayerSubscription!
+        lobbyPlayerMutated: LobbyPlayerMutation!
         gameRequestSubscription: GameRequestSubscription
     }
 `

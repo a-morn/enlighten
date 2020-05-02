@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import React, { useCallback, useEffect, useContext, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { store } from '../../hooks/context/store.js'
+import { store } from 'hooks/context/store.js'
 import { CountDown } from './count-down'
 import { MultiplayerGame } from './multiplayer-game'
 import * as R from 'ramda'
-import correct from '../../assets/correct.wav'
+import correct from 'assets/correct.wav'
 import {
   ANSWER,
   GAME_UPDATED,
@@ -29,7 +29,7 @@ function Multiplayer({ history }) {
   const [otherPlayerName, setOtherPlayerName] = useState()
 
   useEffect(() => {
-    startPolling(2000)
+    startPolling(10000)
   }, [startPolling])
 
   const [pingMultipalyer] = useMutation(PING_MULTIPLAYER)
@@ -37,7 +37,7 @@ function Multiplayer({ history }) {
   useEffect(() => {
     const interval = setInterval(() => {
       pingMultipalyer()
-    }, 1000)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [pingMultipalyer])

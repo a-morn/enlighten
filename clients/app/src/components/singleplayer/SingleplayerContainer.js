@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
-import { store } from '../../hooks/context/store.js'
-import { CategoryPicker } from '../category-picker'
+import { store } from 'hooks/context/store.js'
+import { CategoryPicker } from 'components/category-picker'
 import SingleplayerGame from './singleplayer-game'
 import Bowser from 'bowser'
-import correct from '../../assets/correct.wav'
+import correct from 'assets/correct.wav'
 import {
   GAME,
   ANSWER,

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import FullscreenModal from '../../fullscreen-modal'
+import FullscreenModal from 'components/fullscreen-modal'
 import PlayerList from './player-list'
 
 export function Lobby({
@@ -18,7 +18,7 @@ export function Lobby({
   useEffect(() => {
     const interval = setInterval(() => {
       pingLobby()
-    }, 1000)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [pingLobby])

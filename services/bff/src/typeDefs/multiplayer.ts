@@ -5,6 +5,7 @@ export default `
         score: Int
         won: Boolean
         hasLeft: Boolean
+        profilePictureUrl: String
     }
 
     type GameMultiplayer {

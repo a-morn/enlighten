@@ -11,57 +11,84 @@ import d from 'debug'
 import apollo from './apollo'
 import app from './app'
 
-if (
-  !process.env.MONGO_DB_PASSWORD ||
-  !process.env.MONGO_DB_USER ||
-  !process.env.MONGO_DB_URL
-) {
-  const region = 'us-east-1'
-  const secretName = 'enlighten-mongodb-credentials'
-  const client = new AWS.SecretsManager({
-    region,
-  })
-
-  client.getSecretValue({ SecretId: secretName }, function(err, data) {
-    if (err) {
-      if (err.code === 'DecryptionFailureException')
-        // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-        // Deal with the exception here, and/or rethrow at your discretion.
-        throw err
-      else if (err.code === 'InternalServiceErrorException')
-        // An error occurred on the server side.
-        // Deal with the exception here, and/or rethrow at your discretion.
-        throw err
-      else if (err.code === 'InvalidParameterException')
-        // You provided an invalid value for a parameter.
-        // Deal with the exception here, and/or rethrow at your discretion.
-        throw err
-      else if (err.code === 'InvalidRequestException')
-        // You provided a parameter value that is not valid for the current state of the resource.
-        // Deal with the exception here, and/or rethrow at your discretion.
-        throw err
-      else if (err.code === 'ResourceNotFoundException')
-        // We can't find the resource that you asked for.
-        // Deal with the exception here, and/or rethrow at your discretion.
-        throw err
-    } else {
-      // Decrypts secret using the associated KMS CMK.
-      // Depending on whether the secret is a string or binary, one of these fields will be populated.
-      if (data.SecretString !== undefined) {
-        const secret: {
-          'enlighten-mongodb-url': string
-          'enlighten-mongodb-username': string
-          'enlighten-mongodb-password': string
-        } = JSON.parse(data.SecretString)
-        process.env.MONGO_DB_URL = secret['enlighten-mongodb-url']
-        process.env.MONGO_DB_USER = secret['enlighten-mongodb-username']
-        process.env.MONGO_DB_PASSWORD = secret['enlighten-mongodb-password']
-      }
+const getSecret = async (secretName: string): Promise<string> => {
+  try {
+    const data = await client.getSecretValue({ SecretId: secretName }).promise()
+    // Decrypts secret using the associated KMS CMK.
+    // Depending on whether the secret is a string or binary, one of these fields will be populated.
+    if (data.SecretString !== undefined) {
+      return data.SecretString
     }
-  })
+    throw new Error('Only support string value')
+  } catch (err) {
+    if (err.code === 'DecryptionFailureException')
+      // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+      // Deal with the exception here, and/or rethrow at your discretion.
+      throw err
+    else if (err.code === 'InternalServiceErrorException')
+      // An error occurred on the server side.
+      // Deal with the exception here, and/or rethrow at your discretion.
+      throw err
+    else if (err.code === 'InvalidParameterException')
+      // You provided an invalid value for a parameter.
+      // Deal with the exception here, and/or rethrow at your discretion.
+      throw err
+    else if (err.code === 'InvalidRequestException')
+      // You provided a parameter value that is not valid for the current state of the resource.
+      // Deal with the exception here, and/or rethrow at your discretion.
+      throw err
+    else if (err.code === 'ResourceNotFoundException')
+      // We can't find the resource that you asked for.
+      // Deal with the exception here, and/or rethrow at your discretion.
+      throw err
+  }
+  throw new Error("Can't get here but tsc doesn\t get that")
 }
 
-export function startApp(): void {
+const region = 'us-east-1'
+const client = new AWS.SecretsManager({
+  region,
+})
+
+const getSecrets = Promise.all([
+  (async function() {
+    if (
+      !process.env.MONGO_DB_PASSWORD ||
+      !process.env.MONGO_DB_USER ||
+      !process.env.MONGO_DB_URL
+    ) {
+      const secretName = 'enlighten-mongodb-credentials'
+      const jsonString = await getSecret(secretName)
+      const secret: {
+        'enlighten-mongodb-url': string
+        'enlighten-mongodb-username': string
+        'enlighten-mongodb-password': string
+      } = JSON.parse(jsonString)
+      process.env.MONGO_DB_URL = secret['enlighten-mongodb-url']
+      process.env.MONGO_DB_USER = secret['enlighten-mongodb-username']
+      process.env.MONGO_DB_PASSWORD = secret['enlighten-mongodb-password']
+    }
+  })(),
+  (async function() {
+    if (
+      !process.env.GITHUB_OAUTH_CLIENT_ID ||
+      !process.env.GITHUB_OAUTH_SECRET
+    ) {
+      const secretName = 'enlighten-github-oauth-credentials'
+      const jsonString = await getSecret(secretName)
+      const secret: {
+        'enlighten-github-oauth-client-id': string
+        'enlighten-github-oauth-secret': string
+      } = JSON.parse(jsonString)
+      process.env.GITHUB_OAUTH_CLIENT_ID =
+        secret['enlighten-github-oauth-client-id']
+      process.env.GITHUB_OAUTH_SECRET = secret['enlighten-github-oauth-secret']
+    }
+  })(),
+])
+
+export async function startApp(): Promise<void> {
+  await getSecrets
   const debug = d('services:server')
 
   function normalizePort(val: string): string | number | boolean {
