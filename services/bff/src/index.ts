@@ -92,7 +92,7 @@ const getSecrets = Promise.all([
       const secret: {
         'enlighten-google-oauth-client-id': string
       } = JSON.parse(jsonString)
-      process.env.GITHUB_OAUTH_CLIENT_ID =
+      process.env.GOOGLE_OAUTH_CLIENT_ID =
         secret['enlighten-google-oauth-client-id']
     }
   })(),

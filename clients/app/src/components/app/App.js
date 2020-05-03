@@ -13,6 +13,7 @@ import Singleplayer from 'components/singleplayer'
 import ApolloRoute from 'components/apollo-route'
 import Token from 'components/token'
 import Profile from 'components/profile'
+import Callback from 'components/callback'
 
 function App() {
   return (
@@ -52,6 +53,9 @@ function App() {
                         <ApolloRoute>
                           <Profile />
                         </ApolloRoute>
+                      </Route>
+                      <Route path="/callback/:platform">
+                        <Callback />
                       </Route>
                       <Route>
                         <Page404 />
