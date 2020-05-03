@@ -25,7 +25,7 @@ This is a portfolio project by Albin Sebastian Mörner. The goal is to showcase 
 
 ### Dependencies
 
-- node@12.x
+- node@14.1.0
 - Redis
 - MongoDB 4.2
 - yarn

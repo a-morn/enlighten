@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import { DuoSynth } from 'tone'
 import Alternative from './alternative'
 
-const questionHeading = (type, src, text, tones, synth) => {
+const questionHeading = (type, src, lqip, text, tones, synth) => {
   switch (type) {
     case 'text':
       return <ReactMarkdown source={text} className="markdown" />
@@ -13,9 +13,10 @@ const questionHeading = (type, src, text, tones, synth) => {
           {text && <ReactMarkdown source={text} className=" markdown" />}
           <img
             data-testid="question-image"
-            src={`${process.env.REACT_APP_ASSETS_URL}${src}`}
+            src={lqip}
+            data-srcset={`${process.env.REACT_APP_ASSETS_URL}${src}`}
             alt={text}
-            className="h-32 p-4"
+            className="h-32 p-4 lazyload"
           />
         </Fragment>
       )
@@ -49,7 +50,7 @@ const questionHeading = (type, src, text, tones, synth) => {
 
 const Question = React.memo(
   ({
-    question: { type, alternatives, text, src, tones, answered },
+    question: { type, alternatives, text, src, lqip, tones, answered },
     onAlternativeSelected,
     selectedAnswerId,
     correctAnswerId,
@@ -71,7 +72,7 @@ const Question = React.memo(
         }`}
       >
         <div className="flex flex-col items-center bg-gray-lighter text-black my-4 p-4 rounded">
-          {questionHeading(type, src, text, tones, synth)}
+          {questionHeading(type, src, lqip, text, tones, synth)}
         </div>
         <ul className="question__alternatives shadow-lg">
           {alternatives.map((alt, i) => (

@@ -1,3 +1,4 @@
+/// <reference types="./types/lqip" />
 import { resolve } from "path"; // eslint-disable-line import/order
 const dotenv = require("dotenv-flow"); // eslint-disable-line import/order
 dotenv.config({ path: resolve(__dirname, "..") });
@@ -29,11 +30,14 @@ async function createMultipleQuestions(
 async function populate() {
   const client = await getClient();
   await clearQuestions(client);
+
   await Promise.all([
-    createMultipleQuestions(client, gotQuestions),
-    createMultipleQuestions(client, countriesQuestions),
+    createMultipleQuestions(client, await Promise.all(gotQuestions)),
+    createMultipleQuestions(client, await Promise.all(countriesQuestions)),
     createMultipleQuestions(client, musicTheoryQuestions),
   ]);
+
+  process.exit(0);
 }
 
 populate();

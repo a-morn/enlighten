@@ -67,10 +67,12 @@
     animation-iteration-count: infinite;
 
     &.alternative--image {
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-origin: border-box;
+      display: flex;
+      justify-content: center;
+      img {
+        height: 100px;
+        width: auto;
+      }
     }
   }
 }

@@ -25,6 +25,7 @@ export type Question = {
   | {
       type: "image";
       src: string;
+      lqip: string;
     }
   | {
       type: "tones";
@@ -43,6 +44,7 @@ export type Alternative = {
   | {
       type: "image";
       src: string;
+      lqip: string;
     }
   | {
       type: "text";

@@ -15,7 +15,8 @@ export default `
 		type: String!
 		alternatives: [QuestionAlternative!]
 		text: String!
-		src: String	
+		src: String
+		lqip: String
 		tones: [String]
 		answerId: ID
 		answered: Boolean!
@@ -25,6 +26,7 @@ export default `
 		type: String!
 		text: String
 		src: String
+		lqip: String
 		_id: ID!
 	}
 
