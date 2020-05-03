@@ -7,6 +7,7 @@
     "type": "text",
     "text": "Who is the __lord (298 AC, start of ASoIaF)__ of the house with the name _Arryn_? ",
     "src": null,
+    "lqip": null,
     "tones": null,
     "answerId": "4bb67f74-dccf-4037-83a1-35c0bdc0f074",
     "answered": true,
@@ -16,6 +17,7 @@
         "type": "text",
         "text": "Eddard Stark",
         "src": null,
+        "lqip": null,
         "__typename": "QuestionAlternative"
       },
       {
@@ -23,6 +25,7 @@
         "type": "text",
         "text": "Hoster Tully",
         "src": null,
+        "lqip": null,
         "__typename": "QuestionAlternative"
       },
       {
@@ -30,6 +33,7 @@
         "type": "text",
         "text": "Robert Arryn",
         "src": null,
+        "lqip": null,
         "__typename": "QuestionAlternative"
       },
       {
@@ -37,6 +41,7 @@
         "type": "text",
         "text": "Tywin Lannister",
         "src": null,
+        "lqip": null,
         "__typename": "QuestionAlternative"
       }
     ],
