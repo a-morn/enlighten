@@ -7,15 +7,15 @@ import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import  {OAuth2Client} from 'google-auth-library';
 
-if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
-  throw new Error('OOGLE_OAUTH_CLIENT_ID missing')
-}
+async function verifyGoogle(idToken: string): Promise<string> {  
+  if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
+    throw new Error('GOOGLE_OAUTH_CLIENT_ID missing')
+  }
 
-const googleOauthClientId: string = process.env.GOOGLE_OAUTH_CLIENT_ID
+  const googleOauthClientId: string = process.env.GOOGLE_OAUTH_CLIENT_ID
 
-const client = new OAuth2Client(googleOauthClientId);
+  const client = new OAuth2Client(googleOauthClientId);
 
-async function verifyGoogle(idToken: string) {
   const ticket = await client.verifyIdToken({
       idToken,
       audience: googleOauthClientId,
@@ -23,10 +23,11 @@ async function verifyGoogle(idToken: string) {
   const payload = ticket.getPayload();
   if (!payload) {
     throw new Error('No payload')
+  } else if (!payload.email) {
+    throw new Error('No email')
   }
-  const userid = payload['sub'];
-  // If request specified a G Suite domain:
-  //const domain = payload['hd'];
+  
+  return payload.email
 }
 
 export const me = async (req: Request, res: Response) => {
@@ -115,15 +116,15 @@ export const me = async (req: Request, res: Response) => {
     })
   }
 
-  export const callbackGoogle = async ({ body: { tokenId, email, profilePictureUrl } }: Request, res: Response) => {
-    verifyGoogle(tokenId).catch(console.error);
+  export const callbackGoogle = async ({ body: { tokenId } }: Request, res: Response) => {
+    const email = await verifyGoogle(tokenId);
   
     const client = await getClient()
     const user = await findOneUserByEmail(client, email)
   
     const playerId = user
       ? user._id
-      : await createUser(client, { email, profilePictureUrl })
+      : await createUser(client, { email })
   
     const token = jwt.sign(
       { playerId, isTempUser: false, email },
