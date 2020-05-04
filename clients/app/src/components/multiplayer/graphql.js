@@ -19,6 +19,7 @@ const GAME = gql`
         type
         text
         src
+        lqip
         tones
         answerId
         answered
@@ -27,6 +28,7 @@ const GAME = gql`
           type
           text
           src
+          lqip
         }
       }
       lastQuestion {
@@ -73,6 +75,7 @@ const GAME_UPDATED = gql`
           type
           text
           src
+          lqip
           tones
           answerId
           answered
@@ -81,6 +84,7 @@ const GAME_UPDATED = gql`
             type
             text
             src
+            lqip
           }
         }
         lastQuestion {

@@ -3,6 +3,9 @@ import bookcase from 'assets/bookcase-edit-compressed.mp4'
 import quizTutorialBg from 'assets/quiz-tutorial-bg.png'
 import styles from './LandingPage.module.scss'
 
+const quizTutorialBgLqip =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAJCAYAAAALpr0TAAAAAklEQVR4AewaftIAAACzSURBVG3BsU7DQBBF0Tuz49hEEQVILiL+/6OoqCOKSIjEa3vnJQ2IWJxjuuNOEnMTKfHUFbZibUlKXKaZz6vxsi/04bgZf8WaSaboIjg+G2aQAjceuJtjZkRxduH0XcGA6zSTKX5EV5yuOGb8mltS16QuF4o7UZww44EEdV75+q5IydDvGHrH2WiZtNMJN5CgzisSBBtRnMN+x/DxzlQXluMbw+uB4B8xjsQ40ku08xkvzg14QFJblVHlFAAAAABJRU5ErkJggg=='
+
 function LandingPage() {
   return (
     <div className="">
@@ -29,48 +32,66 @@ function LandingPage() {
             </clipPath>
           </defs>
         </svg>
-        <article
-          style={{ backgroundImage: `url(${quizTutorialBg})` }}
-          className="bg-cover bg-center flex flex-col items-center font-mono rounded"
-        >
-          <h2 className="text-brand-dark text-4xl m-16 text-center">
-            Omg such quiz app!
-          </h2>
-          <div
-            className={`${styles['tutorial-text-wrapper']} bg-gray-light relative mb-16`}
-          >
-            <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
-              1. Challenge other players
-            </p>
-            <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
-              2. Compete and see who knows the most
-            </p>
-            <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
-              3. Climb the ranks and become the top nerd
-            </p>
-            <span
-              className={`${styles['arm']} absolute text-6xl`}
-              role="img"
-              aria-label="arm"
-            >
-              💪{/* This is not displaying on iOS Safari */}
-            </span>
-            <span
-              className={`${styles['thinking-face']} absolute text-6xl top-1/2`}
-              role="img"
-              aria-label="thinking"
-            >
-              🤔
-            </span>
-            <span
-              className={`${styles['nerd-face']} absolute text-6xl left-1/2 left-1/2`}
-              role="img"
-              aria-label="nerd"
-            >
-              🤓
-            </span>
+        <div className={`relative`}>
+          <div className="absolute overflow-hidden top-0 right-0 left-0 bottom-0">
+            <img
+              src={quizTutorialBgLqip}
+              data-srcset={quizTutorialBg}
+              alt=""
+              className="lazyload absolute w-100"
+              style={{
+                top: '50%',
+                left: '50%',
+                width: 'auto',
+                height: 'auto',
+                maxHeight: 'none',
+                maxWidth: 'none',
+                minHeight: '100%',
+                minWidth: '100%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
           </div>
-        </article>
+          <article className="relative bg-cover bg-center flex flex-col items-center font-mono rounded">
+            <h2 className="text-brand-dark text-4xl m-16 text-center">
+              Omg such quiz app!
+            </h2>
+            <div
+              className={`${styles['tutorial-text-wrapper']} bg-gray-light relative mb-16`}
+            >
+              <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
+                1. Challenge other players
+              </p>
+              <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
+                2. Compete and see who knows the most
+              </p>
+              <p className={`text-brand-dark text-2xl m-16 bg-warning-light`}>
+                3. Climb the ranks and become the top nerd
+              </p>
+              <span
+                className={`${styles['arm']} absolute text-6xl`}
+                role="img"
+                aria-label="arm"
+              >
+                💪{/* This is not displaying on iOS Safari */}
+              </span>
+              <span
+                className={`${styles['thinking-face']} absolute text-6xl top-1/2`}
+                role="img"
+                aria-label="thinking"
+              >
+                🤔
+              </span>
+              <span
+                className={`${styles['nerd-face']} absolute text-6xl left-1/2 left-1/2`}
+                role="img"
+                aria-label="nerd"
+              >
+                🤓
+              </span>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   )

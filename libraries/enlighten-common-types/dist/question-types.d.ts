@@ -20,6 +20,7 @@ export declare type Question = {
 } | {
     type: "image";
     src: string;
+    lqip: string;
 } | {
     type: "tones";
     tones: string[];
@@ -33,6 +34,7 @@ export declare type Alternative = {
 } & ({
     type: "image";
     src: string;
+    lqip: string;
 } | {
     type: "text";
     text: string;

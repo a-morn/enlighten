@@ -14,12 +14,16 @@ test('renders image', () => {
   const questionProp = {
     type: 'image',
     src: '/path/to/image.jpg',
+    lqip: 'base64abc',
     alternatives: [],
   }
 
   const { getByTestId } = render(<Question question={questionProp} />)
 
-  expect(getByTestId('question-image').getAttribute('src')).toEqual(
+  expect(getByTestId('question-image').getAttribute('data-srcset')).toEqual(
     `${process.env.REACT_APP_ASSETS_URL}${questionProp.src}`,
+  )
+  expect(getByTestId('question-image').getAttribute('src')).toEqual(
+    questionProp.lqip,
   )
 })

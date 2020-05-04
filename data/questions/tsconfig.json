@@ -1,18 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "moduleResolution": "node",
     "module": "commonjs",
-    "lib": ["es6"],
+    "target": "es2018",
     "allowJs": true,
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "rootDir": "src",
+    "rootDir": "./src",
     "baseUrl": "./",
+    "typeRoots": ["src/typings"],
+    "types": [],
     "paths": {
-      "*": ["./node_modules/@types/*", "*"]
+      "*": ["./node_modules/@types/*", "*"],
+      "memo": ["src/types/memo.d.ts"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

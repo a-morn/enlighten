@@ -7,7 +7,7 @@ const Alternative = memo(
     selected,
     correct,
     disabled,
-    alternative: { text, src, type },
+    alternative: { text, src, lqip, type },
   }) => {
     const classNames = [
       'alternative',
@@ -26,14 +26,16 @@ const Alternative = memo(
           className={`bg-gray-lighter text-black w-full py-8 m:py-6 px-4 rounded bg-origin-content ${classNames}`}
           onClick={onClick}
           disabled={disabled}
-          style={{
-            backgroundImage: src
-              ? `url(${process.env.REACT_APP_ASSETS_URL}${src})`
-              : 'inherit',
-          }}
         >
           {type === 'text' && text}
-          {type === 'image' && <div>&nbsp;</div>}
+          {type === 'image' && (
+            <img
+              alt=""
+              src={lqip}
+              data-srcset={`${process.env.REACT_APP_ASSETS_URL}${src}`}
+              className="lazyload"
+            />
+          )}
         </button>
       </div>
     )

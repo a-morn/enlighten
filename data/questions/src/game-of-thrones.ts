@@ -5,7 +5,9 @@ import {
   QuestionType,
   QuestionEntityType,
   QuestionDirection,
+  Alternative,
 } from "enlighten-common-types";
+import lqip from "lqip";
 
 type GoTHouse = {
   name: string;
@@ -91,7 +93,7 @@ const fiz = (toTypeId: string) => {
   }
 };
 
-const getQuestionProperties = (
+const getQuestionProperties = async (
   fromType: QuestionEntityType<GoTHouse> | QuestionEntityType<GoTHouse>[],
   toType: QuestionEntityType<GoTHouse>,
   el: GoTHouse
@@ -110,33 +112,43 @@ const getQuestionProperties = (
         text: `${fiz(toType.id)} __${toType.label}__ of the house with the ${
           fromType.label
         } _${el[fromType.id]}_? `,
-      };
+      } as const;
     case "coat-of-arms":
       return {
         type: "image",
         text: `What is the __${toType.label}__ of the house with the coat of arms pictured?`,
-        src: el["coat-of-arms"],
-      };
+        src: el[fromType.id],
+        lqip: await lqip.base64(`../../assets/public${el[fromType.id]}`),
+      } as const;
   }
 };
 
-const getAlternative = (toType: QuestionEntityType<GoTHouse>, el: GoTHouse) => {
+const getAlternative = async (
+  toType: QuestionEntityType<GoTHouse>,
+  el: GoTHouse
+): Promise<Alternative> => {
   switch (toType.id) {
     case "name":
     case "seat":
     case "region":
     case "words":
     case "lord-asoiaf-start":
-      return { type: "text", text: el[toType.id] };
+      return {
+        type: "text",
+        text: el[toType.id],
+        _id: uuid(),
+      };
     case "coat-of-arms":
       return {
         type: "image",
         src: el["coat-of-arms"],
+        _id: uuid(),
+        lqip: await lqip.base64(`../../assets/public${el["coat-of-arms"]}`),
       };
   }
 };
 
-const questions: Question[] = config.fromTypes
+const questions: Promise<Question>[] = config.fromTypes
   .reduce(
     (acc: QuestionDirection<GoTHouse>[], fromType) =>
       acc.concat(
@@ -147,39 +159,35 @@ const questions: Question[] = config.fromTypes
     []
   )
   .reduce(
-    (acc: Question[], { fromType, toType }) =>
+    (acc, { fromType, toType }) =>
       acc.concat(
         config.houses
           .map((houseName) => HOUSES.find(({ name }) => houseName === name))
           .filter(function (x: GoTHouse | undefined): x is GoTHouse {
             return x !== undefined;
           })
-          .map((el) => ({
-            _id: uuid(),
-            ...getQuestionProperties(fromType, toType, el),
-            alternatives: [el]
-              .concat(
-                HOUSES.filter(({ name }) => name !== el.name).slice(
-                  0,
-                  config.maxAlternatives
+          .map(async (el) => {
+            const alternatives = await Promise.all(
+              [el]
+                .concat(
+                  HOUSES.filter(({ name }) => name !== el.name).slice(
+                    0,
+                    config.maxAlternatives
+                  )
                 )
-              )
-              .map((el) => ({
-                ...getAlternative(toType, el),
-                _id: uuid(),
-              })),
-            category: "game-of-thrones",
-          }))
-          .map(
-            ({ alternatives, ...question }) =>
-              ({
-                answerId: alternatives[0]._id,
-                alternatives: shuffle(alternatives),
-                ...question,
-              } as Question)
-          )
+                .map(async (el) => await getAlternative(toType, el))
+            );
+            const answerId = alternatives[0]._id;
+            return {
+              _id: uuid(),
+              ...(await getQuestionProperties(fromType, toType, el)),
+              answerId,
+              alternatives: shuffle(alternatives),
+              category: "game-of-thrones",
+            };
+          })
       ),
-    []
+    [] as Promise<Question>[]
   );
 
 export default questions;
