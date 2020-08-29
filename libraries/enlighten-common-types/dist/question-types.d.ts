@@ -12,9 +12,10 @@ export declare type QuestionType<T> = {
 export declare type Question = {
     _id: string;
     alternatives: Alternative[];
-    category: string;
+    categoryId: string;
     answerId: string;
     text: string;
+    levelId: string;
 } & ({
     type: "text";
 } | {

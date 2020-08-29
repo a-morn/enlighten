@@ -8,8 +8,8 @@ const CategorySelect = memo(({ categories, onChange, selected }) => (
     value={selected}
   >
     {!selected && <option>Choose category</option>}
-    {categories.map(({ id, label }, i) => (
-      <option key={i} value={id}>
+    {categories.map(({ _id, label }, i) => (
+      <option key={i} value={_id}>
         {label}
       </option>
     ))}

@@ -6,6 +6,7 @@ import {
   QuestionEntityType,
   QuestionDirection,
   Alternative,
+  Level,
 } from "enlighten-common-types";
 import lqip from "lqip";
 
@@ -93,14 +94,26 @@ const fiz = (toTypeId: string) => {
   }
 };
 
-const getQuestionProperties = async (
+const getQuestion = async (
   fromType: QuestionEntityType<GoTHouse> | QuestionEntityType<GoTHouse>[],
   toType: QuestionEntityType<GoTHouse>,
-  el: GoTHouse
-) => {
+  el: GoTHouse,
+  answerId: string,
+  alternatives: Alternative[],
+  categoryId: string,
+  levels: Level[] | undefined
+): Promise<Question> => {
   if (Array.isArray(fromType)) {
     throw new Error("No handling for array fromType for got");
   }
+
+  const base = {
+    _id: uuid(),
+    alternatives,
+    categoryId,
+    answerId,
+  }
+
   switch (fromType.id) {
     case "name":
     case "seat":
@@ -108,18 +121,20 @@ const getQuestionProperties = async (
     case "words":
     case "lord-asoiaf-start":
       return {
+        ...base,
         type: "text",
         text: `${fiz(toType.id)} __${toType.label}__ of the house with the ${
           fromType.label
         } _${el[fromType.id]}_? `,
-      } as const;
+      };
     case "coat-of-arms":
       return {
+        ...base,
         type: "image",
         text: `What is the __${toType.label}__ of the house with the coat of arms pictured?`,
         src: el[fromType.id],
         lqip: await lqip.base64(`../../assets/public${el[fromType.id]}`),
-      } as const;
+      };
   }
 };
 
@@ -148,7 +163,7 @@ const getAlternative = async (
   }
 };
 
-const questions: Promise<Question>[] = config.fromTypes
+export const getQuestions: (categoryId: string, levels?: Level[]) => Promise<Question>[] = (categoryId: string, levels?: Level[]) => config.fromTypes
   .reduce(
     (acc: QuestionDirection<GoTHouse>[], fromType) =>
       acc.concat(
@@ -178,16 +193,8 @@ const questions: Promise<Question>[] = config.fromTypes
                 .map(async (el) => await getAlternative(toType, el))
             );
             const answerId = alternatives[0]._id;
-            return {
-              _id: uuid(),
-              ...(await getQuestionProperties(fromType, toType, el)),
-              answerId,
-              alternatives: shuffle(alternatives),
-              category: "game-of-thrones",
-            };
+            return await getQuestion(fromType, toType, el, answerId, shuffle(alternatives), categoryId, levels)
           })
       ),
     [] as Promise<Question>[]
   );
-
-export default questions;

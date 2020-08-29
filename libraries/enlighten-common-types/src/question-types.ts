@@ -15,9 +15,10 @@ export type QuestionType<T> = {
 export type Question = {
   _id: string;
   alternatives: Alternative[];
-  category: string;
+  categoryId: string;
   answerId: string;
   text: string;
+  levelId: string;
 } & (
   | {
       type: "text";

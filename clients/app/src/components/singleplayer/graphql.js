@@ -5,6 +5,11 @@ const GAME = gql`
     gameSingleplayer {
       categoryBackground
       categoryBackgroundBase64
+      categoryName
+      levels {
+        _id
+        name
+      }
       lastQuestion {
         _id
         answerId
@@ -18,6 +23,7 @@ const GAME = gql`
         tones
         answerId
         answered
+        levelId
         alternatives {
           _id
           type
@@ -61,6 +67,11 @@ const GAME_UPDATED = gql`
       gameSingleplayer {
         categoryBackground
         categoryBackgroundBase64
+        categoryName
+        levels {
+          _id
+          name
+        }
         lastQuestion {
           _id
           answerId
@@ -74,6 +85,7 @@ const GAME_UPDATED = gql`
           tones
           answerId
           answered
+          levelId
           alternatives {
             _id
             type

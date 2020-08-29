@@ -1,7 +1,6 @@
-import { CategoryId } from './category-types';
 export declare type GameRequest = {
     id: string;
-    categoryId: CategoryId;
+    categoryId: string;
     playerRequestId: string;
     playerRequestName: string;
     playerOfferedName: string;

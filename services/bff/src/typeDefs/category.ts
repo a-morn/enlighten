@@ -1,10 +1,10 @@
 export default `
-    type CategoryId {
-        id: ID!
+    type Category {
+        _id: ID!
         label: String!
     }
 
     extend type Query {
-        categories: [CategoryId]
+        categories: [Category]
     }
 `

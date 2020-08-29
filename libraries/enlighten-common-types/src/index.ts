@@ -6,3 +6,4 @@ export * from "./player-types";
 export * from "./game-request-types";
 export * from "./authentication-types";
 export * from "./user-types";
+export * from "./level-types";

@@ -157,6 +157,17 @@ function Singleplayer() {
     }
   }, [gameData, selectedAnswerId])
 
+  const levelName = R.pathOr(
+    null,
+    ['name'],
+    R.pathOr(
+      [],
+      ['gameSingleplayer', 'levels'],
+      gameData
+    )
+    .find(({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId)
+  )
+
   return (
     <div className="flex flex-col items-center justify-center">
       {!R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (
@@ -172,6 +183,8 @@ function Singleplayer() {
       {R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (
         <SingleplayerGame
           currentQuestion={gameData.gameSingleplayer.currentQuestion}
+          levelName={levelName}
+          categoryName={gameData.gameSingleplayer.categoryName}
           endGame={deleteGameCallback}
           answer={answerCallback}
           isLoading={isLoading}

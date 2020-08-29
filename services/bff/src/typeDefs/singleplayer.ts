@@ -3,9 +3,11 @@ export default `
         categoryId: String!
         categoryBackground: String!
         categoryBackgroundBase64: String!
+        categoryName: String!
         playerId: ID!
         currentQuestion: Question
         lastQuestion: Question
+        levels: [Level]
     }
 
     extend type Query {

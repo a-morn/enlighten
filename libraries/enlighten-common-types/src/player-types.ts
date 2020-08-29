@@ -1,5 +1,3 @@
-import { CategoryId, isCategoryId } from "./category-types";
-
 export type Player = {
   id: string;
   name: string;
@@ -7,7 +5,7 @@ export type Player = {
 };
 
 export type PlayerLobby = Player & {
-  categoryId: CategoryId;
+  categoryId: string;
   timestamp: string;
 };
 
@@ -47,7 +45,7 @@ export function isPlayerGameId(x: unknown): x is PlayerGameId {
 export function isPlayerLobby(x: unknown): x is PlayerLobby {
   return (
     isPlayer(x) &&
-    isCategoryId((x as PlayerLobby).categoryId) &&
+    typeof (x as PlayerLobby).categoryId === 'string' &&
     typeof (x as PlayerLobby).timestamp === "string"
   );
 }

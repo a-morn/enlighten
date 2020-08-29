@@ -24,7 +24,6 @@ import {
   GameRequest,
   MutationResponse,
   PlayerLobby,
-  isCategoryId,
 } from 'enlighten-common-types'
 
 type QueryLobbyResponse = { players: PlayerLobby[] }
@@ -124,9 +123,6 @@ export const lobbyMutationResolvers = (
     _,
     { player: { id, categoryId, name } },
   ): Promise<PlayerLobbyMutationResponse> => {
-    if (!isCategoryId(categoryId)) {
-      throw new UserInputError('Incorrect category')
-    }
     const player = await join(redisClient, pubSub, id, categoryId, name)
 
     return {
@@ -157,9 +153,6 @@ export const lobbyMutationResolvers = (
     const {
       currentUser: { playerId },
     } = context
-    if (!isCategoryId(categoryId)) {
-      throw new UserInputError('Incorrect category')
-    }
     if (playerId !== playerRequestId) {
       throw new ForbiddenError("Can't request games for other players")
     }

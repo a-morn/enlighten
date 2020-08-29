@@ -3,7 +3,12 @@ import ReactMarkdown from 'react-markdown'
 import { DuoSynth } from 'tone'
 import Alternative from './alternative'
 
-const questionHeading = (type, src, lqip, text, tones, synth) => {
+const categoryAndLevel = ({ categoryName, levelName }) => {
+  return <h1 className="uppercase font-bold m-2">{categoryName}{levelName ? ` - ${levelName}` : ''}</h1>
+}
+
+const questionHeading = ({ type, src, lqip, text, tones, synth }) => {
+  console.log('waaaat')
   switch (type) {
     case 'text':
       return <ReactMarkdown source={text} className="markdown" />
@@ -51,6 +56,8 @@ const questionHeading = (type, src, lqip, text, tones, synth) => {
 const Question = React.memo(
   ({
     question: { type, alternatives, text, src, lqip, tones, answered },
+    levelName,
+    categoryName,
     onAlternativeSelected,
     selectedAnswerId,
     correctAnswerId,
@@ -72,7 +79,8 @@ const Question = React.memo(
         }`}
       >
         <div className="flex flex-col items-center bg-gray-lighter text-black my-4 p-4 rounded">
-          {questionHeading(type, src, lqip, text, tones, synth)}
+          {categoryAndLevel({ levelName, categoryName })}
+          {questionHeading({ type, src, lqip, text, tones, synth, levelName, categoryName })}
         </div>
         <ul className="question__alternatives shadow-lg">
           {alternatives.map((alt, i) => (

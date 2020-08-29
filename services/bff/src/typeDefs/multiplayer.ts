@@ -11,11 +11,13 @@ export default `
     type GameMultiplayer {
         id: ID!
         categoryId: String!
+        categoryName: String!
         categoryBackground: String!
         categoryBackgroundBase64: String!
         players: [PlayerMultiplayer]
         currentQuestion: Question
         lastQuestion: Question
+        levels: [Level]
     }
 
     extend type Query {

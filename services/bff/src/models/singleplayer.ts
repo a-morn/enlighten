@@ -6,13 +6,13 @@ import shuffle from 'shuffle-array'
 import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
 import { filterGame } from 'enlighten-common-utils'
 import {
-  CategoryId,
   GameSingeplayer,
   isGameSingleplayer,
   Question,
 } from 'enlighten-common-types'
 import { getCategory } from './category'
 import { getQuestionById, getQuestionsByCategory } from './questions'
+import { getLevels } from './levels'
 
 const getGameByPlayerId = async (
   redisClient: Redis,
@@ -71,10 +71,34 @@ const updateQuestionByPlayerId = async (
     game = fetchedGame
   }
 
+  if (isUndefined(game)) {
+    throw new Error('Should never happen, just helping TSC out')
+  }
+
   const lastQuestionId = game.lastQuestionId
-  game.currentQuestionId = shuffle(
-    game.questions.filter(({ _id }) => _id !== lastQuestionId),
-  )[0]._id
+
+  let currentQuestion
+
+  if (game.levels) {
+    const currentLevel = game.levels[game.currentLevelIndex || 0]; 
+    currentQuestion = shuffle(
+      game.questions
+        .filter(({ _id, levelId }) => _id !== lastQuestionId && levelId === currentLevel._id),
+    )[0]
+    if (isUndefined(currentQuestion)) {
+      throw new Error(`No question with level id ${currentLevel._id} that is not ${lastQuestionId}`)
+    }
+  } else {
+    currentQuestion = shuffle(
+      game.questions
+        .filter(({ _id }) => _id !== lastQuestionId),
+    )[0]
+    if (isUndefined(currentQuestion)) {
+      throw new Error(`No question that is not ${lastQuestionId}`)
+    }
+  }
+
+  game.currentQuestionId = currentQuestion._id
 
   game.lastQuestionId = game.currentQuestionId
   game.currentQuestion = await getQuestionById(game.currentQuestionId)
@@ -89,23 +113,33 @@ const updateQuestionByPlayerId = async (
 const createGame = async (
   redisClient: Redis,
   playerId: string,
-  categoryId: CategoryId,
+  categoryId: string,
 ): Promise<GameSingeplayer> => {
-  const [category, questions] = await Promise.all([
+  const [category, questions, levels] = await Promise.all([
     getCategory(categoryId),
     getQuestionsByCategory(categoryId),
+    getLevels(categoryId)
   ])
+
+  if (isUndefined(category) || isUndefined(questions)) {
+    throw new Error(`This can't happen, just helping tsc out`)
+  }
 
   const game = {
     playerId,
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
+    categoryName: category.label,
     questions: questions.map((q: Question) => ({
       ...q,
       record: 0,
+      answered: false
     })),
+    levels,
+    currentLevelIndex: 0,
   } as GameSingeplayer
+
   const updatedGame = await updateQuestionByPlayerId(
     redisClient,
     playerId,
@@ -143,6 +177,13 @@ const answerQuestion = async (
   question.record += answerId === question.answerId ? 1 : -1
 
   question.answered = true
+
+  if (game.levels) {
+    const currentLevel = game.levels[game.currentLevelIndex || 0];
+    if(!game.questions.filter(({ levelId }) => levelId === currentLevel._id).some((question) => !question.answered || question.record < 1)) {
+      game.currentLevelIndex = Math.min(game.currentLevelIndex || 0 + 1, game.levels.length - 1)
+    }
+  }
 
   updateGame(redisClient, game)
 

@@ -3,7 +3,6 @@ import { UserInputError } from 'apollo-server'
 import {
   GameMultiplayer,
   GameQuestion,
-  CategoryId,
   PlayerLobby,
   PlayerMultiplayer,
   isGameMultiplayer,
@@ -101,7 +100,7 @@ const createGame = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   players: PlayerLobby[],
-  categoryId: CategoryId,
+  categoryId: string,
 ): Promise<GameMultiplayer> => {
   const [category, questions] = await Promise.all([
     getCategory(categoryId),
@@ -113,6 +112,7 @@ const createGame = async (
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
+    categoryName: category.label,
     id: uuid(),
     players: await Promise.all(
       players.map(async player => ({

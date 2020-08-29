@@ -1,7 +1,9 @@
 import { GameQuestion } from "./question-types";
 import { PlayerMultiplayer } from "./player-types";
+import { Level } from ".";
 export declare type Game = {
     categoryId: string;
+    categoryName: string;
     categoryBackground: string;
     categoryBackgroundBase64: string;
     lastQuestionId?: string;
@@ -13,15 +15,14 @@ export declare type Game = {
 export declare type GameSingeplayer = Game & {
     playerId: string;
     questions: GameQuestion[];
+    currentLevelIndex?: number;
+    levels: Level[];
 };
 export declare type GameMultiplayer = Game & {
     id: string;
     players: PlayerMultiplayer[];
     questions: GameQuestion[];
     questionIndex: number;
-};
-export declare type Levels = {
-    [key: number]: GameQuestion[];
 };
 export declare function isGame(x: unknown): x is Game;
 export declare function isGameMultiplayer(x: unknown): x is GameMultiplayer;

@@ -6,7 +6,6 @@ import {
   LOBBY_PLAYERS_SUBSCRIPTION,
 } from 'enlighten-common-graphql'
 import {
-  CategoryId,
   GameRequest,
   PlayerLobby,
   isGameRequest,
@@ -55,7 +54,7 @@ const getGameRequestIdByPlayerId = async (
 // todo: this won't scale for shit
 const getPlayers = async (
   redisClient: Redis,
-  categoryId?: CategoryId,
+  categoryId?: string,
 ): Promise<PlayerLobby[]> => {
   const playersStringArray = await getAllByPattern(
     redisClient,
@@ -153,7 +152,7 @@ const addGameRequest = async (
   pubsub: RedisPubSub,
   playerRequestId: string,
   playerOfferedId: string,
-  categoryId: CategoryId,
+  categoryId: string,
 ): Promise<GameRequest> => {
   const playerRequest = await getPlayer(redisClient, playerRequestId)
   const playerOffered = await getPlayer(redisClient, playerOfferedId)
@@ -292,7 +291,7 @@ const join = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   id: string,
-  categoryId: CategoryId,
+  categoryId: string,
   name: string,
 ): Promise<PlayerLobby> => {
   const player = { id, categoryId, name, timestamp: new Date().toISOString() }
@@ -310,7 +309,7 @@ const answerGameRequest = async (
     redisClient: Redis,
     pubSub: RedisPubSub,
     players: PlayerLobby[],
-    categoryId: CategoryId,
+    categoryId: string,
   ) => Promise<unknown>,
 ): Promise<GameRequest> => {
   const gameRequestAnswered = await getGameRequest(redisClient, id)

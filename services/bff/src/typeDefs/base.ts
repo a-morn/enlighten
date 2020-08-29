@@ -10,6 +10,11 @@ export default `
 		mutation: String!
 	}
 
+	type Level {
+		_id: ID!
+		name: String!
+	}
+
 	type Question {
 		_id: ID!
 		type: String!
@@ -20,6 +25,7 @@ export default `
 		tones: [String]
 		answerId: ID
 		answered: Boolean!
+		levelId: String
 	} 
 
 	type QuestionAlternative {

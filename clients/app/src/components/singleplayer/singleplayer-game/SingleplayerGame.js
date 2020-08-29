@@ -8,6 +8,8 @@ function SingleplayerGame({
   selectedAnswerId,
   correctAnswerId,
   answer,
+  levelName,
+  categoryName
 }) {
   const [endingGame, setEndingGame] = useState(false)
   const endGameCallback = useCallback(() => {
@@ -20,6 +22,8 @@ function SingleplayerGame({
         className="pt-4"
         disabled={isLoading}
         question={currentQuestion}
+        levelName={levelName}
+        categoryName={categoryName}
         selectedAnswerId={selectedAnswerId}
         correctAnswerId={correctAnswerId}
         onAlternativeSelected={answer}

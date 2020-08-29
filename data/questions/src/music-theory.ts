@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import shuffle from "shuffle-array";
-import { Question } from "enlighten-common-types";
+import { Question, Level } from "enlighten-common-types";
 
 const TONES = [
   "C",
@@ -57,7 +57,7 @@ const alternatives = INTERVAL.map((interval) => ({
   _id: uuid(),
 }));
 
-const questions = TONES.reduce(
+export const getQuestions: (categoryId: string, levels?: Level[] | null) => Question[] = (categoryId: string, levels?: Level[] | null) => TONES.reduce(
   (acc: Question[], tone) =>
     acc.concat(
       INTERVAL.reduce(
@@ -76,7 +76,7 @@ const questions = TONES.reduce(
                   `${intervalEndTone(tone, octave, interval)}`,
                 ],
                 text: "What interval is this?",
-                category: "music-theory",
+                categoryId,
                 answerId,
                 alternatives: shuffle(alternatives),
               } as Question;
@@ -87,5 +87,3 @@ const questions = TONES.reduce(
     ),
   [] as Question[]
 );
-
-export default questions;

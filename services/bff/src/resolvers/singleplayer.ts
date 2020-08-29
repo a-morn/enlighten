@@ -11,7 +11,6 @@ import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
 import { filterGame } from 'enlighten-common-utils'
 import {
   AnswerQuestionInput,
-  CategoryId,
   Context,
   GameSingeplayer,
   MutationResponse,
@@ -19,7 +18,7 @@ import {
 
 type CreateGameSingleplayerInput = {
   game: {
-    categoryId: CategoryId
+    categoryId: string
     playerId: string
   }
 }

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const category_types_1 = require("./category-types");
+exports.isGameSingleplayer = exports.isGameMultiplayer = exports.isGame = void 0;
 function isGame(x) {
-    return (category_types_1.isCategoryId(x.categoryId) &&
+    return (typeof x.categoryId === 'string' &&
         typeof x.categoryBackground === "string");
 }
 exports.isGame = isGame;
