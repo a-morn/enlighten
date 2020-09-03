@@ -12,7 +12,6 @@
   "devDependencies": {
     "@types/mongodb": "^3.5.14",
     "@types/node": "^13.13.4",
-    "enlighten-common-types": "2.1.5",
     "ts-node": "^8.9.1",
     "typescript": "^3.9.5"
   },
@@ -22,6 +21,7 @@
     "@types/uuid": "^7.0.3",
     "countries-list": "^2.5.4",
     "dotenv-flow": "^3.1.0",
+    "enlighten-common-types": "file:../../libraries/enlighten-common-types/",
     "lqip": "^2.1.0",
     "memoizee": "^0.4.14",
     "mini-svg-data-uri": "^1.1.3",

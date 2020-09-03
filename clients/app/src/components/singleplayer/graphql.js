@@ -6,6 +6,7 @@ const GAME = gql`
       categoryBackground
       categoryBackgroundBase64
       categoryName
+      progression
       levels {
         _id
         name
@@ -68,6 +69,7 @@ const GAME_UPDATED = gql`
         categoryBackground
         categoryBackgroundBase64
         categoryName
+        progression
         levels {
           _id
           name

@@ -18,7 +18,9 @@ export type Question = {
   categoryId: string;
   answerId: string;
   text: string;
-  levelId: string;
+  types: string[];
+  levelId?: string;
+  questionGroup?: string;
 } & (
   | {
       type: "text";
@@ -52,3 +54,10 @@ export type Alternative = {
       text: string;
     }
 );
+
+export type QuestionGroup = {
+  levelId: string
+  name: string
+  questions: GameQuestion[]
+  types: { type: string, score: number }[]
+}

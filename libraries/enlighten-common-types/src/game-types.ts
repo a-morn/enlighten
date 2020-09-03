@@ -1,4 +1,4 @@
-import { GameQuestion } from "./question-types";
+import { GameQuestion, QuestionGroup } from "./question-types";
 import { PlayerMultiplayer } from "./player-types";
 import { Level } from ".";
 
@@ -16,9 +16,10 @@ export type Game = {
 
 export type GameSingeplayer = Game & {
   playerId: string;
-  questions: GameQuestion[];
+  questionGroups: QuestionGroup[];
   currentLevelIndex?: number;
   levels: Level[];
+  progression: number;
 };
 
 export type GameMultiplayer = Game & {
@@ -49,6 +50,6 @@ export function isGameSingleplayer(x: unknown): x is GameSingeplayer {
   return (
     isGame(x) &&
     typeof (x as GameSingeplayer).playerId === "string" &&
-    typeof (x as GameSingeplayer).questions === "object"
+    typeof (x as GameSingeplayer).questionGroups === "object"
   );
 }

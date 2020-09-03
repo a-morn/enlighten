@@ -9,7 +9,8 @@ function SingleplayerGame({
   correctAnswerId,
   answer,
   levelName,
-  categoryName
+  categoryName,
+  progression
 }) {
   const [endingGame, setEndingGame] = useState(false)
   const endGameCallback = useCallback(() => {
@@ -27,6 +28,7 @@ function SingleplayerGame({
         selectedAnswerId={selectedAnswerId}
         correctAnswerId={correctAnswerId}
         onAlternativeSelected={answer}
+        progression={progression}
       />
       <button
         data-testid="end-game-button"

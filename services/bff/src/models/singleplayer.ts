@@ -9,6 +9,8 @@ import {
   GameSingeplayer,
   isGameSingleplayer,
   Question,
+  QuestionGroup,
+  GameQuestion,
 } from 'enlighten-common-types'
 import { getCategory } from './category'
 import { getQuestionById, getQuestionsByCategory } from './questions'
@@ -75,31 +77,49 @@ const updateQuestionByPlayerId = async (
     throw new Error('Should never happen, just helping TSC out')
   }
 
-  const lastQuestionId = game.lastQuestionId
+  const lastQuestionGroup = game.lastQuestion?.questionGroup
 
-  let currentQuestion
+  let currentQuestion: GameQuestion
+  let currentQuestionGroup: QuestionGroup
 
   if (game.levels) {
     const currentLevel = game.levels[game.currentLevelIndex || 0]; 
-    currentQuestion = shuffle(
-      game.questions
-        .filter(({ _id, levelId }) => _id !== lastQuestionId && levelId === currentLevel._id),
+
+    currentQuestionGroup = shuffle(
+      game.questionGroups
+        .filter(({ name, levelId }) => name !== lastQuestionGroup && levelId === currentLevel._id)
+        .filter(({ types }) => types.some(type => type.score < 1))
     )[0]
+
+    const unansweredTypes = currentQuestionGroup.types
+      .filter(type => type.score < 1)
+      .map(({ type }) => type)
+
+    currentQuestion = shuffle(currentQuestionGroup
+      .questions
+      .filter(q => q.types.some(type => unansweredTypes.includes(type))))[0]
+
     if (isUndefined(currentQuestion)) {
-      throw new Error(`No question with level id ${currentLevel._id} that is not ${lastQuestionId}`)
+      throw new Error(`No question with level id ${currentLevel._id} that is not in question group ${lastQuestionGroup}`)
     }
   } else {
-    currentQuestion = shuffle(
-      game.questions
-        .filter(({ _id }) => _id !== lastQuestionId),
+    currentQuestionGroup = shuffle(
+      game.questionGroups
+        .filter(({ name }) => name !== lastQuestionGroup),
     )[0]
+    if (isUndefined(currentQuestionGroup)) {
+      throw new Error(`No question group that is not ${lastQuestionGroup}`)
+    }
+
+    currentQuestion = shuffle(currentQuestionGroup.questions)[0]
+
     if (isUndefined(currentQuestion)) {
-      throw new Error(`No question that is not ${lastQuestionId}`)
+      throw new Error(`No question in question group ${lastQuestionGroup}`)
     }
   }
 
+  game.currentQuestionGroup = currentQuestionGroup.name
   game.currentQuestionId = currentQuestion._id
-
   game.lastQuestionId = game.currentQuestionId
   game.currentQuestion = await getQuestionById(game.currentQuestionId)
   game.currentQuestion.alternatives = shuffle(game.currentQuestion.alternatives)
@@ -125,17 +145,47 @@ const createGame = async (
     throw new Error(`This can't happen, just helping tsc out`)
   }
 
+  const questionGroups =
+    Object.values(
+      questions
+        .map((q: Question) => ({
+          ...q,
+          record: 0,
+          answered: false
+        }))
+        .reduce((questionGroups, gameQuestion) => {
+          let group: QuestionGroup;
+
+          if (questionGroups[gameQuestion.questionGroup] === undefined) {
+            group = {
+              questions: [gameQuestion],
+              types: gameQuestion.types.map(type => ({ type, score: 0 })),
+              levelId: gameQuestion.levelId,
+              name: gameQuestion.questionGroup
+            }
+          } else {
+            group = questionGroups[gameQuestion.questionGroup]
+            group.questions.push(gameQuestion)
+            const newTypes = gameQuestion.types
+            .filter(type => !group.types.some(groupType =>  groupType.type === type))
+            group.types = [...group.types, ...newTypes.map(type => ({ type, score: 0 }))]
+          }
+
+          return {
+            ...questionGroups,
+            [gameQuestion.questionGroup]: group
+          }
+        }, {} as { [key: string]: QuestionGroup })
+    )
+
   const game = {
     playerId,
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
     categoryName: category.label,
-    questions: questions.map((q: Question) => ({
-      ...q,
-      record: 0,
-      answered: false
-    })),
+    progression: 0,
+    questionGroups,
     levels,
     currentLevelIndex: 0,
   } as GameSingeplayer
@@ -167,21 +217,51 @@ const answerQuestion = async (
     throw new UserInputError('No question to be answered')
   }
 
-  const question = game.questions.find(
-    ({ _id }) => _id === game.currentQuestionId,
-  )
+  const questionGroup = game.questionGroups
+    .find(({ name }) => name === game.currentQuestionGroup)
+    
+  if (isUndefined(questionGroup)) {
+    throw new UserInputError('Current question group did not exist')
+  }
+
+  const question = questionGroup.questions
+    .find(({ _id }) => _id === game.currentQuestionId)
 
   if (isUndefined(question)) {
     throw new UserInputError('Current question did not exist')
   }
-  question.record += answerId === question.answerId ? 1 : -1
+
+  if (answerId === question.answerId) {
+    question.types
+      .forEach(type => {
+        questionGroup.types
+          .filter(qgType => qgType.type === type)
+          .forEach(qgType => qgType.score = 1)
+      })
+    question.record += 1
+  } else {
+    question.types
+      .forEach(type => {
+        questionGroup.types
+          .filter(qgType => qgType.type === type)
+          .forEach(qgType => qgType.score = -1)
+      })
+    question.record -= 1
+  }
 
   question.answered = true
 
   if (game.levels) {
     const currentLevel = game.levels[game.currentLevelIndex || 0];
-    if(!game.questions.filter(({ levelId }) => levelId === currentLevel._id).some((question) => !question.answered || question.record < 1)) {
+    const questionGroupTypeScore = game.questionGroups
+      .filter(({ levelId }) => levelId === currentLevel._id)
+      .reduce((allScore: number[], { types }) => [...allScore, ...types.map(({ score }) => score)], [])
+    const unansweredQuestionGroupTypeScore = questionGroupTypeScore.filter((score) => score < 1)
+    game.progression = (questionGroupTypeScore.length - unansweredQuestionGroupTypeScore.length) / questionGroupTypeScore.length
+
+    if (!unansweredQuestionGroupTypeScore.some(q => q)) {
       game.currentLevelIndex = Math.min(game.currentLevelIndex || 0 + 1, game.levels.length - 1)
+      game.progression = 0
     }
   }
 

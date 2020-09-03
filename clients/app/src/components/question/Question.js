@@ -2,13 +2,30 @@ import React, { Fragment, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { DuoSynth } from 'tone'
 import Alternative from './alternative'
+import './Question.scss'
 
-const categoryAndLevel = ({ categoryName, levelName }) => {
-  return <h1 className="uppercase font-bold m-2">{categoryName}{levelName ? ` - ${levelName}` : ''}</h1>
+const categoryAndLevel = ({
+  categoryName,
+  levelName,
+  progression
+}) => {
+  return <>
+    <h1 className="font-bold">{categoryName}</h1>
+    <div className="progress bg-brand-light m-4">
+      { levelName && <h2 className="category-and-level font-bold m-2 text-gray-darkest">{levelName}</h2> }
+      <div className="bar bg-brand" style={{ width: `${progression > 0.15 ? progression * 100 : 0}%`}}></div>
+    </div>
+  </>
 }
 
-const questionHeading = ({ type, src, lqip, text, tones, synth }) => {
-  console.log('waaaat')
+const questionHeading = ({
+  type,
+  src,
+  lqip,
+  text,
+  tones,
+  synth,
+}) => {
   switch (type) {
     case 'text':
       return <ReactMarkdown source={text} className="markdown" />
@@ -63,23 +80,26 @@ const Question = React.memo(
     correctAnswerId,
     disabled,
     className = '',
+    progression
   }) => {
     const synth = useRef(null)
 
     useEffect(() => {
-      synth.current = new DuoSynth().toMaster()
+      if (type === 'tones') {
+        synth.current = new DuoSynth().toMaster()
+      }
     }, [])
 
     return (
       <div
-        className={`${className} transition-opacity ease-in-out ${
+        className={`question ${className} transition-opacity ease-in-out ${
           answered
             ? 'opacity-0 delay-300 duration-1000'
             : 'opacity-100 duration-500'
         }`}
       >
-        <div className="flex flex-col items-center bg-gray-lighter text-black my-4 p-4 rounded">
-          {categoryAndLevel({ levelName, categoryName })}
+        <div className="flex flex-col items-center bg-gray-lighter text-gray-darkest my-4 p-4 rounded">
+          {categoryAndLevel({ levelName, categoryName, progression })}
           {questionHeading({ type, src, lqip, text, tones, synth, levelName, categoryName })}
         </div>
         <ul className="question__alternatives shadow-lg">

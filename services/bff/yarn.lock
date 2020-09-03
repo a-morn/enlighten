@@ -2417,10 +2417,8 @@ enlighten-common-types@2.0.1:
   resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.0.1.tgz#ab4da0dfc0922ba72ac41a9961d3ee6aeba691e6"
   integrity sha512-xbARIE8jbXI/RslgZ+uC/3rdmfyeiOuCDXz2Mhj3uSJICEqojKPMx+sxlTgTZxezebhh8j+CSyQtCo0+YdiEPw==
 
-enlighten-common-types@2.1.6:
+"enlighten-common-types@file:../../libraries/enlighten-common-types":
   version "2.1.6"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.1.6.tgz#f0005ad2007d3df49b3fa1ef1cce5ba74118293c"
-  integrity sha512-OzmLVW6tjHtsJOOQMBvshpzqVLPNaAzbgsyT+uEzwaqQ9rsyarLWmmpaIPFY/dHSw7vtDyzTTAD3slIE7u9A4w==
 
 enlighten-common-utils@2.0.0:
   version "2.0.0"

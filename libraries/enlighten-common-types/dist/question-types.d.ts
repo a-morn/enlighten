@@ -15,7 +15,9 @@ export declare type Question = {
     categoryId: string;
     answerId: string;
     text: string;
-    levelId: string;
+    types: string[];
+    levelId?: string;
+    questionGroup?: string;
 } & ({
     type: "text";
 } | {
@@ -40,3 +42,12 @@ export declare type Alternative = {
     type: "text";
     text: string;
 });
+export declare type QuestionGroup = {
+    levelId: string;
+    name: string;
+    questions: GameQuestion[];
+    types: {
+        type: string;
+        score: number;
+    }[];
+};

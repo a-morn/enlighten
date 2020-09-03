@@ -12,6 +12,8 @@ import lqip from "lqip";
 import memoizee from "memoizee";
 import { isDefined } from 'ts-is-present';
 import { Level } from "enlighten-common-types";
+import { totalmem } from "os";
+import { isUndefined } from "util";
 
 const COUNTRIES = Object.entries(countries).map(([key, value]) => ({
   ...value,
@@ -89,12 +91,21 @@ const getQuestion = async (
   if (Array.isArray(fromType)) {
     throw new Error(`Array fromType is not supported for this category`);
   }
+
+  const level = levelByContinentAbbrevation(el.continent, levels)
+
+  if (isUndefined(level)) {
+    throw new Error('Level not found')
+  }
+
   const base = {
     _id: uuid(),
     answerId,
     alternatives,
     categoryId,
-    levelId: levelByContinentAbbrevation(el.continent, levels)?._id
+    levelId: level._id,
+    questionGroup: el.name,
+    types: [fromType.id, toType.id]
   }
   switch (fromType.id) {
     case "name":

@@ -1,4 +1,4 @@
-import { GameQuestion } from "./question-types";
+import { GameQuestion, QuestionGroup } from "./question-types";
 import { PlayerMultiplayer } from "./player-types";
 import { Level } from ".";
 export declare type Game = {
@@ -14,9 +14,10 @@ export declare type Game = {
 };
 export declare type GameSingeplayer = Game & {
     playerId: string;
-    questions: GameQuestion[];
+    questionGroups: QuestionGroup[];
     currentLevelIndex?: number;
     levels: Level[];
+    progression: number;
 };
 export declare type GameMultiplayer = Game & {
     id: string;

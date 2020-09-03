@@ -23,7 +23,9 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
       record: faker.random.number(),
       type: 'text',
       text: faker.lorem.text(),
-      levelId: faker.random.uuid()
+      levelId: faker.random.uuid(),
+      questionGroup: faker.lorem.text(),
+      types: [faker.lorem.text()]
     } as GameQuestion,
     currentQuestionId: faker.random.uuid(),
   } as GameMultiplayer)

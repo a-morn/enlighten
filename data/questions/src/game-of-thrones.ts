@@ -101,7 +101,6 @@ const getQuestion = async (
   answerId: string,
   alternatives: Alternative[],
   categoryId: string,
-  levels: Level[] | undefined
 ): Promise<Question> => {
   if (Array.isArray(fromType)) {
     throw new Error("No handling for array fromType for got");
@@ -112,6 +111,7 @@ const getQuestion = async (
     alternatives,
     categoryId,
     answerId,
+    types: [fromType.id, toType.id]
   }
 
   switch (fromType.id) {
@@ -193,7 +193,7 @@ export const getQuestions: (categoryId: string, levels?: Level[]) => Promise<Que
                 .map(async (el) => await getAlternative(toType, el))
             );
             const answerId = alternatives[0]._id;
-            return await getQuestion(fromType, toType, el, answerId, shuffle(alternatives), categoryId, levels)
+            return await getQuestion(fromType, toType, el, answerId, shuffle(alternatives), categoryId)
           })
       ),
     [] as Promise<Question>[]

@@ -348,10 +348,8 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-enlighten-common-types@2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.1.5.tgz#82a4e80db84d3f86fdfe1ce37504b9201154fe5c"
-  integrity sha512-3pyppDEj+LMI52EfL3iALUdIRuskglqmdi6v2IbFS8OE2KhaEE3RgN1e7lwtL0uXEVhpcCyst1MacQylOx6blQ==
+"enlighten-common-types@file:../../libraries/enlighten-common-types":
+  version "2.1.6"
 
 es5-ext@^0.10.35, es5-ext@^0.10.45, es5-ext@^0.10.46, es5-ext@^0.10.50, es5-ext@~0.10.14, es5-ext@~0.10.2, es5-ext@~0.10.46:
   version "0.10.53"

@@ -17,6 +17,6 @@ exports.isGameMultiplayer = isGameMultiplayer;
 function isGameSingleplayer(x) {
     return (isGame(x) &&
         typeof x.playerId === "string" &&
-        typeof x.questions === "object");
+        typeof x.questionGroups === "object");
 }
 exports.isGameSingleplayer = isGameSingleplayer;

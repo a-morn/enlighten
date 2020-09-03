@@ -4,6 +4,7 @@ export default `
         categoryBackground: String!
         categoryBackgroundBase64: String!
         categoryName: String!
+        progression: Float
         playerId: ID!
         currentQuestion: Question
         lastQuestion: Question

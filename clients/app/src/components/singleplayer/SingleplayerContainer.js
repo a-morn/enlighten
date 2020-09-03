@@ -185,6 +185,7 @@ function Singleplayer() {
           currentQuestion={gameData.gameSingleplayer.currentQuestion}
           levelName={levelName}
           categoryName={gameData.gameSingleplayer.categoryName}
+          progression={gameData.gameSingleplayer.progression}
           endGame={deleteGameCallback}
           answer={answerCallback}
           isLoading={isLoading}
