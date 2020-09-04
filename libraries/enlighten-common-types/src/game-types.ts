@@ -17,7 +17,7 @@ export type Game = {
 export type GameSingeplayer = Game & {
   playerId: string;
   questionGroups: QuestionGroup[];
-  currentLevelIndex?: number;
+  currentLevelId?: string;
   levels?: Level[];
   progression: number;
   isWon: boolean;

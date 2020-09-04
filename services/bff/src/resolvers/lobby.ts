@@ -1,5 +1,15 @@
-import { ForbiddenError, UserInputError } from 'apollo-server'
+import { ForbiddenError } from 'apollo-server'
 
+import {
+  GAME_REQUEST,
+  LOBBY_PLAYERS_SUBSCRIPTION,
+} from 'enlighten-common-graphql'
+import {
+  Context,
+  GameRequest,
+  MutationResponse,
+  PlayerLobby,
+} from 'enlighten-common-types'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { ResolverFn, withFilter } from 'graphql-subscriptions'
 
@@ -14,17 +24,6 @@ import {
   updatePlayerTimestamp,
 } from '../models/lobby'
 import { createGame } from '../models/multiplayer'
-import {
-  GAME_REQUEST,
-  LOBBY_PLAYERS_SUBSCRIPTION,
-} from 'enlighten-common-graphql'
-
-import {
-  Context,
-  GameRequest,
-  MutationResponse,
-  PlayerLobby,
-} from 'enlighten-common-types'
 
 type QueryLobbyResponse = { players: PlayerLobby[] }
 

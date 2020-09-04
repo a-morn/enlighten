@@ -11,7 +11,6 @@ export function Scoreboard({ name, score, profilePictureUrl }) {
       setTimeout(() => setPlayerScored(false), 500)
     }
   }, [score, previousScore])
-  profilePictureUrl && console.log(profilePictureUrl)
   return (
     <div className="flex items-center text-brand-dark justify-between">
       {profilePictureUrl ? (

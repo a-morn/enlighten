@@ -1,6 +1,6 @@
-import faker, { fake } from 'faker'
 import { GameQuestion, GameMultiplayer } from 'enlighten-common-types'
 import { filterGame } from 'enlighten-common-utils'
+import faker from 'faker'
 
 const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
   currentQuestionAnswered: boolean,

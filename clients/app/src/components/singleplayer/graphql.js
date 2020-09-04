@@ -11,6 +11,7 @@ const GAME = gql`
       levels {
         _id
         name
+        completed
       }
       lastQuestion {
         _id
@@ -62,6 +63,14 @@ const DELETE_SINGLEPLAYER_GAME = gql`
   }
 `
 
+const CHANGE_LEVEL_SINGLEPLAYER = gql`
+  mutation ChangeLevel($levelId: ID!) {
+    changeLevelSingleplayer(levelId: $levelId) {
+      success
+    }
+  }
+`
+
 const GAME_UPDATED = gql`
   subscription GameUpdated {
     gameSingleplayerSubscription {
@@ -75,6 +84,7 @@ const GAME_UPDATED = gql`
         levels {
           _id
           name
+          completed
         }
         lastQuestion {
           _id
@@ -109,4 +119,5 @@ export {
   CREATE_GAME_SINGLEPLAYER,
   DELETE_SINGLEPLAYER_GAME,
   GAME_UPDATED,
+  CHANGE_LEVEL_SINGLEPLAYER
 }

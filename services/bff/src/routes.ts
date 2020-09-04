@@ -1,11 +1,11 @@
+import axios from 'axios'
 import type { Request, Response } from 'express'
+import  {OAuth2Client} from 'google-auth-library';
+import jwt from 'jsonwebtoken'
+import { v4 as uuidv4 } from 'uuid'
 import { getClient } from './data/client'
 import { findOneUserByEmail, createUser } from './data/users'
 import { getJWTPayloadFromAuthorizationHeader } from './utils'
-import axios from 'axios'
-import jwt from 'jsonwebtoken'
-import { v4 as uuidv4 } from 'uuid'
-import  {OAuth2Client} from 'google-auth-library';
 
 async function verifyGoogle(idToken: string): Promise<string> {  
   if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {

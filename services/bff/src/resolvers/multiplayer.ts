@@ -1,4 +1,13 @@
-import { Question } from 'enlighten-common-types'
+import { GAME_MULTIPLAYER } from 'enlighten-common-graphql'
+import {
+  Question,
+  AnswerQuestionInput,
+  Context,
+  GameMultiplayer,
+  MutationResponse,
+  PlayerMultiplayer,
+} from 'enlighten-common-types'
+import { filterGame } from 'enlighten-common-utils'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { ResolverFn, withFilter } from 'graphql-subscriptions'
 import { Redis } from 'ioredis'
@@ -8,16 +17,6 @@ import {
   removePlayerFromGame,
   updateTimestampForPlayer,
 } from '../models/multiplayer'
-import { GAME_MULTIPLAYER } from 'enlighten-common-graphql'
-import { filterGame } from 'enlighten-common-utils'
-
-import {
-  AnswerQuestionInput,
-  Context,
-  GameMultiplayer,
-  MutationResponse,
-  PlayerMultiplayer,
-} from 'enlighten-common-types'
 
 type RemovePlayerInput = {
   player: {

@@ -1,6 +1,6 @@
 import { Category } from 'enlighten-common-types'
-import { getClient } from '../data/client'
 import { findOneCategory, findCategories } from '../data/categories'
+import { getClient } from '../data/client'
 
 const getCategories = async (): Promise<Category[]> => {
   const client = await getClient()

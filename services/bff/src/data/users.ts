@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb'
 import { User, NewUser } from 'enlighten-common-types'
+import { MongoClient } from 'mongodb'
 import { v4 as uuid } from 'uuid'
 
 export async function findOneUser(

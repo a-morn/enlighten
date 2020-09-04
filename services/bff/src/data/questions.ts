@@ -1,12 +1,12 @@
-import { MongoClient } from 'mongodb'
 import { Question } from 'enlighten-common-types'
+import { MongoClient } from 'mongodb'
 
 export const COUNTRIES_LEVELS = {
   EUROPE: 'Europe',
   THE_AMERICAS: 'The Americas',
   AFRICA: 'Africa',
-  ASIA: 'Asia'
-};
+  ASIA: 'Asia',
+}
 
 export async function findQuestionsByCategory(
   client: MongoClient,

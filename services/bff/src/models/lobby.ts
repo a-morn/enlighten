@@ -1,6 +1,4 @@
 import { ForbiddenError, UserInputError } from 'apollo-server'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { Redis } from 'ioredis'
 import {
   GAME_REQUEST,
   LOBBY_PLAYERS_SUBSCRIPTION,
@@ -11,6 +9,8 @@ import {
   isGameRequest,
   isPlayerLobby,
 } from 'enlighten-common-types'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { Redis } from 'ioredis'
 import { v4 as uuid } from 'uuid'
 
 import { getAllByPattern } from './redis-utils'

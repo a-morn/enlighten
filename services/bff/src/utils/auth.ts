@@ -1,5 +1,5 @@
-import { isUserToken, UserToken } from 'enlighten-common-types'
 import { AuthenticationError } from 'apollo-server-express'
+import { isUserToken, UserToken } from 'enlighten-common-types'
 import jwt from 'jsonwebtoken'
 
 export const getJWTPayloadFromAuthorizationHeader = (

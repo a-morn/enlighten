@@ -1,9 +1,9 @@
-import { MongoClient } from 'mongodb'
 import { Level } from 'enlighten-common-types'
+import { MongoClient } from 'mongodb'
 
 export async function findLevels(
   client: MongoClient,
-  categoryId: string
+  categoryId: string,
 ): Promise<Level[] | undefined> {
   const result = await client
     .db('enlighten')

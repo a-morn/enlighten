@@ -7,14 +7,40 @@ import './Question.scss'
 const categoryAndLevel = ({
   categoryName,
   levelName,
-  progression
+  progression,
+  levels,
+  changeLevel
 }) => {
+  const button = (text, disabled, levelId) =>
+    <button
+      disabled={disabled}
+      className={`text-white font-bold py-2 px-4 rounded-full ${disabled ? 'cursor-not-allowed bg-info' : 'bg-info-dark hover:bg-info'}`}
+      onClick={() => changeLevel(levelId)}>
+      {text}
+    </button>
   return <>
     <h1 className="font-bold">{categoryName}</h1>
-    { levelName &&  <div className="progress bg-brand-light m-4">
-      <h2 className="category-and-level font-bold m-2 text-gray-darkest">{levelName}</h2>
-      <div className="bar bg-brand" style={{ width: `${progression > 0.15 ? progression * 100 : 0}%`}}></div>
-    </div> }
+    { (levelName && levels) &&
+      <>
+        <ul className="flex">{levels
+          .filter(({ completed }, i) => completed || levels[i - 1] === undefined || levels[i - 1].completed)
+          .map(({ name, _id }) => {
+            if (name === levelName) {
+              return <li key={_id} className="font-bold p-2">
+                { button(name, true) }
+              </li>
+            } else {
+              return <li key={_id} className="p-2">
+                { button(name, false, _id) }
+              </li>
+            }
+          })}
+        </ul>
+        <div className="progress bg-success-light m-4">
+          <h2 className="category-and-level font-bold m-2 text-info-dark">{levelName}</h2>
+          <div className="bar bg-success" style={{ width: `${progression > 0.15 ? progression * 100 : 0}%`}}></div>
+        </div>
+      </>}
   </>
 }
 
@@ -80,7 +106,9 @@ const Question = React.memo(
     correctAnswerId,
     disabled,
     className = '',
-    progression
+    progression,
+    levels,
+    changeLevel
   }) => {
     const synth = useRef(null)
 
@@ -99,7 +127,7 @@ const Question = React.memo(
         }`}
       >
         <div className="flex flex-col items-center bg-gray-lighter text-gray-darkest my-4 p-4 rounded">
-          {categoryAndLevel({ levelName, categoryName, progression })}
+          {categoryAndLevel({ levelName, categoryName, progression, levels, changeLevel })}
           {questionHeading({ type, src, lqip, text, tones, synth, levelName, categoryName })}
         </div>
         <ul className="question__alternatives shadow-lg">

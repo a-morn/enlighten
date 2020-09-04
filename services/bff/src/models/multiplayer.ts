@@ -1,5 +1,6 @@
 import { isUndefined } from 'util'
 import { UserInputError } from 'apollo-server'
+import { GAME_MULTIPLAYER, updateGame } from 'enlighten-common-graphql'
 import {
   GameMultiplayer,
   GameQuestion,
@@ -7,16 +8,15 @@ import {
   PlayerMultiplayer,
   isGameMultiplayer,
 } from 'enlighten-common-types'
-import { getClient } from '../data/client'
-import { findOneUser } from '../data/users'
+import { filterGame } from 'enlighten-common-utils'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
 import { v4 as uuid } from 'uuid'
+import { getClient } from '../data/client'
+import { findOneUser } from '../data/users'
 import { getCategory } from './category'
 import { getQuestionsByCategory } from './questions'
-import { GAME_MULTIPLAYER, updateGame } from 'enlighten-common-graphql'
-import { filterGame } from 'enlighten-common-utils'
 
 const getGame = async (
   redisClient: Redis,

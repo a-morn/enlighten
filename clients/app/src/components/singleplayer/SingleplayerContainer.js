@@ -4,28 +4,21 @@ import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { store } from 'hooks/context/store.js'
 import { CategoryPicker } from 'components/category-picker'
 import SingleplayerGame from './singleplayer-game'
-import Bowser from 'bowser'
-import correct from 'assets/correct.wav'
 import {
   GAME,
   ANSWER,
   CREATE_GAME_SINGLEPLAYER,
   DELETE_SINGLEPLAYER_GAME,
   GAME_UPDATED,
+  CHANGE_LEVEL_SINGLEPLAYER
 } from './graphql'
 import { WinScreenSingleplayer } from './win-screen'
-
-const browser = Bowser.getParser(window.navigator.userAgent)
-const correctSound = new Audio(correct)
-correctSound.volume = 0.05
 
 function Singleplayer() {
   const [isStartingGame, setIsStartingGame] = useState()
   const [categoryId, setCategoryId] = useState()
-  const [correctAnswerId, setCorrectAnswerId] = useState()
   const [selectedAnswerId, setSelectedAlternativeId] = useState()
   const [isLoading] = useState(false)
-  const [levelName, setLevelName] = useState()
 
   const globalState = useContext(store)
   const { dispatch } = globalState
@@ -49,19 +42,8 @@ function Singleplayer() {
     ],
   })
   const [answer] = useMutation(ANSWER)
+  const [changeLevel] = useMutation(CHANGE_LEVEL_SINGLEPLAYER)
 
-  useEffect(() => {
-    setLevelName(R.pathOr(
-      null,
-      ['name'],
-      R.pathOr(
-        [],
-        ['gameSingleplayer', 'levels'],
-        gameData
-      )
-      .find(({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId)
-    ))
-  }, [gameData, setLevelName])
   useEffect(() => {
     const url = R.pathOr(
       null,
@@ -110,20 +92,6 @@ function Singleplayer() {
     })
   }, [gameSubscribeToMore])
 
-  useEffect(() => {
-    const currentQuestionAnswerId = R.pathOr(
-      null,
-      ['gameSingleplayer', 'currentQuestion', 'answerId'],
-      gameData,
-    )
-    setCorrectAnswerId(currentQuestionAnswerId)
-    if (currentQuestionAnswerId === selectedAnswerId) {
-      if (browser.getBrowserName() !== 'Safari') {
-        correctSound.play()
-      }
-    }
-  }, [gameData, selectedAnswerId])
-
   const startGameRequest = useCallback(async () => {
     if (!isStartingGame) {
       setIsStartingGame(true)
@@ -169,7 +137,28 @@ function Singleplayer() {
     [answer, gameData],
   )
 
-  // console.log(levelName, isStartingGame, categoryId, playerId, correctAnswerId, selectedAnswerId, isLoading)
+  const changeLevelCallback = useCallback(
+    levelId => {
+      changeLevel({
+        variables: {
+          levelId
+        }
+      })
+    }, [changeLevel]
+  )
+
+  const level = R.pathOr(
+    [],
+    ['gameSingleplayer', 'levels'],
+    gameData
+  )
+  .find(({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId)
+
+  const correctAnswerId = R.pathOr(
+    null,
+    ['gameSingleplayer', 'currentQuestion', 'answerId'],
+    gameData,
+  )
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -186,14 +175,16 @@ function Singleplayer() {
       {(R.path(['gameSingleplayer', 'currentQuestion'], gameData) && !R.path(['gameSingleplayer', 'isWon'], gameData)) && (
         <SingleplayerGame
           currentQuestion={gameData.gameSingleplayer.currentQuestion}
-          levelName={levelName}
+          level={level}
           categoryName={gameData.gameSingleplayer.categoryName}
           progression={gameData.gameSingleplayer.progression}
-          endGame={deleteGameCallback}
-          answer={answerCallback}
           isLoading={isLoading}
           selectedAnswerId={selectedAnswerId}
           correctAnswerId={correctAnswerId}
+          levels={gameData.gameSingleplayer.levels}
+          endGame={deleteGameCallback}
+          answer={answerCallback}
+          changeLevel={changeLevelCallback}
         />
       )}
       {R.path(['gameSingleplayer', 'isWon'], gameData) && <WinScreenSingleplayer

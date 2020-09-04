@@ -1,9 +1,7 @@
-import { MongoClient } from 'mongodb'
 import { Category } from 'enlighten-common-types'
+import { MongoClient } from 'mongodb'
 
-export async function findCategories(
-  client: MongoClient,
-): Promise<Category[]> {
+export async function findCategories(client: MongoClient): Promise<Category[]> {
   const cursor = client
     .db('enlighten')
     .collection('category')

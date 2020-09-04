@@ -13,6 +13,7 @@ export default `
 	type Level {
 		_id: ID!
 		name: String!
+		completed: Boolean!
 	}
 
 	type Question {

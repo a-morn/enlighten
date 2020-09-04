@@ -24,11 +24,11 @@ const getQuestionsByCategory = async (
   categoryId: string,
 ): Promise<Question[]> => {
   const client = await getClient()
-  const questions = findQuestionsByCategory(client, categoryId).catch((e) => {
+  const questions = findQuestionsByCategory(client, categoryId).catch(e => {
     console.log(e)
     throw e
   })
-  
+
   if (!questions) {
     throw new Error(`No questions with categoryId ${categoryId}`)
   }

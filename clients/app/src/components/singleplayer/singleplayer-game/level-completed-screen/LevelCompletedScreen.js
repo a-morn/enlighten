@@ -5,7 +5,7 @@ import FullscreenModal from 'components/fullscreen-modal'
 const width = window.innerWidth
 const height = window.innerHeight
 
-export function LevelCompletedScreen({ completedLevel, nextLevel, close }) {
+export function LevelCompletedScreen({ completedLevelName, nextLevelName, close }) {
   return (
     <>
       <Confetti
@@ -15,8 +15,8 @@ export function LevelCompletedScreen({ completedLevel, nextLevel, close }) {
         />
       <FullscreenModal
         data-testid="winner-modal"
-        title={`You completed level ${completedLevel}!`}
-        body={`Next level: ${nextLevel}`}
+        title={`You completed level: ${completedLevelName}!`}
+        body={`Next level: _${nextLevelName}_`}
         declineText="Ok"
         onDecline={close}
       />
