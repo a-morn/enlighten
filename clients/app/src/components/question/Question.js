@@ -11,10 +11,10 @@ const categoryAndLevel = ({
 }) => {
   return <>
     <h1 className="font-bold">{categoryName}</h1>
-    <div className="progress bg-brand-light m-4">
-      { levelName && <h2 className="category-and-level font-bold m-2 text-gray-darkest">{levelName}</h2> }
+    { levelName &&  <div className="progress bg-brand-light m-4">
+      <h2 className="category-and-level font-bold m-2 text-gray-darkest">{levelName}</h2>
       <div className="bar bg-brand" style={{ width: `${progression > 0.15 ? progression * 100 : 0}%`}}></div>
-    </div>
+    </div> }
   </>
 }
 

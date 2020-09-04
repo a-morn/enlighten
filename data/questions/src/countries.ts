@@ -104,7 +104,7 @@ const getQuestion = async (
     alternatives,
     categoryId,
     levelId: level._id,
-    questionGroup: el.name,
+    questionGroupName: el.name,
     types: [fromType.id, toType.id]
   }
   switch (fromType.id) {

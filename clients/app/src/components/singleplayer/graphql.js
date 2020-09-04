@@ -7,6 +7,7 @@ const GAME = gql`
       categoryBackgroundBase64
       categoryName
       progression
+      isWon
       levels {
         _id
         name
@@ -70,6 +71,7 @@ const GAME_UPDATED = gql`
         categoryBackgroundBase64
         categoryName
         progression
+        isWon
         levels {
           _id
           name

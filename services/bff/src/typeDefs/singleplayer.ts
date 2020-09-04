@@ -9,6 +9,7 @@ export default `
         currentQuestion: Question
         lastQuestion: Question
         levels: [Level]
+        isWon: Boolean
     }
 
     extend type Query {

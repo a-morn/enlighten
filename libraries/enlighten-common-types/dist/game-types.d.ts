@@ -16,8 +16,10 @@ export declare type GameSingeplayer = Game & {
     playerId: string;
     questionGroups: QuestionGroup[];
     currentLevelIndex?: number;
-    levels: Level[];
+    levels?: Level[];
     progression: number;
+    isWon: boolean;
+    currentQuestionGroupName: string;
 };
 export declare type GameMultiplayer = Game & {
     id: string;
