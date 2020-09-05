@@ -1,6 +1,6 @@
 [
   {
-    "id": "game-of-thrones",
+    "_id": "game-of-thrones",
     "label": "Game of Thrones",
     "__typename": "CategoryId"
   }

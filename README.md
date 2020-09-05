@@ -57,12 +57,16 @@ Run the service with VS Code and the `Launch BFFs` configuration.
 
 Should be using private NPM repository...
 
-## 💻 Production 💻
+### Running Cypress on WSL2
+
+https://nickymeuleman.netlify.app/blog/gui-on-wsl2-cypress
+
+## 💻 Production
 
 ### 🤐 Secrets
 
 The workflows defined in `.github/workflows/*-production.yml` deploy to production. The workflows defined in `.github/workflows/*pr.yml` are ran on PR to master. There's currently no staging env. The following secrets are stored on Github and are used during CI: `AWS_ACCESS_KEY_ID`, `AWS_DEFAULT_REGION`, `AWS_PRODUCTION_BUCKET_NAME`, `AWS_SECRET_ACCESS_KEY`, `AWS_ASSETS_DISTRIBUTION_ID`, `AWS_APP_DISTRIBUTION_ID`. The following secrets are stored in AWS Secrets Manager and are used by services: `enlighten-mongodb-credentials`, `enlighten-github-oauth-credentials`, `enlighten-google-oauth-credentials`.
 
-### 🖥️ EC2 🖥️
+### 🖥️ EC2
 
 Runs the Ubuntu Server AMI. Needs CodeDeploy agent installed and running (https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html).
