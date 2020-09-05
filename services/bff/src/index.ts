@@ -1,4 +1,3 @@
-import AWS from 'aws-sdk'
 import { resolve } from 'path' // eslint-disable-line import/order
 import dotenv from 'dotenv-flow' // eslint-disable-line import/order
 dotenv.config({ path: resolve(__dirname, '..') })
@@ -6,10 +5,16 @@ dotenv.config({ path: resolve(__dirname, '..') })
 import http from 'http'
 
 import { createTerminus } from '@godaddy/terminus'
+import AWS from 'aws-sdk'
 import d from 'debug'
 
 import apollo from './apollo'
 import app from './app'
+
+const region = 'us-east-1'
+const client = new AWS.SecretsManager({
+  region,
+})
 
 const getSecret = async (secretName: string): Promise<string> => {
   try {
@@ -41,65 +46,56 @@ const getSecret = async (secretName: string): Promise<string> => {
       // We can't find the resource that you asked for.
       // Deal with the exception here, and/or rethrow at your discretion.
       throw err
+    else throw err
   }
-  throw new Error("Can't get here but tsc doesn\t get that")
 }
 
-const region = 'us-east-1'
-const client = new AWS.SecretsManager({
-  region,
-})
-
-const getSecrets = Promise.all([
-  (async function() {
-    if (
-      !process.env.MONGO_DB_PASSWORD ||
-      !process.env.MONGO_DB_USER ||
-      !process.env.MONGO_DB_URL
-    ) {
-      const secretName = 'enlighten-mongodb-credentials'
-      const jsonString = await getSecret(secretName)
-      const secret: {
-        'enlighten-mongodb-url': string
-        'enlighten-mongodb-username': string
-        'enlighten-mongodb-password': string
-      } = JSON.parse(jsonString)
-      process.env.MONGO_DB_URL = secret['enlighten-mongodb-url']
-      process.env.MONGO_DB_USER = secret['enlighten-mongodb-username']
-      process.env.MONGO_DB_PASSWORD = secret['enlighten-mongodb-password']
-    }
-  })(),
-  (async function() {
-    if (
-      !process.env.GITHUB_OAUTH_CLIENT_ID ||
-      !process.env.GITHUB_OAUTH_SECRET
-    ) {
-      const secretName = 'enlighten-github-oauth-credentials'
-      const jsonString = await getSecret(secretName)
-      const secret: {
-        'enlighten-github-oauth-client-id': string
-        'enlighten-github-oauth-secret': string
-      } = JSON.parse(jsonString)
-      process.env.GITHUB_OAUTH_CLIENT_ID =
-        secret['enlighten-github-oauth-client-id']
-      process.env.GITHUB_OAUTH_SECRET = secret['enlighten-github-oauth-secret']
-    }
-  })(),
-  (async function() {
-    if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
-      const secretName = 'enlighten-google-oauth-credentials'
-      const jsonString = await getSecret(secretName)
-      const secret: {
-        'enlighten-google-oauth-client-id': string
-      } = JSON.parse(jsonString)
-      process.env.GOOGLE_OAUTH_CLIENT_ID =
-        secret['enlighten-google-oauth-client-id']
-    }
-  })(),
-])
+const setEnvVarsFromSecrets = () =>
+  Promise.all([
+    (async function() {
+      if (!process.env.MONGO_DB_CONNECTION_STRING) {
+        const secretName = 'enlighten-mongodb-credentials'
+        const jsonString = await getSecret(secretName)
+        const secret: {
+          'enlighten-mongodb-url': string
+          'enlighten-mongodb-username': string
+          'enlighten-mongodb-password': string
+        } = JSON.parse(jsonString)
+        process.env.MONGO_DB_CONNECTION_STRING = `mongodb+srv://${secret['enlighten-mongodb-username']}:${secret['enlighten-mongodb-password']}@${secret['enlighten-mongodb-url']}`
+      }
+    })(),
+    (async function() {
+      if (
+        !process.env.GITHUB_OAUTH_CLIENT_ID ||
+        !process.env.GITHUB_OAUTH_SECRET
+      ) {
+        const secretName = 'enlighten-github-oauth-credentials'
+        const jsonString = await getSecret(secretName)
+        const secret: {
+          'enlighten-github-oauth-client-id': string
+          'enlighten-github-oauth-secret': string
+        } = JSON.parse(jsonString)
+        process.env.GITHUB_OAUTH_CLIENT_ID =
+          secret['enlighten-github-oauth-client-id']
+        process.env.GITHUB_OAUTH_SECRET =
+          secret['enlighten-github-oauth-secret']
+      }
+    })(),
+    (async function() {
+      if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
+        const secretName = 'enlighten-google-oauth-credentials'
+        const jsonString = await getSecret(secretName)
+        const secret: {
+          'enlighten-google-oauth-client-id': string
+        } = JSON.parse(jsonString)
+        process.env.GOOGLE_OAUTH_CLIENT_ID =
+          secret['enlighten-google-oauth-client-id']
+      }
+    })(),
+  ])
 
 export async function startApp(): Promise<void> {
-  await getSecrets
+  await setEnvVarsFromSecrets()
   const debug = d('services:server')
 
   function normalizePort(val: string): string | number | boolean {
@@ -177,3 +173,12 @@ export async function startApp(): Promise<void> {
   server.on('error', onError)
   server.on('listening', onListening)
 }
+
+process.on('unhandledRejection', (reason: any, _: Promise<any>): void => {
+  throw reason
+})
+
+process.on('uncaughtException', (error: Error) => {
+  console.error(error)
+  process.exit(1)
+})

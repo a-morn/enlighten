@@ -1,16 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
-import gql from 'graphql-tag'
 import React, { Fragment, useEffect, useState } from 'react'
 import CategorySelect from './category-select'
-
-export const GET_CATEGORIES = gql`
-  query Categories {
-    categories {
-      id
-      label
-    }
-  }
-`
+import { GET_CATEGORIES } from './graphql'
 
 export function CategoryPicker({
   categoryId,

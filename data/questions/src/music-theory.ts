@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import shuffle from "shuffle-array";
-import { Question } from "enlighten-common-types";
+import { Question, Level, TextAlternative } from "enlighten-common-types";
+import { isUndefined } from "util";
 
 const TONES = [
   "C",
@@ -51,24 +52,28 @@ const intervalEndTone = (
   return `${endToneLetter}${endToneOctave}`;
 };
 
-const alternatives = INTERVAL.map((interval) => ({
+const alternatives: TextAlternative[] = INTERVAL.map((interval) => ({
   type: "text",
   text: interval.name,
   _id: uuid(),
 }));
 
-const questions = TONES.reduce(
+export const getQuestions: (categoryId: string, levels?: Level[] | null) => Question[] = (categoryId: string, levels?: Level[] | null) => TONES.reduce(
   (acc: Question[], tone) =>
     acc.concat(
       INTERVAL.reduce(
         (acc: Question[], interval) =>
           acc.concat(
-            OCTAVES.map((octave) => {
+            OCTAVES.map<Question>((octave) => {
               const answerId = alternatives.find(
                 (alt) => alt.text === interval.name
               )?._id;
 
-              return {
+              if (isUndefined(answerId)) {
+                throw new Error(`No alternative with with text ${interval.name}`)
+              }
+
+              const question: Question = {
                 _id: uuid(),
                 type: "tones",
                 tones: [
@@ -76,10 +81,14 @@ const questions = TONES.reduce(
                   `${intervalEndTone(tone, octave, interval)}`,
                 ],
                 text: "What interval is this?",
-                category: "music-theory",
+                categoryId,
                 answerId,
                 alternatives: shuffle(alternatives),
-              } as Question;
+                questionGroupName: 'intervals',
+                types: [interval.name]
+              };
+
+              return question
             }) as Question[]
           ),
         [] as Question[]
@@ -87,5 +96,3 @@ const questions = TONES.reduce(
     ),
   [] as Question[]
 );
-
-export default questions;

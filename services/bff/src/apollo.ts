@@ -1,10 +1,10 @@
 import * as http from 'http'
 import { makeExecutableSchema } from 'apollo-server'
 import { ApolloServer, ApolloServerExpressConfig } from 'apollo-server-express'
+import { Context } from 'enlighten-common-types'
 import { Express } from 'express'
 import resolvers from './resolvers/'
 import typeDefs from './typeDefs'
-import { Context } from 'enlighten-common-types'
 import { getJWTPayloadFromAuthorizationHeader } from './utils'
 
 const schema = makeExecutableSchema({

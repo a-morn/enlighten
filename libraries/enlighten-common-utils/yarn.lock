@@ -9,10 +9,10 @@
   dependencies:
     ts-toolbelt "^6.3.3"
 
-enlighten-common-types@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-1.0.0.tgz#b9c55eba12cf42ba6e678a6f65d0b66661daebe9"
-  integrity sha512-CYwNiW9odqcEH64i1/cDzVZD/o/eiO3BUYD79tfDV7VgaUvo4fbxvJliUefgcbQjiRxpc4kNNBeXmoHXDPau/A==
+enlighten-common-types@2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.1.3.tgz#5ce751d7f457409ad64009a9a559dedcd739dbc5"
+  integrity sha512-5CaDMNT8rFTh6FCY7CKNfvuRnCA+Fs1zVdkwTmzTI/KVyQT9L21XERYpWq1BkI45DvzKkKs3OvwLFcr2XXH12A==
 
 ramda@^0.27.0:
   version "0.27.0"

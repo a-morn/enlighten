@@ -1,0 +1,31 @@
+@import 'src/styles/style.scss';
+
+.question {
+  .progress {
+    position: relative;
+    display: inline-block;
+    width: 400px;
+    height: 50px;
+    border-radius: 20px;
+    
+    .category-and-level {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      height: 16px;
+      text-align: center;
+    }
+
+    .bar {
+      border-radius: 20px;
+      width: 0%;
+      height: 100%;
+      transition: width;
+      transition-duration: 1s;
+      transition-timing-function: cubic-bezier(.36,.55,.63,.48);
+    }
+  } 
+}

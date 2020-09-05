@@ -1,6 +1,6 @@
+import { usePrevious } from 'hooks/use-previous'
 import React, { useEffect, useState } from 'react'
 import styles from './Scoreboard.module.scss'
-import { usePrevious } from 'hooks/use-previous'
 
 export function Scoreboard({ name, score, profilePictureUrl }) {
   const [playerScored, setPlayerScored] = useState()
@@ -11,7 +11,6 @@ export function Scoreboard({ name, score, profilePictureUrl }) {
       setTimeout(() => setPlayerScored(false), 500)
     }
   }, [score, previousScore])
-  profilePictureUrl && console.log(profilePictureUrl)
   return (
     <div className="flex items-center text-brand-dark justify-between">
       {profilePictureUrl ? (

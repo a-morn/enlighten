@@ -1,6 +1,6 @@
-import faker from 'faker'
 import { GameQuestion, GameMultiplayer } from 'enlighten-common-types'
 import { filterGame } from 'enlighten-common-utils'
+import faker from 'faker'
 
 const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
   currentQuestionAnswered: boolean,
@@ -10,6 +10,7 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
     categoryBackground: faker.image.imageUrl(),
     categoryBackgroundBase64: faker.random.alphaNumeric(),
     categoryId: faker.random.uuid(),
+    categoryName: faker.internet.domainName(),
     id: faker.random.uuid(),
     players: [],
     questionIndex: faker.random.number(),
@@ -17,11 +18,14 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
       answered: currentQuestionAnswered,
       answerId: faker.random.uuid(),
       alternatives: [],
-      category: faker.random.uuid(),
+      categoryId: faker.random.uuid(),
       _id: faker.random.uuid(),
       record: faker.random.number(),
       type: 'text',
       text: faker.lorem.text(),
+      levelId: faker.random.uuid(),
+      questionGroupName: faker.lorem.text(),
+      types: [faker.lorem.text()],
     } as GameQuestion,
     currentQuestionId: faker.random.uuid(),
   } as GameMultiplayer)

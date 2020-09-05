@@ -1,16 +1,22 @@
-import { MongoClient } from 'mongodb'
-import { CategoryId } from 'enlighten-common-types'
 import { Question } from 'enlighten-common-types'
+import { MongoClient } from 'mongodb'
 
-export async function findQuestions(
+export const COUNTRIES_LEVELS = {
+  EUROPE: 'Europe',
+  THE_AMERICAS: 'The Americas',
+  AFRICA: 'Africa',
+  ASIA: 'Asia',
+}
+
+export async function findQuestionsByCategory(
   client: MongoClient,
-  category: CategoryId,
+  categoryId: string,
 ): Promise<Question[]> {
   const cursor = client
     .db('enlighten')
     .collection('question')
     .find({
-      category,
+      categoryId,
     })
 
   const results = await cursor.toArray()

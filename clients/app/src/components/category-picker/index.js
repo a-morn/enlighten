@@ -1,1 +1,1 @@
-export { CategoryPicker, GET_CATEGORIES } from './CategoryPicker'
+export { CategoryPicker } from './CategoryPicker'

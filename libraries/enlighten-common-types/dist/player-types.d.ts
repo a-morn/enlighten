@@ -1,11 +1,10 @@
-import { CategoryId } from "./category-types";
 export declare type Player = {
     id: string;
     name: string;
     profilePictureUrl?: string;
 };
 export declare type PlayerLobby = Player & {
-    categoryId: CategoryId;
+    categoryId: string;
     timestamp: string;
 };
 export declare type PlayerMultiplayer = Player & {

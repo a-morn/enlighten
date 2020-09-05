@@ -3,9 +3,13 @@ export default `
         categoryId: String!
         categoryBackground: String!
         categoryBackgroundBase64: String!
+        categoryName: String!
+        progression: Float
         playerId: ID!
         currentQuestion: Question
         lastQuestion: Question
+        levels: [Level]
+        isWon: Boolean
     }
 
     extend type Query {
@@ -45,10 +49,18 @@ export default `
         gameSingleplayer: GameSingleplayer!
     }
 
+    type ChangeLevelResponse implements MutationResponse {
+        code: String!
+        success: Boolean!
+        message: String!
+        gameSingleplayer: GameSingleplayer!
+    }
+
     extend type Mutation {
         createGameSingleplayer(game: CreateGameSingleplayerInput!): CreateGameSingleplayerResponse!
         deleteGameSingleplayer: DeleteGameSingleplayerResponse!
         answerQuestionSingleplayer(answer: AnswerQuestionSingleplayerInput!): AnswerQuestionSingleplayerResponse!
+        changeLevelSingleplayer(levelId: ID!): ChangeLevelResponse!
     }
 
     type GameSingleplayerSubscription implements SubscriptionPayload {

@@ -1,6 +1,7 @@
 // https://codepen.io/m2de/pen/JONpmj
 
 import React, { memo } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 const FullscreenModal = memo(
   ({
@@ -20,10 +21,12 @@ const FullscreenModal = memo(
         style={{ backgroundColor }}
       >
         <div className="shadow-inner max-w-md md:relative right-0 left-0 top-0 bottom-0 align-top m-auto justify-end md:justify-center p-8 bg-white md:rounded w-full md:h-auto md:shadow flex flex-col">
-          <h2 className="text-4xl text-center font-hairline md:leading-loose text-grey md:mt-8 mb-4">
+          <h2 className="text-4xl text-center font-hairline md:leading-loose text-grey md:mt-8 mb-4 font-bold">
             {title}
           </h2>
-          <p className="text-xl leading-normal mb-8 text-center">{body}</p>
+          <div className="text-xl leading-normal mb-8 text-center">
+            <ReactMarkdown source={body} className="markdown" />
+          </div>
           {children}
           <div className="inline-flex justify-center">
             {acceptText && (

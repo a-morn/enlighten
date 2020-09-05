@@ -15,9 +15,12 @@ export type QuestionType<T> = {
 export type Question = {
   _id: string;
   alternatives: Alternative[];
-  category: string;
+  categoryId: string;
   answerId: string;
   text: string;
+  types: string[];
+  questionGroupName: string;
+  levelId?: string;
 } & (
   | {
       type: "text";
@@ -38,16 +41,26 @@ export type GameQuestion = Question & {
   answered: boolean;
 };
 
-export type Alternative = {
+export type TextAlternative = {
   _id: string;
-} & (
-  | {
-      type: "image";
-      src: string;
-      lqip: string;
-    }
-  | {
-      type: "text";
-      text: string;
-    }
-);
+  type: "text";
+  text: string;
+}
+
+export type ImageAlternative = {
+  _id: string;
+  type: "image";
+  src: string;
+  lqip: string;
+}
+
+export type Alternative =
+  TextAlternative |
+  ImageAlternative
+
+export type QuestionGroup = {
+  levelId: string
+  name: string
+  questions: GameQuestion[]
+  types: { type: string, score: number }[]
+}

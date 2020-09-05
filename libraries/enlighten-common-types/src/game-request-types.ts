@@ -1,8 +1,6 @@
-import { CategoryId, isCategoryId } from './category-types'
-
 export type GameRequest = {
   id: string
-  categoryId: CategoryId
+  categoryId: string
   playerRequestId: string
   playerRequestName: string
   playerOfferedName: string
@@ -14,7 +12,7 @@ export type GameRequest = {
 export function isGameRequest(x: unknown): x is GameRequest {
   return (
     typeof (x as GameRequest).id === 'string' &&
-    isCategoryId((x as GameRequest).categoryId) &&
+    typeof (x as GameRequest).categoryId === 'string' &&
     typeof (x as GameRequest).playerRequestId === 'string' &&
     typeof (x as GameRequest).playerRequestName === 'string' &&
     typeof (x as GameRequest).playerOfferedName === 'string' &&

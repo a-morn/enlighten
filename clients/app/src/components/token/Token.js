@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react'
 import { store } from 'hooks/context/store.js'
+import React, { useContext, useEffect } from 'react'
 import { getPayloadFromJwt } from 'utils'
 
 function Token({ children }) {

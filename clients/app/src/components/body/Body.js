@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
-import { store } from 'hooks/context/store.js'
 import Bowser from 'bowser'
+import { store } from 'hooks/context/store.js'
 import * as R from 'ramda'
+import React, { useContext } from 'react'
 
 const browser = Bowser.getParser(window.navigator.userAgent)
 

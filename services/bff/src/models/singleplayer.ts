@@ -1,17 +1,19 @@
 import { isUndefined } from 'util'
 import { UserInputError } from 'apollo-server'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { Redis } from 'ioredis'
-import shuffle from 'shuffle-array'
 import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
-import { filterGame } from 'enlighten-common-utils'
 import {
-  CategoryId,
   GameSingeplayer,
   isGameSingleplayer,
   Question,
+  QuestionGroup,
+  GameQuestion,
 } from 'enlighten-common-types'
+import { filterGame } from 'enlighten-common-utils'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { Redis } from 'ioredis'
+import shuffle from 'shuffle-array'
 import { getCategory } from './category'
+import { getLevels } from './levels'
 import { getQuestionById, getQuestionsByCategory } from './questions'
 
 const getGameByPlayerId = async (
@@ -61,7 +63,7 @@ const deleteGameByPlayerId = async (
 const updateQuestionByPlayerId = async (
   redisClient: Redis,
   playerId: string,
-  game?: GameSingeplayer,
+  game?: Omit<GameSingeplayer, 'currentQuestionGroupName'>,
 ): Promise<GameSingeplayer> => {
   if (isUndefined(game)) {
     const fetchedGame = await getGameByPlayerId(redisClient, playerId)
@@ -71,41 +73,185 @@ const updateQuestionByPlayerId = async (
     game = fetchedGame
   }
 
-  const lastQuestionId = game.lastQuestionId
-  game.currentQuestionId = shuffle(
-    game.questions.filter(({ _id }) => _id !== lastQuestionId),
-  )[0]._id
+  if (isUndefined(game)) {
+    throw new Error('Should never happen, just helping TSC out')
+  }
 
-  game.lastQuestionId = game.currentQuestionId
+  const lastQuestionGroupName = game.lastQuestion?.questionGroupName
+
+  let currentQuestion: GameQuestion
+  let currentQuestionGroup: QuestionGroup
+
+  if (game.levels) {
+    const currentLevel = game.levels.find(
+      ({ _id }) => _id === game?.currentLevelId,
+    )
+
+    if (isUndefined(currentLevel)) {
+      throw new Error(`Level with id ${currentLevel} not found`)
+    }
+
+    const questionGroupsInLevel = game.questionGroups.filter(
+      ({ name, levelId }) =>
+        name !== lastQuestionGroupName && levelId === currentLevel._id,
+    )
+
+    if (questionGroupsInLevel.length === 0) {
+      // No question group in current level that is not previous question group
+      const lastQuestionGroup = game.questionGroups.find(
+        ({ name }) => name === lastQuestionGroupName,
+      )
+      if (isUndefined(lastQuestionGroup)) {
+        throw new Error(
+          `Question group with name ${lastQuestionGroupName} not found`,
+        )
+      }
+      questionGroupsInLevel.push(lastQuestionGroup)
+    }
+
+    const lowestScore = (qg: QuestionGroup) =>
+      Math.min(...qg.types.map(({ score }) => score))
+    const questionGroupsSortedByTypeScore = questionGroupsInLevel.sort(
+      (qga, qgb) => lowestScore(qga) - lowestScore(qgb),
+    )
+
+    const questionGroupsWithLowestTypeScore: QuestionGroup[] = []
+    let lowestScoreCounter: number
+    for (const qg of questionGroupsSortedByTypeScore) {
+      if (
+        questionGroupsWithLowestTypeScore.length < 2 ||
+        lowestScore(qg) ===
+          lowestScore(
+            questionGroupsWithLowestTypeScore[
+              questionGroupsWithLowestTypeScore.length - 1
+            ],
+          )
+      ) {
+        lowestScoreCounter = lowestScore(qg)
+        questionGroupsWithLowestTypeScore.push(qg)
+      }
+    }
+
+    currentQuestionGroup = shuffle(questionGroupsWithLowestTypeScore)[0]
+
+    const lowestScoreTypes = currentQuestionGroup.types
+      .filter(type => type.score <= lowestScoreCounter)
+      .map(({ type }) => type)
+
+    currentQuestion = shuffle(
+      currentQuestionGroup.questions.filter(q =>
+        q.types.some(type => lowestScoreTypes.includes(type)),
+      ),
+    )[0]
+
+    if (isUndefined(currentQuestion)) {
+      throw new Error(
+        `No question with level id ${currentLevel._id} that is not in question group ${lastQuestionGroupName}`,
+      )
+    }
+  } else {
+    const notLastQuestionGroupIfPossible = [
+      ...shuffle(
+        game.questionGroups.filter(
+          ({ name }) => name !== lastQuestionGroupName,
+        ),
+      ),
+      game.questionGroups.find(({ name }) => name == lastQuestionGroupName),
+    ][0]
+    if (isUndefined(notLastQuestionGroupIfPossible)) {
+      throw new Error(`No question group found`)
+    }
+
+    currentQuestionGroup = notLastQuestionGroupIfPossible
+
+    currentQuestion = shuffle(currentQuestionGroup.questions)[0]
+
+    if (isUndefined(currentQuestion)) {
+      throw new Error(`No question in question group ${lastQuestionGroupName}`)
+    }
+  }
+
+  game.currentQuestionId = currentQuestion._id
+  game.lastQuestion = game.currentQuestion
   game.currentQuestion = await getQuestionById(game.currentQuestionId)
   game.currentQuestion.alternatives = shuffle(game.currentQuestion.alternatives)
   game.currentQuestion.answered = false
   game.lastUpdated = new Date().toISOString()
 
-  updateGame(redisClient, game)
-  return game
+  const updatedGame: GameSingeplayer = {
+    ...game,
+    currentQuestionGroupName: currentQuestionGroup.name,
+  }
+
+  updateGame(redisClient, updatedGame)
+  return updatedGame
 }
 
 const createGame = async (
   redisClient: Redis,
   playerId: string,
-  categoryId: CategoryId,
+  categoryId: string,
 ): Promise<GameSingeplayer> => {
-  const [category, questions] = await Promise.all([
+  const [category, questions, levels] = await Promise.all([
     getCategory(categoryId),
     getQuestionsByCategory(categoryId),
+    getLevels(categoryId),
   ])
 
-  const game = {
+  if (isUndefined(questions) || isUndefined(category)) {
+    throw new Error(
+      `This can't happen as there's a null check earlier on. Just helping tsc out`,
+    )
+  }
+
+  const questionGroups = Object.values(
+    questions
+      .map((q: Question) => ({
+        ...q,
+        record: 0,
+        answered: false,
+      }))
+      .reduce((questionGroups, gameQuestion) => {
+        let group: QuestionGroup
+        if (questionGroups[gameQuestion.questionGroupName] === undefined) {
+          group = {
+            questions: [gameQuestion],
+            types: gameQuestion.types.map(type => ({ type, score: 0 })),
+            levelId: gameQuestion.levelId || '',
+            name: gameQuestion.questionGroupName,
+          }
+        } else {
+          group = questionGroups[gameQuestion.questionGroupName]
+          group.questions.push(gameQuestion)
+          const newTypes = gameQuestion.types.filter(
+            type => !group.types.some(groupType => groupType.type === type),
+          )
+          group.types = [
+            ...group.types,
+            ...newTypes.map(type => ({ type, score: 0 })),
+          ]
+        }
+
+        return {
+          ...questionGroups,
+          [gameQuestion.questionGroupName]: group,
+        }
+      }, {} as { [key: string]: QuestionGroup }),
+  )
+
+  const game: Omit<GameSingeplayer, 'currentQuestionGroupName'> = {
     playerId,
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
-    questions: questions.map((q: Question) => ({
-      ...q,
-      record: 0,
-    })),
-  } as GameSingeplayer
+    categoryName: category.label,
+    progression: 0,
+    questionGroups,
+    levels: levels?.map(level => ({ ...level, completed: false })),
+    currentLevelId: levels ? levels[0]._id : undefined,
+    isWon: false,
+  }
+
   const updatedGame = await updateQuestionByPlayerId(
     redisClient,
     playerId,
@@ -133,22 +279,92 @@ const answerQuestion = async (
     throw new UserInputError('No question to be answered')
   }
 
-  const question = game.questions.find(
+  const questionGroup = game.questionGroups.find(
+    ({ name }) => name === game.currentQuestionGroupName,
+  )
+
+  if (isUndefined(questionGroup)) {
+    throw new UserInputError('Current question group did not exist')
+  }
+
+  const question = questionGroup.questions.find(
     ({ _id }) => _id === game.currentQuestionId,
   )
 
   if (isUndefined(question)) {
     throw new UserInputError('Current question did not exist')
   }
-  question.record += answerId === question.answerId ? 1 : -1
+
+  if (answerId === question.answerId) {
+    question.types.forEach(type => {
+      questionGroup.types
+        .filter(qgType => qgType.type === type)
+        .forEach(qgType => (qgType.score = 1))
+    })
+    question.record += 1
+  } else {
+    question.types.forEach(type => {
+      questionGroup.types
+        .filter(qgType => qgType.type === type)
+        .forEach(qgType => (qgType.score = -1))
+    })
+    question.record -= 1
+  }
 
   question.answered = true
 
+  // TODO: solve better
+  const oldLevels = game.levels ? game.levels.map(level => ({ ...level })) : []
+
+  if (game.levels) {
+    const currentLevel = game.levels.find(
+      ({ _id }) => _id === game.currentLevelId,
+    )
+    if (isUndefined(currentLevel)) {
+      throw new Error(`Level with id ${currentLevel} not found`)
+    }
+    const questionGroupTypeScore = game.questionGroups
+      .filter(({ levelId }) => levelId === currentLevel._id)
+      .reduce(
+        (allScore: number[], { types }) => [
+          ...allScore,
+          ...types.map(({ score }) => score),
+        ],
+        [],
+      )
+    const unansweredQuestionGroupTypeScore = questionGroupTypeScore.filter(
+      score => score < 1,
+    )
+    game.progression =
+      (questionGroupTypeScore.length -
+        unansweredQuestionGroupTypeScore.length) /
+      questionGroupTypeScore.length
+
+    if (
+      unansweredQuestionGroupTypeScore.length === 0 ||
+      process.env.IMMEDIATE_LEVEL_CHANGE
+    ) {
+      if (game.currentLevelId === game.levels[game.levels.length - 1]._id) {
+        game.isWon = true
+      } else if (
+        !game.levels.find(({ _id }) => _id === game.currentLevelId)?.completed
+      ) {
+        const currentIndex = game.levels.findIndex(
+          ({ _id }) => _id === game.currentLevelId,
+        )
+        game.levels[currentIndex].completed = true
+        game.currentLevelId = game.levels[currentIndex + 1]._id
+        game.progression = 0
+      }
+    }
+  }
+
+  const gameWithoutLevelsUpdate = { ...game, levels: oldLevels }
   updateGame(redisClient, game)
 
   pubSub.publish(GAME_SINGLEPLAYER, {
     gameSingleplayerSubscription: {
-      gameSingleplayer: game,
+      gameSingleplayer: gameWithoutLevelsUpdate,
       mutation: 'UPDATE',
     },
   })
@@ -168,10 +384,48 @@ const answerQuestion = async (
   return game
 }
 
+const changeLevel = async (
+  redisClient: Redis,
+  pubSub: RedisPubSub,
+  playerId: string,
+  levelId: string,
+): Promise<GameSingeplayer> => {
+  const game = await getGameByPlayerId(redisClient, playerId)
+  if (!game) {
+    throw new UserInputError(`Player ${playerId} is not in a game`)
+  }
+
+  const level = game.levels?.find(({ _id }) => _id === levelId)
+
+  if (isUndefined(level)) {
+    throw new UserInputError(`No level with id ${levelId}`)
+  }
+
+  game.currentLevelId = levelId
+
+  const updatedGame = await updateQuestionByPlayerId(
+    redisClient,
+    playerId,
+    game,
+  )
+
+  updateGame(redisClient, updatedGame)
+
+  pubSub.publish(GAME_SINGLEPLAYER, {
+    gameSingleplayerSubscription: {
+      gameSingleplayer: filterGame(updatedGame),
+      mutation: 'UPDATE',
+    },
+  })
+
+  return game
+}
+
 export {
   getGameByPlayerId,
   createGame,
   answerQuestion,
   updateQuestionByPlayerId,
   deleteGameByPlayerId,
+  changeLevel,
 }

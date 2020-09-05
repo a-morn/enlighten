@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
 import FullscreenModal from 'components/fullscreen-modal'
+import React, { useEffect } from 'react'
 import PlayerList from './player-list'
 
 export function Lobby({

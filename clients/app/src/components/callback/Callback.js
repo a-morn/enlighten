@@ -1,7 +1,7 @@
-import React, { useEffect, useCallback, useContext } from 'react'
 import { store } from 'hooks/context/store.js'
-import { getPayloadFromJwt } from 'utils'
+import React, { useEffect, useCallback, useContext } from 'react'
 import { useParams, withRouter } from 'react-router-dom'
+import { getPayloadFromJwt } from 'utils'
 
 function Login({ history }) {
   const { dispatch } = useContext(store)
@@ -82,7 +82,6 @@ function Login({ history }) {
           const idToken = new URLSearchParams(window.location.hash).get(
             'id_token',
           )
-          console.log(idToken)
           if (idToken) {
             await googleCallback(idToken)
           } else {

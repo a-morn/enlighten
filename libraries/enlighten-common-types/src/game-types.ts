@@ -1,9 +1,10 @@
-import { GameQuestion } from "./question-types";
-import { isCategoryId } from "./category-types";
+import { GameQuestion, QuestionGroup } from "./question-types";
 import { PlayerMultiplayer } from "./player-types";
+import { Level } from ".";
 
 export type Game = {
   categoryId: string;
+  categoryName: string;
   categoryBackground: string;
   categoryBackgroundBase64: string;
   lastQuestionId?: string;
@@ -15,7 +16,12 @@ export type Game = {
 
 export type GameSingeplayer = Game & {
   playerId: string;
-  questions: GameQuestion[];
+  questionGroups: QuestionGroup[];
+  currentLevelId?: string;
+  levels?: Level[];
+  progression: number;
+  isWon: boolean;
+  currentQuestionGroupName: string;
 };
 
 export type GameMultiplayer = Game & {
@@ -25,13 +31,9 @@ export type GameMultiplayer = Game & {
   questionIndex: number;
 };
 
-export type Levels = {
-  [key: number]: GameQuestion[];
-};
-
 export function isGame(x: unknown): x is Game {
   return (
-    isCategoryId((x as Game).categoryId) &&
+    typeof (x as Game).categoryId === 'string' &&
     typeof (x as Game).categoryBackground === "string"
   );
 }
@@ -50,6 +52,6 @@ export function isGameSingleplayer(x: unknown): x is GameSingeplayer {
   return (
     isGame(x) &&
     typeof (x as GameSingeplayer).playerId === "string" &&
-    typeof (x as GameSingeplayer).questions === "object"
+    typeof (x as GameSingeplayer).questionGroups === "object"
   );
 }

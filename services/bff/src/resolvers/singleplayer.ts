@@ -1,3 +1,11 @@
+import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
+import {
+  AnswerQuestionInput,
+  Context,
+  GameSingeplayer,
+  MutationResponse,
+} from 'enlighten-common-types'
+import { filterGame } from 'enlighten-common-utils'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { ResolverFn, withFilter } from 'graphql-subscriptions'
 import { Redis } from 'ioredis'
@@ -6,30 +14,30 @@ import {
   createGame,
   deleteGameByPlayerId,
   getGameByPlayerId,
+  changeLevel,
 } from '../models/singleplayer'
-import { GAME_SINGLEPLAYER } from 'enlighten-common-graphql'
-import { filterGame } from 'enlighten-common-utils'
-import {
-  AnswerQuestionInput,
-  CategoryId,
-  Context,
-  GameSingeplayer,
-  MutationResponse,
-} from 'enlighten-common-types'
 
 type CreateGameSingleplayerInput = {
   game: {
-    categoryId: CategoryId
+    categoryId: string
     playerId: string
   }
 }
 
-type GameSingleplayeMutationrResponse = MutationResponse & {
+type GameSingleplayeMutationResponse = MutationResponse & {
   game: GameSingeplayer | null
 }
 
 type DeleteGameSingleplayerInput = {
   id: string
+}
+
+type GameChangeLevelSingleplayerResponse = MutationResponse & {
+  game: GameSingeplayer | null
+}
+
+type ChangeLevelSingleplayerInput = {
+  levelId: string
 }
 
 export function singleplayerQueryResolvers(
@@ -64,22 +72,27 @@ export const singleplayerMutationResolvers = (
   createGameSingleplayer: (
     _: unknown,
     input: CreateGameSingleplayerInput,
-  ) => Promise<GameSingleplayeMutationrResponse>
+  ) => Promise<GameSingleplayeMutationResponse>
   deleteGameSingleplayer: (
     _: unknown,
     input: DeleteGameSingleplayerInput,
     context: Context,
-  ) => Promise<GameSingleplayeMutationrResponse>
+  ) => Promise<GameSingleplayeMutationResponse>
   answerQuestionSingleplayer: (
     _: unknown,
     input: AnswerQuestionInput,
     context: Context,
-  ) => Promise<GameSingleplayeMutationrResponse>
+  ) => Promise<GameSingleplayeMutationResponse>
+  changeLevelSingleplayer: (
+    _: unknown,
+    input: ChangeLevelSingleplayerInput,
+    context: Context,
+  ) => Promise<GameSingleplayeMutationResponse>
 } => ({
   createGameSingleplayer: async (
     _,
     { game: { playerId, categoryId } },
-  ): Promise<GameSingleplayeMutationrResponse> => {
+  ): Promise<GameSingleplayeMutationResponse> => {
     const game = await createGame(redisClient, playerId, categoryId)
     const filteredGame = filterGame(game)
 
@@ -94,7 +107,7 @@ export const singleplayerMutationResolvers = (
     _,
     __,
     context,
-  ): Promise<GameSingleplayeMutationrResponse> => {
+  ): Promise<GameSingleplayeMutationResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -111,7 +124,7 @@ export const singleplayerMutationResolvers = (
     _,
     { answer: { answerId, questionId } },
     context,
-  ): Promise<GameSingleplayeMutationrResponse> => {
+  ): Promise<GameSingleplayeMutationResponse> => {
     const {
       currentUser: { playerId },
     } = context
@@ -123,6 +136,24 @@ export const singleplayerMutationResolvers = (
       questionId,
       answerId,
     )
+    const filteredGame = filterGame(game)
+    return {
+      game: filteredGame,
+      code: 200,
+      success: true,
+      message: 'Question answered',
+    }
+  },
+  changeLevelSingleplayer: async (
+    _,
+    { levelId },
+    context,
+  ): Promise<GameChangeLevelSingleplayerResponse> => {
+    const {
+      currentUser: { playerId },
+    } = context
+
+    const game = await changeLevel(redisClient, pubSub, playerId, levelId)
     const filteredGame = filterGame(game)
     return {
       game: filteredGame,

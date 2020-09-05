@@ -1,23 +1,22 @@
 import { isUndefined } from 'util'
 import { UserInputError } from 'apollo-server'
+import { GAME_MULTIPLAYER, updateGame } from 'enlighten-common-graphql'
 import {
   GameMultiplayer,
   GameQuestion,
-  CategoryId,
   PlayerLobby,
   PlayerMultiplayer,
   isGameMultiplayer,
 } from 'enlighten-common-types'
-import { getClient } from '../data/client'
-import { findOneUser } from '../data/users'
+import { filterGame } from 'enlighten-common-utils'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { Redis } from 'ioredis'
 import shuffle from 'shuffle-array'
 import { v4 as uuid } from 'uuid'
+import { getClient } from '../data/client'
+import { findOneUser } from '../data/users'
 import { getCategory } from './category'
 import { getQuestionsByCategory } from './questions'
-import { GAME_MULTIPLAYER, updateGame } from 'enlighten-common-graphql'
-import { filterGame } from 'enlighten-common-utils'
 
 const getGame = async (
   redisClient: Redis,
@@ -101,7 +100,7 @@ const createGame = async (
   redisClient: Redis,
   pubSub: RedisPubSub,
   players: PlayerLobby[],
-  categoryId: CategoryId,
+  categoryId: string,
 ): Promise<GameMultiplayer> => {
   const [category, questions] = await Promise.all([
     getCategory(categoryId),
@@ -113,6 +112,7 @@ const createGame = async (
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
+    categoryName: category.label,
     id: uuid(),
     players: await Promise.all(
       players.map(async player => ({

@@ -1,6 +1,6 @@
+import FullscreenModal from 'components/fullscreen-modal'
 import React from 'react'
 import Confetti from 'react-confetti'
-import FullscreenModal from 'components/fullscreen-modal'
 import styles from './WinScreen.module.scss'
 
 const width = window.innerWidth

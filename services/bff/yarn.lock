@@ -2402,28 +2402,41 @@ end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-enlighten-common-graphql@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/enlighten-common-graphql/-/enlighten-common-graphql-1.0.1.tgz#97d3fd0b84f0a651f8d1631036a654f6c49810a2"
-  integrity sha512-8X5/uFZXtVXqN1G/BXvswT+Y1A7dq0PD/nHhfQyZna4OUPHA2/zN1WMIZJuUlIxpDSoT8LP8pzgOI8FcPzUUbQ==
+enlighten-common-graphql@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/enlighten-common-graphql/-/enlighten-common-graphql-2.0.0.tgz#ae50435238fcd95dedd484adb1f58ddb9ec3ceca"
+  integrity sha512-H479S863rNTn1sQpcsRLnNWosxLrR5ME2E8dX+wHqNZWWzho2dtMLv/GAAuDry7DX+LqdzCN1yPznKOMIuBGxg==
   dependencies:
-    enlighten-common-types "1.0.0"
-    enlighten-common-utils "1.0.1"
+    enlighten-common-types "2.0.1"
+    enlighten-common-utils "2.0.0"
     graphql-redis-subscriptions "^2.2.1"
     ramda "^0.27.0"
 
-enlighten-common-types@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-1.0.0.tgz#b9c55eba12cf42ba6e678a6f65d0b66661daebe9"
-  integrity sha512-CYwNiW9odqcEH64i1/cDzVZD/o/eiO3BUYD79tfDV7VgaUvo4fbxvJliUefgcbQjiRxpc4kNNBeXmoHXDPau/A==
+enlighten-common-types@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.0.1.tgz#ab4da0dfc0922ba72ac41a9961d3ee6aeba691e6"
+  integrity sha512-xbARIE8jbXI/RslgZ+uC/3rdmfyeiOuCDXz2Mhj3uSJICEqojKPMx+sxlTgTZxezebhh8j+CSyQtCo0+YdiEPw==
 
-enlighten-common-utils@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-1.0.1.tgz#504bd354bfc75f4ad67683c1e211461d3af816cf"
-  integrity sha512-xpuOzhqjSRdvLwgB/qeRyrhCtYq1kFAbqoEsuduhg7wffyG8l6InLZF3mYhSLcppgF/QXGRyQ5ZkNmv1nIPSWg==
+enlighten-common-types@2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.1.7.tgz#543e46362f0764a383889f462babd241bbc5af2e"
+  integrity sha512-zsPMdeEeekTUBnNgjQ2IyXUVmTleRuOsScc78exh0bLvwA6VYQ43mbhDHMelcESDuP+lPzwyYEf5M6SoufcTKQ==
+
+enlighten-common-utils@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-2.0.0.tgz#728cfdfe2359207980770f9cce489d471737e11c"
+  integrity sha512-K//o6s9i/NvRpHTaN9OXp/j6EAMGyTpKjO8EJLfht2rqm70tCiu8NW+voyGxlCs2R78qmBSsQkBjgmxv8/Ayfg==
   dependencies:
     "@types/ramda" "^0.27.4"
-    enlighten-common-types "1.0.0"
+    enlighten-common-types "2.0.1"
+    ramda "^0.27.0"
+
+enlighten-common-utils@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-2.0.1.tgz#51d9b45165b5716deb0d8fc25a57c5463f6b9db7"
+  integrity sha512-H+k7+hOQAmoBzDAy0khS+x3unTS+euVbb8tFFGDo/Ngl1x5eTpmin/I593wohXjOEzEMw0DGKkzjywSIR4H4jg==
+  dependencies:
+    "@types/ramda" "^0.27.4"
     ramda "^0.27.0"
 
 enquirer@2.3.5:

@@ -5,6 +5,14 @@ const GAME = gql`
     gameSingleplayer {
       categoryBackground
       categoryBackgroundBase64
+      categoryName
+      progression
+      isWon
+      levels {
+        _id
+        name
+        completed
+      }
       lastQuestion {
         _id
         answerId
@@ -18,6 +26,7 @@ const GAME = gql`
         tones
         answerId
         answered
+        levelId
         alternatives {
           _id
           type
@@ -54,6 +63,14 @@ const DELETE_SINGLEPLAYER_GAME = gql`
   }
 `
 
+const CHANGE_LEVEL_SINGLEPLAYER = gql`
+  mutation ChangeLevel($levelId: ID!) {
+    changeLevelSingleplayer(levelId: $levelId) {
+      success
+    }
+  }
+`
+
 const GAME_UPDATED = gql`
   subscription GameUpdated {
     gameSingleplayerSubscription {
@@ -61,6 +78,14 @@ const GAME_UPDATED = gql`
       gameSingleplayer {
         categoryBackground
         categoryBackgroundBase64
+        categoryName
+        progression
+        isWon
+        levels {
+          _id
+          name
+          completed
+        }
         lastQuestion {
           _id
           answerId
@@ -74,6 +99,7 @@ const GAME_UPDATED = gql`
           tones
           answerId
           answered
+          levelId
           alternatives {
             _id
             type
@@ -93,4 +119,5 @@ export {
   CREATE_GAME_SINGLEPLAYER,
   DELETE_SINGLEPLAYER_GAME,
   GAME_UPDATED,
+  CHANGE_LEVEL_SINGLEPLAYER,
 }

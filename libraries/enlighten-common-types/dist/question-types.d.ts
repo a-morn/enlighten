@@ -12,9 +12,12 @@ export declare type QuestionType<T> = {
 export declare type Question = {
     _id: string;
     alternatives: Alternative[];
-    category: string;
+    categoryId: string;
     answerId: string;
     text: string;
+    types: string[];
+    questionGroupName: string;
+    levelId?: string;
 } & ({
     type: "text";
 } | {
@@ -29,13 +32,24 @@ export declare type GameQuestion = Question & {
     record: number;
     answered: boolean;
 };
-export declare type Alternative = {
+export declare type TextAlternative = {
     _id: string;
-} & ({
+    type: "text";
+    text: string;
+};
+export declare type ImageAlternative = {
+    _id: string;
     type: "image";
     src: string;
     lqip: string;
-} | {
-    type: "text";
-    text: string;
-});
+};
+export declare type Alternative = TextAlternative | ImageAlternative;
+export declare type QuestionGroup = {
+    levelId: string;
+    name: string;
+    questions: GameQuestion[];
+    types: {
+        type: string;
+        score: number;
+    }[];
+};

@@ -1,5 +1,15 @@
-import { ForbiddenError, UserInputError } from 'apollo-server'
+import { ForbiddenError } from 'apollo-server'
 
+import {
+  GAME_REQUEST,
+  LOBBY_PLAYERS_SUBSCRIPTION,
+} from 'enlighten-common-graphql'
+import {
+  Context,
+  GameRequest,
+  MutationResponse,
+  PlayerLobby,
+} from 'enlighten-common-types'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { ResolverFn, withFilter } from 'graphql-subscriptions'
 
@@ -14,18 +24,6 @@ import {
   updatePlayerTimestamp,
 } from '../models/lobby'
 import { createGame } from '../models/multiplayer'
-import {
-  GAME_REQUEST,
-  LOBBY_PLAYERS_SUBSCRIPTION,
-} from 'enlighten-common-graphql'
-
-import {
-  Context,
-  GameRequest,
-  MutationResponse,
-  PlayerLobby,
-  isCategoryId,
-} from 'enlighten-common-types'
 
 type QueryLobbyResponse = { players: PlayerLobby[] }
 
@@ -124,9 +122,6 @@ export const lobbyMutationResolvers = (
     _,
     { player: { id, categoryId, name } },
   ): Promise<PlayerLobbyMutationResponse> => {
-    if (!isCategoryId(categoryId)) {
-      throw new UserInputError('Incorrect category')
-    }
     const player = await join(redisClient, pubSub, id, categoryId, name)
 
     return {
@@ -157,9 +152,6 @@ export const lobbyMutationResolvers = (
     const {
       currentUser: { playerId },
     } = context
-    if (!isCategoryId(categoryId)) {
-      throw new UserInputError('Incorrect category')
-    }
     if (playerId !== playerRequestId) {
       throw new ForbiddenError("Can't request games for other players")
     }

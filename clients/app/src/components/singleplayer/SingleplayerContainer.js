@@ -1,26 +1,25 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
+import { CategoryPicker } from 'components/category-picker'
+import { store } from 'hooks/context/store.js'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
-import { store } from 'hooks/context/store.js'
-import { CategoryPicker } from 'components/category-picker'
-import SingleplayerGame from './singleplayer-game'
-import Bowser from 'bowser'
-import correct from 'assets/correct.wav'
 import {
   GAME,
   ANSWER,
   CREATE_GAME_SINGLEPLAYER,
   DELETE_SINGLEPLAYER_GAME,
   GAME_UPDATED,
+  CHANGE_LEVEL_SINGLEPLAYER,
 } from './graphql'
-
-const browser = Bowser.getParser(window.navigator.userAgent)
-const correctSound = new Audio(correct)
-correctSound.volume = 0.05
+import SingleplayerGame from './singleplayer-game'
+import { WinScreenSingleplayer } from './win-screen'
 
 function Singleplayer() {
   const [isStartingGame, setIsStartingGame] = useState()
   const [categoryId, setCategoryId] = useState()
+  const [selectedAnswerId, setSelectedAlternativeId] = useState()
+  const [isLoading] = useState(false)
+
   const globalState = useContext(store)
   const { dispatch } = globalState
   const {
@@ -30,6 +29,23 @@ function Singleplayer() {
   const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
     GAME,
   )
+  const [createGame] = useMutation(CREATE_GAME_SINGLEPLAYER, {
+    refetchQueries: [
+      {
+        query: GAME,
+      },
+    ],
+  })
+  const [deleteGame] = useMutation(DELETE_SINGLEPLAYER_GAME, {
+    refetchQueries: [
+      {
+        query: GAME,
+      },
+    ],
+  })
+  const [answer] = useMutation(ANSWER)
+  const [changeLevel] = useMutation(CHANGE_LEVEL_SINGLEPLAYER)
+
   useEffect(() => {
     const url = R.pathOr(
       null,
@@ -78,22 +94,6 @@ function Singleplayer() {
     })
   }, [gameSubscribeToMore])
 
-  const [createGame] = useMutation(CREATE_GAME_SINGLEPLAYER, {
-    refetchQueries: [
-      {
-        query: GAME,
-      },
-    ],
-  })
-  const [deleteGame] = useMutation(DELETE_SINGLEPLAYER_GAME, {
-    refetchQueries: [
-      {
-        query: GAME,
-      },
-    ],
-  })
-  const [answer] = useMutation(ANSWER)
-
   const startGameRequest = useCallback(async () => {
     if (!isStartingGame) {
       setIsStartingGame(true)
@@ -139,23 +139,26 @@ function Singleplayer() {
     [answer, gameData],
   )
 
-  const [correctAnswerId, setCorrectAnswerId] = useState()
-  const [selectedAnswerId, setSelectedAlternativeId] = useState()
-  const [isLoading] = useState(false)
+  const changeLevelCallback = useCallback(
+    levelId => {
+      changeLevel({
+        variables: {
+          levelId,
+        },
+      })
+    },
+    [changeLevel],
+  )
 
-  useEffect(() => {
-    const currentQuestionAnswerId = R.pathOr(
-      null,
-      ['gameSingleplayer', 'currentQuestion', 'answerId'],
-      gameData,
-    )
-    setCorrectAnswerId(currentQuestionAnswerId)
-    if (currentQuestionAnswerId === selectedAnswerId) {
-      if (browser.getBrowserName() !== 'Safari') {
-        correctSound.play()
-      }
-    }
-  }, [gameData, selectedAnswerId])
+  const level = R.pathOr([], ['gameSingleplayer', 'levels'], gameData).find(
+    ({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId,
+  )
+
+  const correctAnswerId = R.pathOr(
+    null,
+    ['gameSingleplayer', 'currentQuestion', 'answerId'],
+    gameData,
+  )
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -169,14 +172,27 @@ function Singleplayer() {
           disabled={isStartingGame}
         />
       )}
-      {R.path(['gameSingleplayer', 'currentQuestion'], gameData) && (
-        <SingleplayerGame
-          currentQuestion={gameData.gameSingleplayer.currentQuestion}
-          endGame={deleteGameCallback}
-          answer={answerCallback}
-          isLoading={isLoading}
-          selectedAnswerId={selectedAnswerId}
-          correctAnswerId={correctAnswerId}
+      {R.path(['gameSingleplayer', 'currentQuestion'], gameData) &&
+        !R.path(['gameSingleplayer', 'isWon'], gameData) && (
+          <SingleplayerGame
+            currentQuestion={gameData.gameSingleplayer.currentQuestion}
+            level={level}
+            categoryName={gameData.gameSingleplayer.categoryName}
+            progression={gameData.gameSingleplayer.progression}
+            isLoading={isLoading}
+            selectedAnswerId={selectedAnswerId}
+            correctAnswerId={correctAnswerId}
+            levels={gameData.gameSingleplayer.levels}
+            endGame={deleteGameCallback}
+            answer={answerCallback}
+            changeLevel={changeLevelCallback}
+          />
+        )}
+      {R.path(['gameSingleplayer', 'isWon'], gameData) && (
+        <WinScreenSingleplayer
+          data-testid="win-screen"
+          close={deleteGameCallback}
+          category={gameData.gameSingleplayer.categoryName}
         />
       )}
     </div>
