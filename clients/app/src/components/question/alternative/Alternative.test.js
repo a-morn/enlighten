@@ -1,5 +1,5 @@
-import React from 'react'
 import { render } from '@testing-library/react'
+import React from 'react'
 import Alternative from './Alternative'
 
 test("doesn't have classes correct, incorrect, or selected by default", () => {

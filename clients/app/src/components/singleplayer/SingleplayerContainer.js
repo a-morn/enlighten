@@ -1,17 +1,17 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
+import { CategoryPicker } from 'components/category-picker'
+import { store } from 'hooks/context/store.js'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
-import { store } from 'hooks/context/store.js'
-import { CategoryPicker } from 'components/category-picker'
-import SingleplayerGame from './singleplayer-game'
 import {
   GAME,
   ANSWER,
   CREATE_GAME_SINGLEPLAYER,
   DELETE_SINGLEPLAYER_GAME,
   GAME_UPDATED,
-  CHANGE_LEVEL_SINGLEPLAYER
+  CHANGE_LEVEL_SINGLEPLAYER,
 } from './graphql'
+import SingleplayerGame from './singleplayer-game'
 import { WinScreenSingleplayer } from './win-screen'
 
 function Singleplayer() {
@@ -26,7 +26,9 @@ function Singleplayer() {
     state: { playerId },
   } = useContext(store)
 
-  const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(GAME)
+  const { data: gameData, subscribeToMore: gameSubscribeToMore } = useQuery(
+    GAME,
+  )
   const [createGame] = useMutation(CREATE_GAME_SINGLEPLAYER, {
     refetchQueries: [
       {
@@ -141,18 +143,16 @@ function Singleplayer() {
     levelId => {
       changeLevel({
         variables: {
-          levelId
-        }
+          levelId,
+        },
       })
-    }, [changeLevel]
+    },
+    [changeLevel],
   )
 
-  const level = R.pathOr(
-    [],
-    ['gameSingleplayer', 'levels'],
-    gameData
+  const level = R.pathOr([], ['gameSingleplayer', 'levels'], gameData).find(
+    ({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId,
   )
-  .find(({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId)
 
   const correctAnswerId = R.pathOr(
     null,
@@ -172,26 +172,29 @@ function Singleplayer() {
           disabled={isStartingGame}
         />
       )}
-      {(R.path(['gameSingleplayer', 'currentQuestion'], gameData) && !R.path(['gameSingleplayer', 'isWon'], gameData)) && (
-        <SingleplayerGame
-          currentQuestion={gameData.gameSingleplayer.currentQuestion}
-          level={level}
-          categoryName={gameData.gameSingleplayer.categoryName}
-          progression={gameData.gameSingleplayer.progression}
-          isLoading={isLoading}
-          selectedAnswerId={selectedAnswerId}
-          correctAnswerId={correctAnswerId}
-          levels={gameData.gameSingleplayer.levels}
-          endGame={deleteGameCallback}
-          answer={answerCallback}
-          changeLevel={changeLevelCallback}
+      {R.path(['gameSingleplayer', 'currentQuestion'], gameData) &&
+        !R.path(['gameSingleplayer', 'isWon'], gameData) && (
+          <SingleplayerGame
+            currentQuestion={gameData.gameSingleplayer.currentQuestion}
+            level={level}
+            categoryName={gameData.gameSingleplayer.categoryName}
+            progression={gameData.gameSingleplayer.progression}
+            isLoading={isLoading}
+            selectedAnswerId={selectedAnswerId}
+            correctAnswerId={correctAnswerId}
+            levels={gameData.gameSingleplayer.levels}
+            endGame={deleteGameCallback}
+            answer={answerCallback}
+            changeLevel={changeLevelCallback}
+          />
+        )}
+      {R.path(['gameSingleplayer', 'isWon'], gameData) && (
+        <WinScreenSingleplayer
+          data-testid="win-screen"
+          close={deleteGameCallback}
+          category={gameData.gameSingleplayer.categoryName}
         />
       )}
-      {R.path(['gameSingleplayer', 'isWon'], gameData) && <WinScreenSingleplayer
-        data-testid="win-screen"
-        close={deleteGameCallback}
-        category={gameData.gameSingleplayer.categoryName}
-      />}
     </div>
   )
 }

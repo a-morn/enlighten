@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react'
-import { withRouter } from 'react-router-dom'
 import githubLogo from 'assets/GitHub-Mark-64px.png'
 import googleLogo from 'assets/google-icon-64px.png'
 import FullscreenModal from 'components/fullscreen-modal'
+import React, { useState, useCallback } from 'react'
+import { withRouter } from 'react-router-dom'
 
 function Login({ className }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)

@@ -1,6 +1,6 @@
-import React from 'react'
 import bookcase from 'assets/bookcase-edit-compressed.mp4'
 import quizTutorialBg from 'assets/quiz-tutorial-bg.png'
+import React from 'react'
 import styles from './LandingPage.module.scss'
 
 const quizTutorialBgLqip =

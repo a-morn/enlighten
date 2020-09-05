@@ -1,10 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import Question from 'components/question'
-import { LevelCompletedScreen } from './level-completed-screen'
-import { usePrevious } from 'hooks/use-previous'
-import useWhyDidYouUpdate from 'hooks/debug/why-did-you-update'
-import Bowser from 'bowser'
 import correct from 'assets/correct.wav'
+import Bowser from 'bowser'
+import Question from 'components/question'
+import { usePrevious } from 'hooks/use-previous'
+import React, { useState, useCallback, useEffect } from 'react'
+import { LevelCompletedScreen } from './level-completed-screen'
 
 const browser = Bowser.getParser(window.navigator.userAgent)
 const correctSound = new Audio(correct)
@@ -21,11 +20,12 @@ function SingleplayerGame({
   categoryName,
   progression,
   levels,
-  changeLevel
+  changeLevel,
 }) {
-
   const [endingGame, setEndingGame] = useState(false)
-  const [showLevelCompletedScreen, setShowLevelCompletedScreen] = useState(false)
+  const [showLevelCompletedScreen, setShowLevelCompletedScreen] = useState(
+    false,
+  )
   const [previousLevel, setPreviousLevel] = useState()
 
   const previous = usePrevious(level)
@@ -33,16 +33,18 @@ function SingleplayerGame({
     if (level && previous && level.name !== previous.name) {
       setPreviousLevel(previous)
     }
-  }, [level, previousLevel])
+  }, [level, previous, previousLevel])
   useEffect(() => {
-    if (level &&
+    if (
+      level &&
       previousLevel &&
       !previousLevel.completed &&
       !level.completed &&
-      previousLevel.name !== level.name) {
+      previousLevel.name !== level.name
+    ) {
       setShowLevelCompletedScreen(true)
     }
-  }, [level, previous, setShowLevelCompletedScreen])
+  }, [level, previous, previousLevel, setShowLevelCompletedScreen])
   useEffect(() => {
     if (correctAnswerId === selectedAnswerId) {
       if (browser.getBrowserName() !== 'Safari') {
@@ -50,7 +52,7 @@ function SingleplayerGame({
       }
     }
   }, [correctAnswerId, selectedAnswerId])
-  
+
   const endGameCallback = useCallback(() => {
     setEndingGame(true)
     endGame()
@@ -61,7 +63,7 @@ function SingleplayerGame({
         className="pt-4"
         disabled={isLoading}
         question={currentQuestion}
-        levelName={level?.name} 
+        levelName={level?.name}
         categoryName={categoryName}
         selectedAnswerId={selectedAnswerId}
         correctAnswerId={correctAnswerId}
@@ -70,13 +72,14 @@ function SingleplayerGame({
         levels={levels}
         changeLevel={changeLevel}
       />
-      { showLevelCompletedScreen && <LevelCompletedScreen
+      {showLevelCompletedScreen && (
+        <LevelCompletedScreen
           data-testid="level-completed-screen"
           completedLevelName={previousLevel.name}
           nextLevelName={level.name}
           close={() => setShowLevelCompletedScreen(false)}
         />
-      }
+      )}
       <button
         data-testid="end-game-button"
         className={`bg-danger-dark hover:bg-danger text-white rounded px-4 mt-10 shadow-lg p-4 ${

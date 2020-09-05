@@ -24,7 +24,9 @@ const FullscreenModal = memo(
           <h2 className="text-4xl text-center font-hairline md:leading-loose text-grey md:mt-8 mb-4 font-bold">
             {title}
           </h2>
-          <div className="text-xl leading-normal mb-8 text-center"><ReactMarkdown source={body} className="markdown" /></div>
+          <div className="text-xl leading-normal mb-8 text-center">
+            <ReactMarkdown source={body} className="markdown" />
+          </div>
           {children}
           <div className="inline-flex justify-center">
             {acceptText && (

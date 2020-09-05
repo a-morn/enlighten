@@ -1,11 +1,10 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
+import correct from 'assets/correct.wav'
+import { store } from 'hooks/context/store.js'
+import * as R from 'ramda'
 import React, { useCallback, useEffect, useContext, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { store } from 'hooks/context/store.js'
 import { CountDown } from './count-down'
-import { MultiplayerGame } from './multiplayer-game'
-import * as R from 'ramda'
-import correct from 'assets/correct.wav'
 import {
   ANSWER,
   GAME_UPDATED,
@@ -13,6 +12,7 @@ import {
   REMOVE_PLAYER_FROM_GAME,
   GAME,
 } from './graphql'
+import { MultiplayerGame } from './multiplayer-game'
 
 function Multiplayer({ history }) {
   const {

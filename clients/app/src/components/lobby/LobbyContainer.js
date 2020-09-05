@@ -1,10 +1,9 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
+import { CategoryPicker } from 'components/category-picker'
+import { store } from 'hooks/context/store.js'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { useParams, withRouter } from 'react-router-dom'
-import { store } from 'hooks/context/store.js'
-import { CategoryPicker } from 'components/category-picker'
-import { Lobby } from './lobby'
 import {
   GAME_SUBSCRIPTION,
   LOBBY_SUBSCRIPTION,
@@ -18,6 +17,7 @@ import {
   PING_LOBBY,
   ANSWER_GAME_REQUEST,
 } from './graphql'
+import { Lobby } from './lobby'
 
 function LobbyContainerComponent({ history }) {
   const [categoryId, setCategoryId] = useState()

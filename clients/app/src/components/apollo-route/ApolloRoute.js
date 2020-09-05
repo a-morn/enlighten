@@ -7,8 +7,8 @@ import { onError } from 'apollo-link-error'
 import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
-import React, { useEffect, useContext, useState } from 'react'
 import { store } from 'hooks/context/store.js'
+import React, { useEffect, useContext, useState } from 'react'
 import { getPayloadFromJwt } from 'utils'
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {

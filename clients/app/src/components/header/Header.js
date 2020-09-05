@@ -1,9 +1,9 @@
+import EnlightenLogo from 'assets/enlighten-logo.svg'
+import { store } from 'hooks/context/store.js'
 import React, { useCallback, useState, useContext } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import EnlightenLogo from 'assets/enlighten-logo.svg'
 import styles from './Header.module.scss'
 import Login from './login'
-import { store } from 'hooks/context/store.js'
 
 function Header({ history }) {
   const [open, setOpen] = useState()
