@@ -122,9 +122,7 @@ const updateQuestionByPlayerId = async (
         questionGroupsWithLowestTypeScore.length < 2 ||
         lowestScore(qg) ===
           lowestScore(
-            questionGroupsWithLowestTypeScore[
-              questionGroupsWithLowestTypeScore.length - 1
-            ],
+            questionGroupsWithLowestTypeScore[0],
           )
       ) {
         lowestScoreCounter = lowestScore(qg)
@@ -342,7 +340,7 @@ const answerQuestion = async (
 
     if (
       unansweredQuestionGroupTypeScore.length === 0 ||
-      process.env.IMMEDIATE_LEVEL_CHANGE
+      process.env.IMMEDIATE_LEVEL_CHANGE === 'true'
     ) {
       if (game.currentLevelId === game.levels[game.levels.length - 1]._id) {
         game.isWon = true
@@ -402,6 +400,7 @@ const changeLevel = async (
   }
 
   game.currentLevelId = levelId
+  game.progression = 0
 
   const updatedGame = await updateQuestionByPlayerId(
     redisClient,

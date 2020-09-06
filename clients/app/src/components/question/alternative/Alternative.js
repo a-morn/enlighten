@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import './Alternative.scss'
+import ReactMarkdown from 'react-markdown'
 
 const Alternative = memo(
   ({
@@ -27,7 +28,7 @@ const Alternative = memo(
           onClick={onClick}
           disabled={disabled}
         >
-          {type === 'text' && text}
+          {type === 'text' && <ReactMarkdown>{text}</ReactMarkdown>}
           {type === 'image' && (
             <img
               alt=""
