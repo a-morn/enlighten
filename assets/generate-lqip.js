@@ -4,6 +4,7 @@ const files = [
   "./public/countries/world-map.jpeg",
   "./public/game-of-thrones/got-tapestry.jpg",
   "./public/music-theory/abandoned-art-school.jpg",
+  "./public/computer-science/hhkb2.jpg"
 ];
 
 files.forEach(async (file) => {

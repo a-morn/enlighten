@@ -27,30 +27,32 @@ const categoryAndLevel = ({
       <h1 className="font-bold">{categoryName}</h1>
       {levelName && levels && (
         <>
-          <ul className="flex">
-            {levels
-              .filter(
-                ({ completed }, i) =>
-                  completed ||
-                  levels[i - 1] === undefined ||
-                  levels[i - 1].completed,
-              )
-              .map(({ name, _id }) => {
-                if (name === levelName) {
-                  return (
-                    <li key={_id} className="font-bold p-2">
-                      {button(name, true)}
-                    </li>
-                  )
-                } else {
-                  return (
-                    <li key={_id} className="p-2">
-                      {button(name, false, _id)}
-                    </li>
-                  )
-                }
-              })}
-          </ul>
+          {levels.length > 1 && (
+            <ul className="flex">
+              {levels
+                .filter(
+                  ({ completed }, i) =>
+                    completed ||
+                    levels[i - 1] === undefined ||
+                    levels[i - 1].completed,
+                )
+                .map(({ name, _id }) => {
+                  if (name === levelName) {
+                    return (
+                      <li key={_id} className="font-bold p-2">
+                        {button(name, true)}
+                      </li>
+                    )
+                  } else {
+                    return (
+                      <li key={_id} className="p-2">
+                        {button(name, false, _id)}
+                      </li>
+                    )
+                  }
+                })}
+            </ul>
+          )}
           <div className="progress bg-success-light m-4">
             <h2 className="category-and-level font-bold m-2 text-info-dark">
               {levelName}
@@ -71,11 +73,18 @@ const categoryAndLevel = ({
 const questionHeading = ({ type, src, lqip, text, tones, synth }) => {
   switch (type) {
     case 'text':
-      return <ReactMarkdown source={text} className="markdown" />
+      return (
+        <div style={{ maxWidth: '100vw' }}>
+          <ReactMarkdown
+            source={text}
+            className="mx-8 markdown overflow-x-scroll overflow-y-hidden"
+          />
+        </div>
+      )
     case 'image':
       return (
         <Fragment>
-          {text && <ReactMarkdown source={text} className=" markdown" />}
+          {text && <ReactMarkdown source={text} className="markdown" />}
           <img
             data-testid="question-image"
             src={lqip}

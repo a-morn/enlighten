@@ -12,7 +12,6 @@ import lqip from "lqip";
 import memoizee from "memoizee";
 import { isDefined } from 'ts-is-present';
 import { Level } from "enlighten-common-types";
-import { totalmem } from "os";
 import { isUndefined } from "util";
 
 const COUNTRIES = Object.entries(countries).map(([key, value]) => ({

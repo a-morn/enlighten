@@ -4,31 +4,43 @@ import { Category, Levels } from "enlighten-common-types";
 
 export const getLevels: (categories: Category[]) => Levels[] = categories => [
     {
-        levels: [{
+        levels: [
+            {
                 _id: uuid(),
-                name: 'Europe'
+                name: 'Europe',
+                completed: false
             },
             {
                 _id: uuid(),
-                name: 'The Americas'
+                name: 'The Americas',
+                completed: false
             },
             {
                 _id: uuid(),
-                name: 'Africa'
+                name: 'Africa',
+                completed: false
             },
             {
                 _id: uuid(),
-                name: 'Asia'
+                name: 'Asia',
+                completed: false
             }
         ],
         categoryId: getCategoryIdByLabel('Countries', categories)
     },
-    // {
-    //     levels: [],
-    //     categoryId: getCategoryIdByLabel('Game of Thrones', categories)
-    // },
-    // {
-    //     levels: [],
-    //     categoryId: getCategoryIdByLabel('Music Theory', categories)
-    // }
+    {
+        levels: [
+            {
+                _id: uuid(),
+                name: 'Data Structures',
+                completed: false
+            },
+            {
+                _id: uuid(),
+                name: 'Algorithms',
+                completed: false
+            },
+        ],
+        categoryId: getCategoryIdByLabel('Computer Science', categories)
+    },
 ]

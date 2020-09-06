@@ -17,7 +17,7 @@ const FullscreenModal = memo(
   }) => {
     return (
       <div
-        className={`border border-solid border-gray-500 bg-info fixed z-50 top-0 right-0 bottom-0 left-0 w-full h-full overflow-auto flex ${className}`}
+        className={`border border-solid border-gray-500 bg-info fixed z-50 top-0 right-0 bottom-0 left-0 w-screen h-screen overflow-auto flex ${className}`}
         style={{ backgroundColor }}
       >
         <div className="shadow-inner max-w-md md:relative right-0 left-0 top-0 bottom-0 align-top m-auto justify-end md:justify-center p-8 bg-white md:rounded w-full md:h-auto md:shadow flex flex-col">

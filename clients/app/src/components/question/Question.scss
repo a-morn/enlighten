@@ -4,7 +4,8 @@
   .progress {
     position: relative;
     display: inline-block;
-    width: 400px;
+    width: calc(100vw - 64px);
+    max-width: 400px;
     height: 50px;
     border-radius: 20px;
     
