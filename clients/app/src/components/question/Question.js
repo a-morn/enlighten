@@ -27,7 +27,7 @@ const categoryAndLevel = ({
       <h1 className="font-bold">{categoryName}</h1>
       {levelName && levels && (
         <>
-          {levels.length > 1 && (
+          {levels.filter(({ completed }) => completed).length > 0 && (
             <ul className="flex">
               {levels
                 .filter(
@@ -77,7 +77,7 @@ const questionHeading = ({ type, src, lqip, text, tones, synth }) => {
         <div style={{ maxWidth: '100vw' }}>
           <ReactMarkdown
             source={text}
-            className="mx-8 markdown overflow-x-scroll overflow-y-hidden"
+            className="mx-8 markdown sm-overflow-x-scroll overflow-y-hidden"
           />
         </div>
       )

@@ -3,6 +3,7 @@ import { CategoryPicker } from 'components/category-picker'
 import { store } from 'hooks/context/store.js'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
+import { useParams, withRouter } from 'react-router-dom'
 import {
   GAME,
   ANSWER,
@@ -14,11 +15,13 @@ import {
 import SingleplayerGame from './singleplayer-game'
 import { WinScreenSingleplayer } from './win-screen'
 
-function Singleplayer() {
+function Singleplayer({ history }) {
   const [isStartingGame, setIsStartingGame] = useState()
   const [categoryId, setCategoryId] = useState()
   const [selectedAnswerId, setSelectedAlternativeId] = useState()
   const [isLoading] = useState(false)
+
+  const { categoryId: categoryFromParams } = useParams()
 
   const globalState = useContext(store)
   const { dispatch } = globalState
@@ -93,6 +96,14 @@ function Singleplayer() {
       },
     })
   }, [gameSubscribeToMore])
+
+  useEffect(() => {
+    if (!categoryId && categoryFromParams) {
+      setCategoryId(categoryFromParams)
+    } else if (categoryId && categoryId !== categoryFromParams) {
+      history.push(`/singleplayer/${categoryId}`)
+    }
+  }, [categoryFromParams, categoryId, history, setCategoryId])
 
   const startGameRequest = useCallback(async () => {
     if (!isStartingGame) {
@@ -199,4 +210,4 @@ function Singleplayer() {
   )
 }
 
-export default Singleplayer
+export default withRouter(Singleplayer)
