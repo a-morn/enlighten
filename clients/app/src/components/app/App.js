@@ -34,7 +34,7 @@ function App() {
                       <Route path="/about">
                         <About />
                       </Route>
-                      <Route path="/singleplayer">
+                      <Route path="/singleplayer/:categoryId?">
                         <ApolloRoute>
                           <Singleplayer />
                         </ApolloRoute>

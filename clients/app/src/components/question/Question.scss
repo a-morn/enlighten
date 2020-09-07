@@ -1,6 +1,7 @@
 @import 'src/styles/style.scss';
 
 .question {
+  max-width: 100vw;
   .progress {
     position: relative;
     display: inline-block;

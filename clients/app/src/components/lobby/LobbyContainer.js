@@ -116,10 +116,6 @@ function LobbyContainerComponent({ history }) {
 
   const [pingLobby] = useMutation(PING_LOBBY)
 
-  if (!categoryId && categoryFromParams) {
-    setCategoryId(categoryFromParams)
-  }
-
   const joinLobbyCallback = useCallback(
     name => {
       joinLobby({ variables: { player: { id: playerId, categoryId, name } } })
@@ -134,10 +130,12 @@ function LobbyContainerComponent({ history }) {
   }, [gameData, history, playerId])
 
   useEffect(() => {
-    if (categoryId) {
+    if (!categoryId && categoryFromParams) {
+      setCategoryId(categoryFromParams)
+    } else if (categoryId) {
       history.push(`/lobby/${categoryId}`)
     }
-  }, [categoryId, history])
+  }, [categoryId, categoryFromParams, history])
 
   useEffect(() => {
     setInLobby(
