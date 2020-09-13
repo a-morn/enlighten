@@ -11,7 +11,7 @@ function censorAnswerIfNotAnswered<T extends Game>(game: T): T {
     const censoredGame = {
       ...game,
       currentQuestion: game.currentQuestion
-        ? R.pickBy((_, k) => k !== "answerId", game.currentQuestion)
+        ? R.pickBy((_, k) => k !== "answerIds", game.currentQuestion)
         : null,
     } as T;
     return censoredGame;

@@ -82,10 +82,11 @@ export const getQuestions: (categoryId: string, levels?: Level[] | null) => Ques
                 ],
                 text: "What interval is this?",
                 categoryId,
-                answerId,
+                answerIds: [answerId],
                 alternatives: shuffle(alternatives),
                 questionGroupName: 'intervals',
-                types: [interval.name]
+                types: [interval.name],
+                hasMultipleCorrectAnswers: false,
               };
 
               return question

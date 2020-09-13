@@ -8,22 +8,18 @@ export const getLevels: (categories: Category[]) => Levels[] = categories => [
             {
                 _id: uuid(),
                 name: 'Europe',
-                completed: false
             },
             {
                 _id: uuid(),
                 name: 'The Americas',
-                completed: false
             },
             {
                 _id: uuid(),
                 name: 'Africa',
-                completed: false
             },
             {
                 _id: uuid(),
                 name: 'Asia',
-                completed: false
             }
         ],
         categoryId: getCategoryIdByLabel('Countries', categories)
@@ -33,14 +29,37 @@ export const getLevels: (categories: Category[]) => Levels[] = categories => [
             {
                 _id: uuid(),
                 name: 'Data Structures',
-                completed: false
             },
             {
                 _id: uuid(),
                 name: 'Algorithms',
-                completed: false
             },
         ],
         categoryId: getCategoryIdByLabel('Computer Science', categories)
+    },
+    {
+        levels: [
+            {
+                _id: uuid(),
+                name: 'Number bases',
+            },
+            {
+                _id: uuid(),
+                name: 'Trigonometry',
+            },
+            {
+                _id: uuid(),
+                name: 'Functions',
+            },
+            {
+                _id: uuid(),
+                name: 'Kinematics',
+            },
+            {
+                _id: uuid(),
+                name: 'Linear algebra',
+            }
+        ],
+        categoryId: getCategoryIdByLabel('Mathematics', categories)
     },
 ]

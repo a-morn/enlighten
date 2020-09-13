@@ -16,25 +16,22 @@ export type Question = {
   _id: string;
   alternatives: Alternative[];
   categoryId: string;
-  answerId: string;
   text: string;
   types: string[];
   questionGroupName: string;
+  hasMultipleCorrectAnswers: boolean;
+  answerIds: string[];
   levelId?: string;
-} & (
-  | {
+} & ({
       type: "text";
-    }
-  | {
+  } | {
       type: "image";
       src: string;
       lqip: string;
-    }
-  | {
+  } | {
       type: "tones";
       tones: string[];
-    }
-);
+  });
 
 export type GameQuestion = Question & {
   record: number;

@@ -10,6 +10,6 @@ export declare type Context = {
 export declare type AnswerQuestionInput = {
     answer: {
         questionId: string;
-        answerId: string;
+        answerIds: string[];
     };
 };

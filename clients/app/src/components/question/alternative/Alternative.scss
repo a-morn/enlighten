@@ -7,6 +7,9 @@
     outline: none;
     min-height: 50px;
     position: relative;
+    &.selected {
+      background-color: $info;
+    }
     &.incorrect.selected {
       animation: bg-color-pulse-incorrect 0.8s ease infinite;
       &:before {

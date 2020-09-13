@@ -98,7 +98,7 @@ const getQuestion = async (
   fromType: QuestionEntityType<GoTHouse> | QuestionEntityType<GoTHouse>[],
   toType: QuestionEntityType<GoTHouse>,
   el: GoTHouse,
-  answerId: string,
+  answerIds: string[],
   alternatives: Alternative[],
   categoryId: string,
 ): Promise<Question> => {
@@ -110,9 +110,10 @@ const getQuestion = async (
     _id: uuid(),
     alternatives,
     categoryId,
-    answerId,
+    answerIds,
     types: [fromType.id, toType.id],
-    questionGroupName: el.name
+    questionGroupName: el.name,
+    hasMultipleCorrectAnswers: false,
   }
 
   switch (fromType.id) {
@@ -194,7 +195,7 @@ export const getQuestions: (categoryId: string, levels?: Level[]) => Promise<Que
                 .map(async (el) => await getAlternative(toType, el))
             );
             const answerId = alternatives[0]._id;
-            return await getQuestion(fromType, toType, el, answerId, shuffle(alternatives), categoryId)
+            return await getQuestion(fromType, toType, el, [answerId], shuffle(alternatives), categoryId)
           })
       ),
     [] as Promise<Question>[]

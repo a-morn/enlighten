@@ -263,7 +263,7 @@ const answerQuestion = async (
   pubSub: RedisPubSub,
   playerId: string,
   questionId: string,
-  answerId: string,
+  answerIds: string[],
 ): Promise<GameSingeplayer> => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (!game) {
@@ -293,7 +293,7 @@ const answerQuestion = async (
     throw new UserInputError('Current question did not exist')
   }
 
-  if (answerId === question.answerId) {
+  if (answerIds.length === question.answerIds.length && question.answerIds.every(correctId => answerIds.includes(correctId))) {
     question.types.forEach(type => {
       questionGroup.types
         .filter(qgType => qgType.type === type)

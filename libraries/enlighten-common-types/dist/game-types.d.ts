@@ -1,6 +1,6 @@
 import { GameQuestion, QuestionGroup } from "./question-types";
 import { PlayerMultiplayer } from "./player-types";
-import { Level } from ".";
+import { GameLevel } from ".";
 export declare type Game = {
     categoryId: string;
     categoryName: string;
@@ -16,7 +16,7 @@ export declare type GameSingeplayer = Game & {
     playerId: string;
     questionGroups: QuestionGroup[];
     currentLevelId?: string;
-    levels?: Level[];
+    levels?: GameLevel[];
     progression: number;
     isWon: boolean;
     currentQuestionGroupName: string;

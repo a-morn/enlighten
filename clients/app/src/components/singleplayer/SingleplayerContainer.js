@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import { CategoryPicker } from 'components/category-picker'
 import { store } from 'hooks/context/store.js'
+import { usePrevious } from 'hooks/use-previous'
 import * as R from 'ramda'
 import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { useParams, withRouter } from 'react-router-dom'
@@ -18,7 +19,7 @@ import { WinScreenSingleplayer } from './win-screen'
 function Singleplayer({ history }) {
   const [isStartingGame, setIsStartingGame] = useState()
   const [categoryId, setCategoryId] = useState()
-  const [selectedAnswerId, setSelectedAlternativeId] = useState()
+  const [selectedAnswerIds, setSelectedAnswerIds] = useState([])
   const [isLoading] = useState(false)
 
   const { categoryId: categoryFromParams } = useParams()
@@ -48,6 +49,8 @@ function Singleplayer({ history }) {
   })
   const [answer] = useMutation(ANSWER)
   const [changeLevel] = useMutation(CHANGE_LEVEL_SINGLEPLAYER)
+
+  const previousGameData = usePrevious(gameData)
 
   useEffect(() => {
     const url = R.pathOr(
@@ -105,6 +108,33 @@ function Singleplayer({ history }) {
     }
   }, [categoryFromParams, categoryId, history, setCategoryId])
 
+  useEffect(() => {
+    if (
+      R.pathOr(
+        undefined,
+        ['gameSingleplayer', 'currentQuestion', '_id'],
+        previousGameData,
+      ) !==
+        R.pathOr(
+          undefined,
+          ['gameSingleplayer', 'currentQuestion', '_id'],
+          gameData,
+        ) ||
+      (R.pathOr(
+        undefined,
+        ['gameSingleplayer', 'currentQuestion', 'answerIds'],
+        previousGameData,
+      ) &&
+        R.pathOr(
+          null,
+          ['gameSingleplayer', 'currentQuestion', 'answerIds'],
+          gameData,
+        ) === null)
+    ) {
+      setSelectedAnswerIds([])
+    }
+  }, [previousGameData, gameData])
+
   const startGameRequest = useCallback(async () => {
     if (!isStartingGame) {
       setIsStartingGame(true)
@@ -136,18 +166,30 @@ function Singleplayer({ history }) {
   }, [deleteGame, gameData])
 
   const answerCallback = useCallback(
-    answerId => {
+    answerIds => {
       answer({
         variables: {
           answer: {
-            answerId,
+            answerIds,
             questionId: gameData.gameSingleplayer.currentQuestion._id,
           },
         },
       })
-      setSelectedAlternativeId(answerId)
     },
     [answer, gameData],
+  )
+
+  const toggleSelectAlternativeIdsCallback = useCallback(
+    answerId => {
+      setSelectedAnswerIds((selected = []) => {
+        if (selected.includes(answerId)) {
+          return selected.filter(id => id !== answerId)
+        } else {
+          return [...selected, answerId]
+        }
+      })
+    },
+    [setSelectedAnswerIds],
   )
 
   const changeLevelCallback = useCallback(
@@ -165,9 +207,9 @@ function Singleplayer({ history }) {
     ({ _id }) => _id === gameData.gameSingleplayer.currentQuestion.levelId,
   )
 
-  const correctAnswerId = R.pathOr(
+  const correctAnswerIds = R.pathOr(
     null,
-    ['gameSingleplayer', 'currentQuestion', 'answerId'],
+    ['gameSingleplayer', 'currentQuestion', 'answerIds'],
     gameData,
   )
 
@@ -191,11 +233,12 @@ function Singleplayer({ history }) {
             categoryName={gameData.gameSingleplayer.categoryName}
             progression={gameData.gameSingleplayer.progression}
             isLoading={isLoading}
-            selectedAnswerId={selectedAnswerId}
-            correctAnswerId={correctAnswerId}
+            selectedAnswerIds={selectedAnswerIds}
+            correctAnswerIds={correctAnswerIds}
             levels={gameData.gameSingleplayer.levels}
             endGame={deleteGameCallback}
             answer={answerCallback}
+            toggleSelectAlternative={toggleSelectAlternativeIdsCallback}
             changeLevel={changeLevelCallback}
           />
         )}

@@ -13,6 +13,6 @@ export type Context = {
 export type AnswerQuestionInput = {
   answer: {
     questionId: string
-    answerId: string
+    answerIds: string[]
   }
 }

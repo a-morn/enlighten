@@ -26,7 +26,7 @@ export default `
 
     input AnswerQuestionMultiplayerInput {
         questionId: ID!
-        answerId: ID!
+        answerIds: ID!
     }
 
     type AnswerQuestionMultiplayerResponse implements MutationResponse {

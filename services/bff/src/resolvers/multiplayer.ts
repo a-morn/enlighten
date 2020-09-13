@@ -82,7 +82,7 @@ export const multiplayerMutationResolvers = (
 } => ({
   answerQuestionMultiplayer: async (
     _,
-    { answer: { answerId, questionId } },
+    { answer: { answerIds, questionId } },
     context,
   ): Promise<GameQuestionMutationResponse> => {
     const {
@@ -93,7 +93,7 @@ export const multiplayerMutationResolvers = (
       pubSub,
       playerId,
       questionId,
-      answerId,
+      answerIds,
     )
 
     return {

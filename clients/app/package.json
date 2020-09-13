@@ -30,6 +30,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.1",
     "react-use-websocket": "^0.9.8",
+    "remark-sub-super": "^1.0.19",
     "reset-css": "^4.0.1",
     "subscriptions-transport-ws": "^0.9.16",
     "tone": "^13.8.25"

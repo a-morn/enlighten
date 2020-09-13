@@ -52,7 +52,8 @@ const getDataStructureQuestions = (categoryId: string, levelId: string): Questio
 
         const result: Question = {
           _id: uuid(),
-          answerId,
+          hasMultipleCorrectAnswers: false,
+          answerIds: [answerId],
           alternatives: alternatives as Alternative[],
           questionGroupName: ds.name,
           types: ['name', 'operations'],
@@ -90,7 +91,8 @@ const getDataStructureQuestions = (categoryId: string, levelId: string): Questio
 
         const result: Question = {
           _id: uuid(),
-          answerId,
+          answerIds: [answerId],
+          hasMultipleCorrectAnswers: false,
           alternatives: alternatives as Alternative[],
           questionGroupName: ds.name,
           types: ['name', 'operations'],
@@ -126,7 +128,8 @@ const getDataStructureQuestions = (categoryId: string, levelId: string): Questio
 
       const result: Question = {
         _id: uuid(),
-        answerId,
+        answerIds: [answerId],
+        hasMultipleCorrectAnswers: false,
         alternatives: alternatives as Alternative[],
         questionGroupName: ds.name,
         types: ['name', 'operations'],
@@ -159,7 +162,8 @@ const getDataStructureQuestions = (categoryId: string, levelId: string): Questio
 
         const result: Question = {
           _id: uuid(),
-          answerId,
+          answerIds: [answerId],
+          hasMultipleCorrectAnswers: false,
           alternatives: alternatives as Alternative[],
           questionGroupName: ds.name,
           types: ['name', 'operations'],
@@ -415,7 +419,8 @@ const getAlgorithmQuestions = (categoryId: string, levelId: string): Question[] 
 
       const result: Question = {
         _id: uuid(),
-        answerId,
+        answerIds: [answerId],
+        hasMultipleCorrectAnswers: false,
         alternatives: alternatives as Alternative[],
         questionGroupName: algo.name,
         types: ['name', 'implementation'],
@@ -456,7 +461,8 @@ ${algoImpl.text}
 
       const result: Question = {
         _id: uuid(),
-        answerId,
+        answerIds: [answerId],
+        hasMultipleCorrectAnswers: false,
         alternatives: alternatives as Alternative[],
         questionGroupName: algo.name,
         types: ['name', 'implementation'],

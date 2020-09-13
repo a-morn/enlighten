@@ -48,7 +48,7 @@ export function MultiplayerGame({
           onAlternativeSelected={alternativeSelected}
         />
         <button
-          className="bg-red-500 text-white rounded px-4 mt-10 shadow-lg py-6 md:py-4"
+          className="bg-red-500 text-white rounded px-4 mt-10 shadow-lg py-6 md:py-4  mx-4"
           onClick={leaveGame}
         >
           Leave game

@@ -38,7 +38,7 @@ export default `
     }
 
     input AnswerQuestionSingleplayerInput {
-        answerId: ID!
+        answerIds: [ID]!
         questionId: ID!
     }
 

@@ -9,6 +9,7 @@ import { getQuestions as gotGetQuestions } from "./game-of-thrones";
 import { getQuestions as countriesGetQuestions } from "./countries";
 import { getQuestions as musicTheoryGetQuestions } from "./music-theory";
 import { getQuestions as csGetQuestions } from "./computer-science"
+import { getQuestions as mathGetQuestions } from './math'
 import categories from './categories'
 import { getLevels } from './levels'
 import { getCategoryIdByLabel } from "./utils";
@@ -87,6 +88,7 @@ async function populate() {
     createMultipleQuestions(client, await Promise.all(countriesGetQuestions(getCategoryIdByLabel('Countries', categories), getLevelsByLabel('Countries', levels)))),
     createMultipleQuestions(client, musicTheoryGetQuestions(getCategoryIdByLabel('Music Theory', categories))),
     createMultipleQuestions(client, await csGetQuestions(getCategoryIdByLabel('Computer Science', categories), getLevelsByLabel('Computer Science', levels))),
+    createMultipleQuestions(client, await mathGetQuestions(getCategoryIdByLabel('Mathematics', categories), getLevelsByLabel('Mathematics', levels))),
     createCategories(client, categories),
     createLevels(client, levels)
   ]);

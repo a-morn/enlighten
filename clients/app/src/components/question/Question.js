@@ -1,5 +1,6 @@
 import React, { Fragment, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkSubSuper from 'remark-sub-super'
 import { DuoSynth } from 'tone'
 import Alternative from './alternative'
 import './Question.scss'
@@ -28,7 +29,7 @@ const categoryAndLevel = ({
       {levelName && levels && (
         <>
           {levels.filter(({ completed }) => completed).length > 0 && (
-            <ul className="flex">
+            <ul className="flex flex-wrap">
               {levels
                 .filter(
                   ({ completed }, i) =>
@@ -76,8 +77,13 @@ const questionHeading = ({ type, src, lqip, text, tones, synth }) => {
       return (
         <div style={{ maxWidth: '100vw' }}>
           <ReactMarkdown
+            plugins={[remarkSubSuper]}
+            renderers={{
+              sub: 'sub',
+              sup: 'sup',
+            }}
             source={text}
-            className="mx-8 markdown sm-overflow-x-scroll overflow-y-hidden"
+            className="mx-8 markdown sm-overflow-x-scroll"
           />
         </div>
       )
@@ -124,17 +130,27 @@ const questionHeading = ({ type, src, lqip, text, tones, synth }) => {
 
 const Question = React.memo(
   ({
-    question: { type, alternatives, text, src, lqip, tones, answered },
+    question: {
+      type,
+      alternatives,
+      text,
+      src,
+      lqip,
+      tones,
+      answered,
+      hasMultipleCorrectAnswers,
+    },
     levelName,
     categoryName,
-    onAlternativeSelected,
-    selectedAnswerId,
-    correctAnswerId,
+    answer,
+    selectedAnswerIds,
+    correctAnswerIds,
     disabled,
     className = '',
     progression,
     levels,
     changeLevel,
+    toggleSelectAlternative,
   }) => {
     const synth = useRef(null)
 
@@ -146,13 +162,13 @@ const Question = React.memo(
 
     return (
       <div
-        className={`question ${className} transition-opacity ease-in-out ${
+        className={`question ${className} transition-opacity ease-in-out flex flex-col ${
           answered
             ? 'opacity-0 delay-300 duration-1000'
             : 'opacity-100 duration-500'
         }`}
       >
-        <div className="flex flex-col items-center bg-gray-lighter text-gray-darkest my-4 p-4 rounded">
+        <div className="flex flex-col items-center bg-gray-lighter text-gray-darkest m-4 p-4 rounded">
           {categoryAndLevel({
             levelName,
             categoryName,
@@ -171,21 +187,36 @@ const Question = React.memo(
             categoryName,
           })}
         </div>
-        <ul className="question__alternatives shadow-lg">
+        <ul className="question__alternatives shadow-lg mx-4">
           {alternatives.map((alt, i) => (
             <li key={i} data-testid={`alternative-${i}-wrapper`}>
               <Alternative
                 alternative={alt}
-                onClick={() => onAlternativeSelected(alt._id)}
-                selected={alt._id === selectedAnswerId}
-                correct={
-                  correctAnswerId === null ? null : alt._id === correctAnswerId
+                onClick={
+                  hasMultipleCorrectAnswers
+                    ? () => toggleSelectAlternative(alt._id)
+                    : () => {
+                        toggleSelectAlternative(alt._id)
+                        answer([alt._id])
+                      }
                 }
+                selected={
+                  selectedAnswerIds && selectedAnswerIds.includes(alt._id)
+                }
+                correct={correctAnswerIds && correctAnswerIds.includes(alt._id)}
                 disabled={disabled}
               />
             </li>
           ))}
         </ul>
+        {hasMultipleCorrectAnswers && (
+          <button
+            className={`bg-cta text-black py-8 m:py-6 px-4 rounded mt-4 mx-4`}
+            onClick={() => answer(selectedAnswerIds)}
+          >
+            Answer
+          </button>
+        )}
       </div>
     )
   },
