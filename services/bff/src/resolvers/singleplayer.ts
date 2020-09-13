@@ -122,7 +122,7 @@ export const singleplayerMutationResolvers = (
   },
   answerQuestionSingleplayer: async (
     _,
-    { answer: { answerId, questionId } },
+    { answer: { answerIds, questionId } },
     context,
   ): Promise<GameSingleplayeMutationResponse> => {
     const {
@@ -134,7 +134,7 @@ export const singleplayerMutationResolvers = (
       pubSub,
       playerId,
       questionId,
-      answerId,
+      answerIds,
     )
     const filteredGame = filterGame(game)
     return {

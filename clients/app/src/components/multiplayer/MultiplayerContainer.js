@@ -126,7 +126,7 @@ function Multiplayer({ history }) {
   useEffect(() => {
     const currentQuestionAnswerId = R.pathOr(
       null,
-      ['gameMultiplayer', 'currentQuestion', 'answerId'],
+      ['gameMultiplayer', 'currentQuestion', 'answerIds'],
       data,
     )
 
@@ -160,7 +160,7 @@ function Multiplayer({ history }) {
   const [selectedAnswerId, setSelectedAnswerId] = useState()
 
   const alternativeSelected = useCallback(
-    answerId => {
+    answerIds => {
       const currentQuestionAnswered = R.pathOr(
         null,
         ['currentQuestion', 'answered'],
@@ -171,12 +171,12 @@ function Multiplayer({ history }) {
         answer({
           variables: {
             answer: {
-              answerId,
+              answerIds,
               questionId: data.gameMultiplayer.currentQuestion._id,
             },
           },
         })
-        setSelectedAnswerId(answerId)
+        setSelectedAnswerId(answerIds)
       }
     },
     [answer, data],

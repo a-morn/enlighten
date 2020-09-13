@@ -24,7 +24,8 @@ export default `
 		src: String
 		lqip: String
 		tones: [String]
-		answerId: ID
+		answerIds: [ID]
+		hasMultipleCorrectAnswers: Boolean!
 		answered: Boolean!
 		levelId: String
 	} 

@@ -15,7 +15,7 @@ const GAME = gql`
       }
       lastQuestion {
         _id
-        answerId
+        answerIds
       }
       currentQuestion {
         _id
@@ -24,7 +24,8 @@ const GAME = gql`
         src
         lqip
         tones
-        answerId
+        answerIds
+        hasMultipleCorrectAnswers
         answered
         levelId
         alternatives {
@@ -88,7 +89,7 @@ const GAME_UPDATED = gql`
         }
         lastQuestion {
           _id
-          answerId
+          answerIds
         }
         currentQuestion {
           _id
@@ -97,7 +98,8 @@ const GAME_UPDATED = gql`
           src
           lqip
           tones
-          answerId
+          answerIds
+          hasMultipleCorrectAnswers
           answered
           levelId
           alternatives {

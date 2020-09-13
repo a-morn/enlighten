@@ -108,7 +108,7 @@ const createGame = async (
   ])
 
   const client = await getClient()
-  const game = {
+  const game: GameMultiplayer = {
     categoryId,
     categoryBackground: category.background,
     categoryBackgroundBase64: category.backgroundBase64,
@@ -172,7 +172,7 @@ const answerQuestion = async (
   pubSub: RedisPubSub,
   playerId: string,
   questionId: string,
-  answerId: string,
+  answerIds: string[],
 ): Promise<GameQuestion> => {
   const game = await getGameByPlayerId(redisClient, playerId)
   if (game === null) {
@@ -192,7 +192,7 @@ const answerQuestion = async (
         `Player ${playerId} is not a part of game ${game.id}`,
       )
     }
-    const correct = answerId === question.answerId
+    const correct = answerIds.length === question.answerIds.length && question.answerIds.every(correctId => answerIds.includes(correctId))
     player.score = Math.max(0, player.score + (correct ? 1 : -1))
     if (player.score >= 10) {
       player.won = true

@@ -82,7 +82,7 @@ const getQuestion = async (
   fromType: QuestionEntityType<ICountryWithFlag> | QuestionEntityType<ICountryWithFlag>[],
   toType: QuestionEntityType<ICountryWithFlag>,
   el: ICountryWithFlag,
-  answerId: string,
+  answerIds: string[],
   alternatives: Alternative[],
   categoryId: string,
   levels: Level[]
@@ -99,7 +99,8 @@ const getQuestion = async (
 
   const base = {
     _id: uuid(),
-    answerId,
+    answerIds,
+    hasMultipleCorrectAnswers: false,
     alternatives,
     categoryId,
     levelId: level._id,
@@ -185,7 +186,7 @@ export const getQuestions: (categoryId: string, levels: Level[]) => Promise<Ques
               fromType,
               toType,
               el,
-              answerId,
+              [answerId],
               shuffle(alternatives),
               categoryId,
               levels

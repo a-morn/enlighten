@@ -13,14 +13,15 @@ function SingleplayerGame({
   currentQuestion,
   endGame,
   isLoading,
-  selectedAnswerId,
-  correctAnswerId,
+  selectedAnswerIds,
+  correctAnswerIds,
   answer,
   level,
   categoryName,
   progression,
   levels,
   changeLevel,
+  toggleSelectAlternative,
 }) {
   const [endingGame, setEndingGame] = useState(false)
   const [showLevelCompletedScreen, setShowLevelCompletedScreen] = useState(
@@ -46,12 +47,17 @@ function SingleplayerGame({
     }
   }, [level, previous, previousLevel, setShowLevelCompletedScreen])
   useEffect(() => {
-    if (correctAnswerId === selectedAnswerId) {
+    if (
+      selectedAnswerIds &&
+      correctAnswerIds &&
+      correctAnswerIds.every(correct => selectedAnswerIds.includes(correct)) &&
+      correctAnswerIds.length === selectedAnswerIds.length
+    ) {
       if (browser.getBrowserName() !== 'Safari') {
         correctSound.play()
       }
     }
-  }, [correctAnswerId, selectedAnswerId])
+  }, [correctAnswerIds, selectedAnswerIds])
 
   const endGameCallback = useCallback(() => {
     setEndingGame(true)
@@ -65,12 +71,13 @@ function SingleplayerGame({
         question={currentQuestion}
         levelName={level?.name}
         categoryName={categoryName}
-        selectedAnswerId={selectedAnswerId}
-        correctAnswerId={correctAnswerId}
-        onAlternativeSelected={answer}
+        selectedAnswerIds={selectedAnswerIds}
+        correctAnswerIds={correctAnswerIds}
+        answer={answer}
         progression={progression}
         levels={levels}
         changeLevel={changeLevel}
+        toggleSelectAlternative={toggleSelectAlternative}
       />
       {showLevelCompletedScreen && (
         <LevelCompletedScreen

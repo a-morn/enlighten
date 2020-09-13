@@ -943,10 +943,17 @@
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.1.tgz#937fab3194766256ee09fcd40b781740758617e7"
   integrity sha512-lhbQXx9HKZAPgBkISrBcmAcMpZsmpe/Cd/hY7LGZS5OfkySUBItnPZHgQPssWYUET8elF+yCFBbP1Q0RZPTdaw==
 
-"@types/ramda@^0.27.3", "@types/ramda@^0.27.4":
+"@types/ramda@^0.27.3":
   version "0.27.4"
   resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.27.4.tgz#816002c95e54cf3f3d5d7e8e014998450934d992"
   integrity sha512-uE1OSffeRZoFjVah2RjR4pAyptzqN6T+fEsWr06biuUstR2IBIzKhSGwKxzISAoy4SC+JkJv8y99Hm3cJ/TDOQ==
+  dependencies:
+    ts-toolbelt "^6.3.3"
+
+"@types/ramda@^0.27.4":
+  version "0.27.17"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.27.17.tgz#b4359d29614994dbb4c70e504b268bd9f0388bb0"
+  integrity sha512-AHVwr1YdFdxeabfC1g34ZuJ61dKOcfdXlG+sqGUweD+5VrD6A9emwmc2OZY+N8CdEKdwl29hwvtTMSJ6ZVVsiQ==
   dependencies:
     ts-toolbelt "^6.3.3"
 
@@ -2402,41 +2409,28 @@ end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-enlighten-common-graphql@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/enlighten-common-graphql/-/enlighten-common-graphql-2.0.0.tgz#ae50435238fcd95dedd484adb1f58ddb9ec3ceca"
-  integrity sha512-H479S863rNTn1sQpcsRLnNWosxLrR5ME2E8dX+wHqNZWWzho2dtMLv/GAAuDry7DX+LqdzCN1yPznKOMIuBGxg==
+enlighten-common-graphql@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/enlighten-common-graphql/-/enlighten-common-graphql-3.0.0.tgz#3efb01bb6129cad5cca97bd129d760486f72df60"
+  integrity sha512-XaTW9XQdLDRWFx4AHqNFRPtihA3I+ROAxUVjnyQRUNAYfsEhy4WfVZpZ9PkyQboPuvWnnMMOQZmC4Biy4uxdjQ==
   dependencies:
-    enlighten-common-types "2.0.1"
-    enlighten-common-utils "2.0.0"
+    enlighten-common-types "^3.1.7"
+    enlighten-common-utils "^3.0.1"
     graphql-redis-subscriptions "^2.2.1"
     ramda "^0.27.0"
 
-enlighten-common-types@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.0.1.tgz#ab4da0dfc0922ba72ac41a9961d3ee6aeba691e6"
-  integrity sha512-xbARIE8jbXI/RslgZ+uC/3rdmfyeiOuCDXz2Mhj3uSJICEqojKPMx+sxlTgTZxezebhh8j+CSyQtCo0+YdiEPw==
+enlighten-common-types@^3.1.7:
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-3.1.7.tgz#05bdbba5025d1baff864242a1f440c46493ebbae"
+  integrity sha512-a3tcG5ugE4gvPwj6ASWX/1R/EnIidLkY3bh/2p/F+Vi9mEYjx2g1bJaVKMB26GDwUHlcqVnQSFxQzJJ6WbwtPQ==
 
-enlighten-common-types@2.1.7:
-  version "2.1.7"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.1.7.tgz#543e46362f0764a383889f462babd241bbc5af2e"
-  integrity sha512-zsPMdeEeekTUBnNgjQ2IyXUVmTleRuOsScc78exh0bLvwA6VYQ43mbhDHMelcESDuP+lPzwyYEf5M6SoufcTKQ==
-
-enlighten-common-utils@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-2.0.0.tgz#728cfdfe2359207980770f9cce489d471737e11c"
-  integrity sha512-K//o6s9i/NvRpHTaN9OXp/j6EAMGyTpKjO8EJLfht2rqm70tCiu8NW+voyGxlCs2R78qmBSsQkBjgmxv8/Ayfg==
+enlighten-common-utils@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-3.0.1.tgz#d358d2d0a3bfed9d58f2fb872c569384e6080447"
+  integrity sha512-ja/GUrm4pga4ZEC66I+Z+HUn6Wxv/2ZWJt8VHCk3sR7kPAAOZgSP737FaePaVL0xvKIS0IHkReI+4cMwEA3nDw==
   dependencies:
     "@types/ramda" "^0.27.4"
-    enlighten-common-types "2.0.1"
-    ramda "^0.27.0"
-
-enlighten-common-utils@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-2.0.1.tgz#51d9b45165b5716deb0d8fc25a57c5463f6b9db7"
-  integrity sha512-H+k7+hOQAmoBzDAy0khS+x3unTS+euVbb8tFFGDo/Ngl1x5eTpmin/I593wohXjOEzEMw0DGKkzjywSIR4H4jg==
-  dependencies:
-    "@types/ramda" "^0.27.4"
+    enlighten-common-types "^3.1.7"
     ramda "^0.27.0"
 
 enquirer@2.3.5:
@@ -5543,9 +5537,9 @@ ramda@^0.26.1:
   integrity sha512-hLWjpy7EnsDBb0p+Z3B7rPi3GDeRG5ZtiI33kJhTt+ORCd38AbAIjB/9zRIUoeTbE/AVX5ZkU7m6bznsvrf8eQ==
 
 ramda@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.27.0.tgz#915dc29865c0800bf3f69b8fd6c279898b59de43"
-  integrity sha512-pVzZdDpWwWqEVVLshWUHjNwuVP7SfcmPraYuqocJp1yo2U1R7P+5QAfDhdItkuoGqIBnBYrtPp7rEPqDn9HlZA==
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.27.1.tgz#66fc2df3ef873874ffc2da6aa8984658abacf5c9"
+  integrity sha512-PgIdVpn5y5Yns8vqb8FzBUEYn98V3xcPgawAkkgj0YJ0qDsnHCiNmZYfOGMgOvoB0eWFLpYbhxUR3mxfDIMvpw==
 
 range-parser@~1.2.0, range-parser@~1.2.1:
   version "1.2.1"

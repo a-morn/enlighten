@@ -38,18 +38,18 @@ denque@^1.1.0:
   resolved "https://registry.yarnpkg.com/denque/-/denque-1.4.1.tgz#6744ff7641c148c3f8a69c307e51235c1f4a37cf"
   integrity sha512-OfzPuSZKGcgr96rf1oODnfjqBFmr1DVoc/TrItj3Ohe0Ah1C5WX5Baquw/9U9KovnQ88EqmJbD66rKYUQYN1tQ==
 
-enlighten-common-types@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-2.0.1.tgz#ab4da0dfc0922ba72ac41a9961d3ee6aeba691e6"
-  integrity sha512-xbARIE8jbXI/RslgZ+uC/3rdmfyeiOuCDXz2Mhj3uSJICEqojKPMx+sxlTgTZxezebhh8j+CSyQtCo0+YdiEPw==
+enlighten-common-types@^3.1.7:
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/enlighten-common-types/-/enlighten-common-types-3.1.7.tgz#05bdbba5025d1baff864242a1f440c46493ebbae"
+  integrity sha512-a3tcG5ugE4gvPwj6ASWX/1R/EnIidLkY3bh/2p/F+Vi9mEYjx2g1bJaVKMB26GDwUHlcqVnQSFxQzJJ6WbwtPQ==
 
-enlighten-common-utils@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-2.0.0.tgz#728cfdfe2359207980770f9cce489d471737e11c"
-  integrity sha512-K//o6s9i/NvRpHTaN9OXp/j6EAMGyTpKjO8EJLfht2rqm70tCiu8NW+voyGxlCs2R78qmBSsQkBjgmxv8/Ayfg==
+enlighten-common-utils@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/enlighten-common-utils/-/enlighten-common-utils-3.0.1.tgz#d358d2d0a3bfed9d58f2fb872c569384e6080447"
+  integrity sha512-ja/GUrm4pga4ZEC66I+Z+HUn6Wxv/2ZWJt8VHCk3sR7kPAAOZgSP737FaePaVL0xvKIS0IHkReI+4cMwEA3nDw==
   dependencies:
     "@types/ramda" "^0.27.4"
-    enlighten-common-types "2.0.1"
+    enlighten-common-types "^3.1.7"
     ramda "^0.27.0"
 
 graphql-redis-subscriptions@^2.2.1:

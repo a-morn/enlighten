@@ -8,7 +8,7 @@ const enlighten_common_types_1 = require("enlighten-common-types");
 function censorAnswerIfNotAnswered(game) {
     if (!ramda_1.default.pathEq(["currentQuestion", "answered"], true)(game)) {
         const censoredGame = Object.assign(Object.assign({}, game), { currentQuestion: game.currentQuestion
-                ? ramda_1.default.pickBy((_, k) => k !== "answerId", game.currentQuestion)
+                ? ramda_1.default.pickBy((_, k) => k !== "answerIds", game.currentQuestion)
                 : null });
         return censoredGame;
     }

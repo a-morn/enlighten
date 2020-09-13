@@ -1,6 +1,7 @@
 import React, { memo } from 'react'
 import './Alternative.scss'
 import ReactMarkdown from 'react-markdown'
+import remarkSubSuper from 'remark-sub-super'
 
 const Alternative = memo(
   ({
@@ -28,7 +29,17 @@ const Alternative = memo(
           onClick={onClick}
           disabled={disabled}
         >
-          {type === 'text' && <ReactMarkdown>{text}</ReactMarkdown>}
+          {selected}
+          {type === 'text' && (
+            <ReactMarkdown
+              source={text}
+              plugins={[remarkSubSuper]}
+              renderers={{
+                sub: 'sub',
+                sup: 'sup',
+              }}
+            />
+          )}
           {type === 'image' && (
             <img
               alt=""

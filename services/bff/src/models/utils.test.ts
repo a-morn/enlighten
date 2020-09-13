@@ -16,7 +16,8 @@ const getGame: (currentQuestionAnswered: boolean) => GameMultiplayer = (
     questionIndex: faker.random.number(),
     currentQuestion: {
       answered: currentQuestionAnswered,
-      answerId: faker.random.uuid(),
+      hasMultipleCorrectAnswers: false,
+      answerIds: [faker.random.uuid()],
       alternatives: [],
       categoryId: faker.random.uuid(),
       _id: faker.random.uuid(),
@@ -39,7 +40,7 @@ describe('filterGame', () => {
     expect(filteredGame).toBe(null)
   })
 
-  test('should return answerId if current question is answered', () => {
+  test('should return answerIds if current question is answered', () => {
     const game = getGame(true)
 
     const filteredGame = filterGame(game)
@@ -47,17 +48,17 @@ describe('filterGame', () => {
     expect(filteredGame).toEqual(
       expect.objectContaining({
         currentQuestion: expect.objectContaining({
-          answerId: game.currentQuestion?.answerId,
+          answerIds: game.currentQuestion?.answerIds,
         }),
       }),
     )
   })
 
-  test('should not return answerId if current question is not answered', () => {
+  test('should not return answerIds if current question is not answered', () => {
     const game = getGame(false)
 
     const filteredGame = filterGame(game)
 
-    expect(filteredGame?.currentQuestion?.answerId).toBeUndefined()
+    expect(filteredGame?.currentQuestion?.answerIds).toBeUndefined()
   })
 })
