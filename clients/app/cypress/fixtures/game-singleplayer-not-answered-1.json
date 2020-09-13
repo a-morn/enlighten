@@ -13,7 +13,8 @@
     "src": null,
     "lqip": null,
     "tones": null,
-    "answerId": null,
+    "answerIds": null,
+    "hasMultipleCorrectAnswers": false,
     "answered": false,
     "levelId": null,
     "alternatives": [

@@ -13,7 +13,8 @@
     "src": null,
     "lqip": null,
     "tones": null,
-    "answerId": "4bb67f74-dccf-4037-83a1-35c0bdc0f074",
+    "answerIds": ["4bb67f74-dccf-4037-83a1-35c0bdc0f074"],
+    "hasMultipleCorrectAnswers": false,
     "answered": true,
     "levelId": null,
     "alternatives": [
