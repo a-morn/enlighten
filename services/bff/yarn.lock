@@ -6520,9 +6520,9 @@ symbol-tree@^3.2.2:
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
 systeminformation@^4.23.3:
-  version "4.24.0"
-  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-4.24.0.tgz#1a008afca0048425b26cb572839b59fd93f9ebb5"
-  integrity sha512-4I8BoiCxHqmXeg4huwyiRUkuWmMY/LK19uP1OPQTgvvunxNMQzFesU4MkCuw/HXjiP7wt754ZU9C5AvnTxExlw==
+  version "4.34.19"
+  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-4.34.19.tgz#c5f066cc043482686d95bbc554d52e6ec9e42367"
+  integrity sha512-ssUYQ0s1FFeb8EGtyCX/41cC/XaF84gbNAUfaUTziibx+xCAaR0zrOy0yZlnUrsWDQ+snp/Utl8cx8IdtrevrA==
 
 table@^5.2.3:
   version "5.4.6"
